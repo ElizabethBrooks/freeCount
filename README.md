@@ -3,7 +3,7 @@
 These are R shiny applications provide a framework for analyzing biological data produced by genomic sequencing technologies, such as RNA-seq. Users are guided through biological data assessment, processing and analysis. The different analyses available include differential expression (DE), network, and functional analysis.
 
 ## Shiny Applications & Features
-* <b>DE Analysis</b> with edgeR
+* **freeCount DA**: DE Analysis with edgeR
 	* Clustering analysis using distance based PCA and MDS
 	* Filtering
  		* to remove lowly-expressed genes
@@ -11,19 +11,19 @@ These are R shiny applications provide a framework for analyzing biological data
  		* by LFC cut off (exact tests only, since GLMs account for LFC cut offs)
 	* Exact tests
 	* ANOVA like analysis using GLMs
-* <b>Network Analysis</b> with WGCNA
+* **freeCount NA**: Network Analysis with WGCNA
 	* Clustering analysis using hierarchical clustering
 	* Filtering to
  		* remove bad genes and samples
  		* select genes associated with particular modules
 	* Unsigned networks
-* <b>Functional Analysis</b> with topGO
+* **freeCount FA**: Functional Analysis with topGO
 	* Over-representation analysis using Fisher's exact tests
 	* Enrichment like analysis using rank based Kolmogrov-Smirnov (KS) tests
 	* Filtering
  		* by unadjusted p-value cut off
  		* by candidate GO term list
-* <b>Set Operations</b> with ggVennDiagram
+* **freeCount SO**: Set Operations with ggVennDiagram
 	* Venn diagrams with ggVennDiagram
 	* Extraction of subsets with gplots
 
