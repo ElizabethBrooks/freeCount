@@ -2,7 +2,7 @@
 
 These are R Shiny applications provide a framework for analyzing biological data produced by genomic sequencing technologies, such as RNA-seq. Users are guided through biological data assessment, processing and analysis. The different analyses available include differential expression (DE), network, and functional analysis.
 
-## freeCount Tools & Features
+## Tools & Features
 * **DA**: **D**E **A**nalysis
 	* Clustering analysis using distance based PCA and MDS
 	* Exact tests with edgeR
@@ -81,7 +81,7 @@ git clone https://github.com/ElizabethBrooks/DGEAnalysis_ShinyApps.git
 
 <b>Third</b>, open Posit (formerly RStudio) and before clicking the <i>Run App</i> button, make sure to install all of the necessary R packages for each of the applications.
 
-### DE Analysis with edgeR
+### freeCount DA
 ```
 packageList <- c("BiocManager", "shiny", "shinythemes", "ggplot2", "rcartocolor", "dplyr", "statmod", "pheatmap", "ggplotify")
 biocList <- c("edgeR")
@@ -95,7 +95,7 @@ if(length(newBioc)){
 }
 ```
 
-### Network Analysis with WGCNA
+### freeCount NA
 ```
 packageList <- c("BiocManager", "shiny", "shinythemes", "dplyr", "matrixStats", "Hmisc", "splines", "foreach", "doParallel", "fastcluster", "dynamicTreeCut", "survival")
 biocList <- c("WGCNA", "GO.db", "impute", "preprocessCore")
@@ -109,7 +109,7 @@ if(length(newBioc)){
 }
 ```
 
-### Functional Analysis with topGO
+### freeCount FA
 ```
 packageList <- c("BiocManager", "shiny", "shinythemes", "ggplot2", "rcartocolor", "tidyr")
 biocList <- c("topGO", "Rgraphviz")
@@ -123,7 +123,7 @@ if(length(newBioc)){
 }
 ```
 
-### Set Operations with ggVennDiagram
+### freeCount SO
 ```
 packageList <- c("BiocManager", "shiny", "shinythemes", "ggplot2", "rcartocolor", "ggVennDiagram", "gplots")
 newPackages <- packageList[!(packageList %in% installed.packages()[,"Package"])]
@@ -144,19 +144,19 @@ After the app is launched you will see the following pages:
 
 ## Methods
 
-### DE Analysis with edgeR
+### freeCount DA
 
 Differential expression (DE) analysis can be used to identify DE genes using the edgeR package (Chen, Lun & Smyth, 2016) in R (R Core Team, 2023). Library sizes are calculated for each sample before normalizing with trimmed mean of M-values (TMM) between each pair of samples. The clustering of samples with a PCA is performed using edgeR to create a multidimensional scaling (MDS) plot of the distances between gene expression profiles, in which the same genes are selected for all comparisons. Two-way ANOVAs is calculated using generalized linear models (GLMs) to identify genes with significant DE above an input log2 fold-change (LFC) threshold using t-tests relative to a threshold (TREAT) with the glmTreat function of edgeR (McCarthy & Smyth, 2009). The resulting tables of DE genes can be filtered by statistical or biological significance, including false discoverey rate (FDR) or LFC.
 
-### Network Analysis with WGCNA
+### freeCount NA
 
 Gene co-expression networks can be generated to increase the power of functional analyses. Networks should be constructed with the log-transformed normalized gene counts using the R package WGCNA (Langfelder & Horvath, 2008; Zhang & Horvath, 2005). An unsigned network can be created to enable the detection of modules with genes that have mixed directions of expression. The co-expression networks should be manually constructed with a recommended minimum module size of 30 and soft thresholding power of 9, which is where the scale free topology model fit was above 0.8 and mean connectivity under the hundreds (Horvath, 2011).
 
-### Functional Analysis with topGO
+### freeCount FA
 
 Significantly over-represented or enriched GO terms can be determined using the R package topGO (Alexa & Rahnenfuhrer, 2022) to perform Fisher's exact or Kolmogorov-Smirnov (KS) like tests. These tests allow users to identify any pathways observed in the selected set of genes more than expected by chance against the background set of all genes that were sufficiently expressed for further analysis given the sample library sizes and experimental design. The genes that were sufficiently expressed for further analysis were determined using the filterByExpr function of edgeR.
 
-### Set Operations with ggVennDiagram
+### freeCount SO
 
 The intersection of DE genes and modules can be identified by comparing the sets of genes placed in each network module to the set of DE genes. The genes contained in the intersections of sets are extracted using the venn function of the gplots R package (Warnes et al., 2022). The set relationships are visualized using the ggVennDiagram package (Gao et al., 2024).
 
