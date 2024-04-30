@@ -1,4 +1,6 @@
-## Functional Analysis
+## freeCount FA Tutorial
+
+### Functional Analysis
 
 Functional analysis is a typical approach to interpreting gene expression data and identify potential biological mechanisms. After determining sets significantly of DE genes or genes associated with different network modules, it is possible to perform enrichment or over-representation analysis. 
 
@@ -114,7 +116,7 @@ geneB 0006260 BP  DNA replication 5.993446976 0.660171634 2 100
 
 ## Analysis Workflow
 
-To run the functional analysis app, open the R <b>script app_shiny_functionalAnalysis.R</b> in Posit and press the <i>Run App</i> button in the upper right corner of the [source pane](https://docs.posit.co/ide/user/ide/guide/ui/ui-panes.html).
+To run the functional analysis app, open the R script <b>FA.R</b> in Posit and press the <i>Run App</i> button in the upper right corner of the [source pane](https://docs.posit.co/ide/user/ide/guide/ui/ui-panes.html).
 
 After the app is launched you will see the following pages:
 1. <i>Getting Started</i> page with information for uploading data to start the analysis

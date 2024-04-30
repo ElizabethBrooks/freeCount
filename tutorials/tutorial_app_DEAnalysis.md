@@ -1,4 +1,6 @@
-## Differential Expression (DE) Analysis
+## freeCount DA Tutorial
+
+### Differential Expression (DE) Analysis
 
 A common task when working with transcriptomic data is the identification of differentially expressed (DE) genes or tags between groups. In this tutorial users will learn how to perform biostatistical analysis with the edgeR shiny app, including pairwise and analysis of variance (ANOVA) like comparisons to identify significantly DE genes.
 
@@ -93,7 +95,7 @@ SampleSix,treat
 
 ## Analysis Workflow
 
-To run the edgeR app, open the R <b>script app_DEAnalysis.R</b> in Posit and press the <i>Run App</i> button in the upper right corner of the [source pane](https://docs.posit.co/ide/user/ide/guide/ui/ui-panes.html).
+To run the DE analysis app, open the R script <b>DA.R</b> in Posit and press the <i>Run App</i> button in the upper right corner of the [source pane](https://docs.posit.co/ide/user/ide/guide/ui/ui-panes.html).
 
 After the app is launched you will see the following pages:
 1. <i>Getting Started</i> page with information for uploading data to start the analysis

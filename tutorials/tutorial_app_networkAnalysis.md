@@ -1,4 +1,6 @@
-## Network Analysis
+## freeCount NA Tutorial
+
+### Network Analysis
 
 Correlation networks are commonly used in the bioinformatic analysis of high-dimensional biological data sets. Weighted correlation network analysis can be used to find clusters, or modules of genes with correlated patterns of expression.
 
@@ -101,7 +103,7 @@ SampleSix,2
 ## Analysis Workflow
 
 > [!TIP]
-> To run the WGCNA app, open the R <b>script app_networkAnalysis.R</b> in Posit and press the <i>Run App</i> button in the upper right corner of the [source pane](https://docs.posit.co/ide/user/ide/guide/ui/ui-panes.html).
+> To run the network analysis app, open the R script <b>NA.R</b> in Posit and press the <i>Run App</i> button in the upper right corner of the [source pane](https://docs.posit.co/ide/user/ide/guide/ui/ui-panes.html).
 
 After the app is launched you will see the following pages:
 1. <i>Getting Started</i> page with information for uploading data to start the analysis

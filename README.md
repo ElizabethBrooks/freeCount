@@ -1,6 +1,6 @@
 # freeCount
 
-These are R Shiny applications provide a framework for analyzing biological data produced by genomic sequencing technologies, such as RNA-seq. Users are guided through biological data assessment, processing and analysis. The different analyses available include differential expression (DE), network, and functional analysis.
+These are R Shiny applications that provide a framework for analyzing biological data produced by genomic sequencing technologies, such as RNA-seq. Users are guided through biological data assessment, processing and analysis. The different analyses available include differential expression (DE), network, and functional analysis.
 
 ## Tools & Features
 * **DA**: **D**E **A**nalysis
