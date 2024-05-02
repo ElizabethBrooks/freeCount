@@ -71,11 +71,15 @@ Each of the R shiny applications can be run locally on your computer using R and
 
 <b>First,</b> download this GitHub repository using the git clone command in the terminal as follows.
 
-The latest version of this application may be downloaded from this repository by clicking the green <i>< > Code</i> button near the top of the page, and then clicking <i>Download ZIP</i>.
+To download the code onto a local computer or server space, click the green <i>< > Code</i> button and copy the link. Then, using the HTTPS web URL in the terminal:
 
-To download the code onto a local computer or server space, click the green <i>< > Code</i> button and copy the link. Then, in the terminal:
+git clone https://github.com/ElizabethBrooks/freeCount.git
 
-git clone https://github.com/ElizabethBrooks/DGEAnalysis_ShinyApps.git
+Alternatively, using SSH:
+
+git clone git@github.com:ElizabethBrooks/freeCount.git
+
+The latest version of this application may also be downloaded from this repository by clicking the green <i>< > Code</i> button near the top of the page, and then clicking <i>Download ZIP</i>.
 
 <b>Second</b>, if running the app locally, you will need to install or update [R and Posit](https://posit.co/download/rstudio-desktop/).
 
