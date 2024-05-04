@@ -1,5 +1,5 @@
 # creator: Elizabeth Brooks
-# updated: 12 April 2024
+# updated: 4 May 2024
 
 #### Setup ####
 
@@ -39,7 +39,7 @@ ui <- fluidPage(
   #theme = shinytheme("superhero"),
   
   # add application title
-  titlePanel("Set Operations"),
+  titlePanel("SO: Set Operations"),
   
   # setup sidebar layout
   sidebarLayout(
@@ -793,7 +793,7 @@ server <- function(input, output, session) {
                       setTwo = namesSetTwo,
                       setThree = namesSetThree,
                       setFour = namesSetFour
-                      )
+    )
   }
   
   # function to render four-way venn

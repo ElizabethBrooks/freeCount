@@ -1,7 +1,7 @@
 #!/usr/bin/env Rscript
 
 # creator: Elizabeth Brooks
-# updated: 8 April 2024
+# updated: 4 May 2024
 
 # install any missing packages
 packageList <- c("BiocManager", "shiny", "shinythemes", "ggplot2", "rcartocolor", "tidyr")
@@ -52,6 +52,7 @@ DGE_results_table <- read.csv(file = "/Users/bamflappy/Repos/DGEAnalysis_ShinyAp
 #GOmaps_pannzer <- read.delim(file = "/Users/bamflappy/Repos/DGEAnalysis_ShinyApps/data/functionalAnalysis/example5_mycobacterium_GO.out.txt", sep = "", row.names=NULL, colClasses = c(qpid = "character", goid = "character"))
 #GOmaps_pannzer <- read.delim(file = "/Users/bamflappy/Repos/DGEAnalysis_ShinyApps/data/functionalAnalysis/example6_daphnia_GO.out.txt", sep = "", row.names=NULL, colClasses = c(qpid = "character", goid = "character"))
 #GOmaps_pannzer <- read.delim(file = "/Users/bamflappy/Repos/DGEAnalysis_ShinyApps/data/functionalAnalysis/example4_daphnia_GO.out.txt", sep = "", row.names=NULL, colClasses = c(qpid = "character", goid = "character"))
+#GOmaps_pannzer <- read.delim(file = "/Users/bamflappy/Repos/freeCount/data/dev/Cancer_RNAseq_STAD_GTEx_GO.out.txt", sep = "\t", row.names=NULL, colClasses = c(qpid = "character", goid = "character"))
 
 # re-format mappings from pannzer2
 #GOmaps_pannzer_fmt <- split(GOmaps_pannzer$goid,GOmaps_pannzer$qpid)
@@ -65,6 +66,7 @@ DGE_results_table <- read.csv(file = "/Users/bamflappy/Repos/DGEAnalysis_ShinyAp
 #write.table(GOmaps_pannzer_out, file = "/Users/bamflappy/Repos/DGEAnalysis_ShinyApps/data/functionalAnalysis/example4_daphnia_GO.fmt.txt", sep = "\t", quote = FALSE)
 #write.table(GOmaps_pannzer_out, file = "/Users/bamflappy/Repos/DGEAnalysis_ShinyApps/data/functionalAnalysis/example6_daphnia_GO.fmt.txt", sep = "\t", quote = FALSE)
 #write.table(GOmaps_pannzer_out, file = "/Users/bamflappy/Repos/DGEAnalysis_ShinyApps/data/functionalAnalysis/example3_daphnia_GO.fmt.txt", sep = "\t", quote = FALSE)
+#write.table(GOmaps_pannzer_out, file = "/Users/bamflappy/Repos/freeCount/data/FA_functionalAnalysis/Cancer_RNAseq_STAD_GTEx_GO.fmt.txt", sep = "\t", quote = FALSE)
 
 # retrieve gene to GO map in two column csv format
 #GOmaps_csv <- read.delim(file = "/Users/bamflappy/Repos/DGEAnalysis_ShinyApps/data/tmp/All.annot.csv")

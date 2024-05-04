@@ -1,5 +1,5 @@
 # creator: Elizabeth Brooks
-# updated: 12 April 2024
+# updated: 4 May 2024
 
 #### Setup ####
 
@@ -34,6 +34,7 @@ plotColors <- carto_pal(12, "Safe")
 defaultLFC <- 1.2
 defaultFDR <- 0.05
 
+# TO-DO: double check pheatmap display
 # TO-DO: fix check of design file length (requires new line to match counts header length)
 # TO-DO: fix output table header, which is missing the "gene" column?
 # TO-DO: store data and results in reactiveVal and reactiveValues
@@ -52,7 +53,7 @@ ui <- fluidPage(
   theme = shinytheme("yeti"),
   
   # add application title
-  titlePanel("Differential Expression (DE) Analysis with edgeR"),
+  titlePanel("DA: Differential Expression (DE) Analysis"),
   
   # setup sidebar layout
   sidebarLayout(

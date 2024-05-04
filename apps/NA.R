@@ -1,5 +1,5 @@
 # creator: Elizabeth Brooks
-# updated: 12 April 2024
+# updated: 4 May 2024
 
 #### Setup ####
 
@@ -50,7 +50,7 @@ ui <- fluidPage(
   #theme = shinytheme("superhero"),
   
   # add application title
-  titlePanel("Weighted Gene Co-Expression Network Analysis with WGCNA"),
+  titlePanel("NA: Network Analysis"),
   
   # setup sidebar layout
   sidebarLayout(

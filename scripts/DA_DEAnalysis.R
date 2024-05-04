@@ -1,7 +1,7 @@
 #!/usr/bin/env Rscript
 
 # creator: Elizabeth Brooks
-# updated: 2 April 2024
+# updated: 4 May 2024
 
 # install any missing packages
 packageList <- c("BiocManager", "shiny", "shinythemes", "ggplot2", "rcartocolor", "dplyr", "statmod")

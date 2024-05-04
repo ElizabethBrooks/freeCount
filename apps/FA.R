@@ -1,5 +1,5 @@
 # creator: Elizabeth Brooks
-# updated: 12 April 2024
+# updated: 4 May 2024
 
 #### Setup ####
 
@@ -60,11 +60,11 @@ ui <- fluidPage(
   #theme = shinytheme("superhero"),
   
   # add application title
-  titlePanel("Functional Analysis with topGO"),
+  titlePanel("FA: Functional Analysis"),
   
   # setup sidebar layout
   sidebarLayout(
-      
+    
     # setup sidebar panel
     sidebarPanel(
       
@@ -517,182 +517,182 @@ ui <- fluidPage(
             # To-DO : make the current results load after completed
             # show results
             #conditionalPanel(
-              #condition = "output.levelResultsCompleted",
-              tags$hr(),
-              tags$p(
-                align = "center",
-                HTML("<b>Range of GO Term P-Values</b>")
-              ),
-              tags$br(),
-              plotOutput(outputId = "PHist"),
-              downloadButton(outputId = "downloadPHist", label = "Download Plot"),
-              tags$p(
-                "The above histogram shows the range and frequency of p-values from the enrichment tests for the selected GO level (BP, MF, or CC)."
-              ),
-              tags$hr(),
-              tags$p(
-                align = "center",
-                HTML("<b>Results for the Top Significant GO Terms:</b>")
-              ),
-              tableOutput(outputId = "topTerms"),
-              tags$p(
-                HTML("The above table shows the funcational analysis results for <i>up to the top 5</i> most significant (lowest p-value) GO terms for selected ontology level (BP, MF, or CC). The significance is determined by the input unadjusted p-value cut off.")
-              ),
-              tags$hr(),
-              tags$p(
-                align = "center",
-                HTML("<b>Density Plots of GO Terms</b>")
-              ),
-              tags$br(),
-              fluidRow(
-                column(
-                  width = 6,
-                  tags$p(
-                    "Enter GO Term ID:"
-                  ),
-                  textInput(
-                    inputId = "ontologyTerm",
-                    label = NULL,
-                    value = "GO:0008150"
-                  )
-                ),
-                column(
-                  width = 6,
-                  tags$p(
-                    "Click to Analyze:"
-                  ),  
-                  actionButton("termUpdate", "Analyze")
-                )
-              ),
-              #conditionalPanel(
-                #condition = "output.densityResultsCompleted",
-                tags$br(),
+            #condition = "output.levelResultsCompleted",
+            tags$hr(),
+            tags$p(
+              align = "center",
+              HTML("<b>Range of GO Term P-Values</b>")
+            ),
+            tags$br(),
+            plotOutput(outputId = "PHist"),
+            downloadButton(outputId = "downloadPHist", label = "Download Plot"),
+            tags$p(
+              "The above histogram shows the range and frequency of p-values from the enrichment tests for the selected GO level (BP, MF, or CC)."
+            ),
+            tags$hr(),
+            tags$p(
+              align = "center",
+              HTML("<b>Results for the Top Significant GO Terms:</b>")
+            ),
+            tableOutput(outputId = "topTerms"),
+            tags$p(
+              HTML("The above table shows the funcational analysis results for <i>up to the top 5</i> most significant (lowest p-value) GO terms for selected ontology level (BP, MF, or CC). The significance is determined by the input unadjusted p-value cut off.")
+            ),
+            tags$hr(),
+            tags$p(
+              align = "center",
+              HTML("<b>Density Plots of GO Terms</b>")
+            ),
+            tags$br(),
+            fluidRow(
+              column(
+                width = 6,
                 tags$p(
-                  align = "center",
-                  HTML("<b>Density Plot</b>")
+                  "Enter GO Term ID:"
                 ),
-                # TO-DO: change to imageOutput
-                plotOutput(outputId = "densityPlot"),
-                downloadButton(outputId = "downloadDensity", label = "Download Plot"),
-                tags$br(),
+                textInput(
+                  inputId = "ontologyTerm",
+                  label = NULL,
+                  value = "GO:0008150"
+                )
+              ),
+              column(
+                width = 6,
                 tags$p(
-                  "The above density plot shows the distribution of the gene's rank for the top GO term of each GO level (BP, MF, or CC). The gene's rank is compared with the null distribution."
-                ),
-              #),
-              tags$br(),
-              tags$p(
-                HTML("<b>Table of Gene IDs</b>")
-              ),
-              downloadButton(outputId = "downloadSelected", label = "Download Table"),
-              tags$p(
-                "The table of gene IDs associated with the selected GO term may be downloaded above."
-              ),
-              tags$hr(),
-              tags$p(
-                align = "center",
-                HTML("<b>Euler Diagrams of GO Terms</b>")
-              ),
-              tags$br(),
-              fluidRow(
-                column(
-                  width = 4,
-                  tags$p(
-                    "Enter First GO Term ID:"
-                  ),
-                  textInput(
-                    inputId = "ontologyTermOne",
-                    label = NULL,
-                    value = "GO:0008150"
-                  )
-                ),
-                column(
-                  width = 4,
-                  tags$p(
-                    "Enter Second GO Term ID:"
-                  ),
-                  textInput(
-                    inputId = "ontologyTermTwo",
-                    label = NULL,
-                    value = "GO:0065007"
-                  )
-                ),
-                column(
-                  width = 4,
-                  tags$p(
-                    "Click to Analyze:"
-                  ),  
-                  actionButton("eulerUpdate", "Analyze")
-                )
-              ),
-              plotOutput(outputId = "exampleEuler"),
-              downloadButton(outputId = "downloadExampleEuler", label = "Download Plot"),
-              tags$p(
-                "The above euler diagram shows the relationship between the sets of genes associated with the selected GO terms."
-              ),
-              tags$br(),
-              tags$p(
-                HTML("<b>Tables of Gene IDs</b>")
-              ),
-              fluidRow(
-                column(
-                  width = 6,
-                  tags$p(
-                    "Gene IDs for First GO Term:"
-                  ),
-                  downloadButton(outputId = "downloadSelectedOne", label = "Download Table")
-                ),
-                column(
-                  width = 6,
-                  tags$p(
-                    "Gene IDs for Second GO Term:"
-                  ),
-                  downloadButton(outputId = "downloadSelectedTwo", label = "Download Table")
-                )
-              ),
-              tags$p(
-                "The tables of gene IDs associated with each of the selected GO terms may be downloaded above."
-              ),
-              tags$hr(),
-              # TO-DO: fix downloading of subgraphs
-              tags$p(
-                align = "center",
-                HTML("<b>Subgraphs of Significant GO Terms</b>")
-              ),
-              tags$br(),
-              fluidRow(
-                column(
-                  width = 6,
-                  tags$p(
-                    "Select the Number of Nodes:"
-                  ),
-                  sliderInput(
-                    inputId = "sigNodes",
-                    label = NULL,
-                    min = 1,
-                    max = 10,
-                    value = 5,
-                    step = 1
-                  )
-                ),
-                column(
-                  width = 6,
-                  tags$p(
-                    HTML("<b>Download Subgraphs:</b>")
-                  ),
-                  downloadButton(outputId = "downloadSubgraphs", label = "Download PDF")
-                )
-              ),
-              tags$br(),
-              tags$p(
-                "The subgraph induced by the selected number of significant GO terms identifed by the selected algorithm for scoring GO terms for enrichment.",
-                "Rectangles indicate the signifcant terms with colors representing the relative signifcance, which ranges from dark red (most signifcant) to bright yellow (least signifcant)."
-              ),
-              tags$p(
-                HTML("For each <i>node</i>, some basic information is displayed."),
-                "The frst two lines show the GO identifer and a trimmed GO name.",
-                "In the third line the raw p-value is shown.",
-                "The forth line is showing the number of signifcant genes and the total number of genes annotated to the respective GO term."
+                  "Click to Analyze:"
+                ),  
+                actionButton("termUpdate", "Analyze")
               )
+            ),
+            #conditionalPanel(
+            #condition = "output.densityResultsCompleted",
+            tags$br(),
+            tags$p(
+              align = "center",
+              HTML("<b>Density Plot</b>")
+            ),
+            # TO-DO: change to imageOutput
+            plotOutput(outputId = "densityPlot"),
+            downloadButton(outputId = "downloadDensity", label = "Download Plot"),
+            tags$br(),
+            tags$p(
+              "The above density plot shows the distribution of the gene's rank for the top GO term of each GO level (BP, MF, or CC). The gene's rank is compared with the null distribution."
+            ),
+            #),
+            tags$br(),
+            tags$p(
+              HTML("<b>Table of Gene IDs</b>")
+            ),
+            downloadButton(outputId = "downloadSelected", label = "Download Table"),
+            tags$p(
+              "The table of gene IDs associated with the selected GO term may be downloaded above."
+            ),
+            tags$hr(),
+            tags$p(
+              align = "center",
+              HTML("<b>Euler Diagrams of GO Terms</b>")
+            ),
+            tags$br(),
+            fluidRow(
+              column(
+                width = 4,
+                tags$p(
+                  "Enter First GO Term ID:"
+                ),
+                textInput(
+                  inputId = "ontologyTermOne",
+                  label = NULL,
+                  value = "GO:0008150"
+                )
+              ),
+              column(
+                width = 4,
+                tags$p(
+                  "Enter Second GO Term ID:"
+                ),
+                textInput(
+                  inputId = "ontologyTermTwo",
+                  label = NULL,
+                  value = "GO:0065007"
+                )
+              ),
+              column(
+                width = 4,
+                tags$p(
+                  "Click to Analyze:"
+                ),  
+                actionButton("eulerUpdate", "Analyze")
+              )
+            ),
+            plotOutput(outputId = "exampleEuler"),
+            downloadButton(outputId = "downloadExampleEuler", label = "Download Plot"),
+            tags$p(
+              "The above euler diagram shows the relationship between the sets of genes associated with the selected GO terms."
+            ),
+            tags$br(),
+            tags$p(
+              HTML("<b>Tables of Gene IDs</b>")
+            ),
+            fluidRow(
+              column(
+                width = 6,
+                tags$p(
+                  "Gene IDs for First GO Term:"
+                ),
+                downloadButton(outputId = "downloadSelectedOne", label = "Download Table")
+              ),
+              column(
+                width = 6,
+                tags$p(
+                  "Gene IDs for Second GO Term:"
+                ),
+                downloadButton(outputId = "downloadSelectedTwo", label = "Download Table")
+              )
+            ),
+            tags$p(
+              "The tables of gene IDs associated with each of the selected GO terms may be downloaded above."
+            ),
+            tags$hr(),
+            # TO-DO: fix downloading of subgraphs
+            tags$p(
+              align = "center",
+              HTML("<b>Subgraphs of Significant GO Terms</b>")
+            ),
+            tags$br(),
+            fluidRow(
+              column(
+                width = 6,
+                tags$p(
+                  "Select the Number of Nodes:"
+                ),
+                sliderInput(
+                  inputId = "sigNodes",
+                  label = NULL,
+                  min = 1,
+                  max = 10,
+                  value = 5,
+                  step = 1
+                )
+              ),
+              column(
+                width = 6,
+                tags$p(
+                  HTML("<b>Download Subgraphs:</b>")
+                ),
+                downloadButton(outputId = "downloadSubgraphs", label = "Download PDF")
+              )
+            ),
+            tags$br(),
+            tags$p(
+              "The subgraph induced by the selected number of significant GO terms identifed by the selected algorithm for scoring GO terms for enrichment.",
+              "Rectangles indicate the signifcant terms with colors representing the relative signifcance, which ranges from dark red (most signifcant) to bright yellow (least signifcant)."
+            ),
+            tags$p(
+              HTML("For each <i>node</i>, some basic information is displayed."),
+              "The frst two lines show the GO identifer and a trimmed GO name.",
+              "In the third line the raw p-value is shown.",
+              "The forth line is showing the number of signifcant genes and the total number of genes annotated to the respective GO term."
+            )
             #)
           ),
           
@@ -710,7 +710,7 @@ ui <- fluidPage(
             tags$br(),
             tags$p(
               align = "center",
-              HTML("<b>Dot Plot of Top 5 Significant GO Terms</b>")
+              HTML("<b>Dot Plot of Top Significant GO Terms</b>")
             ),
             tags$br(),
             plotOutput(outputId = "dotPlot"),
@@ -981,7 +981,10 @@ server <- function(input, output, session) {
     if(is.null(input$mappings)){
       return(NULL)
     }
+    # TO-DO: double check reading in tab delimited pannzer2 outputs
+    # Error in read.table: "more columns than column names" with sep = "", but not with sep = "\t"
     # read in the file
+    #GOmaps_input <- suppressWarnings(read.delim(file = input$mappings$datapath, sep = "\t", row.names=NULL, colClasses = c(goid = "character")))
     GOmaps_input <- suppressWarnings(read.delim(file = input$mappings$datapath, sep = "", row.names=NULL, colClasses = c(goid = "character")))
     # check what format mappings file was input
     if(ncol(GOmaps_input) == 2){ # two columns
@@ -1070,10 +1073,10 @@ server <- function(input, output, session) {
   
   # setup reactive gene universe values
   geneUniverse <- reactiveValues(list_data = NULL)
-    
+  
   # function to create gene universe
   observeEvent(input$runAnalysis, {
-  #geneUniverse <- reactive({
+    #geneUniverse <- reactive({
     # require input
     req(input$scoreStat)
     # check for valid inputs
@@ -1192,10 +1195,10 @@ server <- function(input, output, session) {
   
   # check if results are complete
   #output$levelResultsCompleted <- function(){
-    #if(is.null(resultsGO$results_data)){
-      #return(FALSE)
-    #}
-    #return(TRUE)
+  #if(is.null(resultsGO$results_data)){
+  #return(FALSE)
+  #}
+  #return(TRUE)
   #}
   #outputOptions(output, 'levelResultsCompleted', suspendWhenHidden=FALSE, priority=0)
   
@@ -1472,10 +1475,10 @@ server <- function(input, output, session) {
   # TO-DO: this causes additional function calls
   # check if results have completed
   #output$densityResultsCompleted <- function(){
-    #if(is.null(createDensity())){
-      #return(FALSE)
-    #}
-    #return(TRUE)
+  #if(is.null(createDensity())){
+  #return(FALSE)
+  #}
+  #return(TRUE)
   #}
   #outputOptions(output, 'densityResultsCompleted', suspendWhenHidden=FALSE, priority=0)
   
