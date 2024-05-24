@@ -32,6 +32,7 @@ options(stringsAsFactors = FALSE)
 # See note above.
 #enableWGCNAThreads()
 
+# TO-DO: add software version print out on information tab
 # TO-DO: store data and results in reactiveVal and reactiveValues
 # TO-DO: output example tables as csv
 # TO-DO: hide plots for invalid inputs

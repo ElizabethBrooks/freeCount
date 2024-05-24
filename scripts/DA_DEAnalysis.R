@@ -4,7 +4,7 @@
 # updated: 4 May 2024
 
 # install any missing packages
-packageList <- c("BiocManager", "shiny", "shinythemes", "ggplot2", "rcartocolor", "dplyr", "statmod")
+packageList <- c("BiocManager", "shiny", "shinythemes", "ggplot2", "rcartocolor", "dplyr", "statmod", "pheatmap", "ggplotify")
 biocList <- c("edgeR")
 newPackages <- packageList[!(packageList %in% installed.packages()[,"Package"])]
 newBioc <- biocList[!(biocList %in% installed.packages()[,"Package"])]
@@ -15,15 +15,17 @@ if(length(newBioc)){
   BiocManager::install(newBioc)
 }
 
-#Turn off scientific notation
-options(scipen = 999)
-
-#Load the edgeR library
-library(edgeR)
-library(statmod)
-library(ggplot2)
-library(rcartocolor)
-library(dplyr)
+# load packages 
+suppressPackageStartupMessages({
+  library(shiny)
+  library(shinythemes)
+  library(ggplot2)
+  library(rcartocolor)
+  library(edgeR)
+  library(dplyr)
+  library(pheatmap)
+  library(ggplotify)
+})
 
 #  plotting palettes
 plotColors <- carto_pal(12, "Safe")
@@ -35,14 +37,14 @@ plotColorSubset <- c(plotColors[4], plotColors[5], plotColors[6])
 ##
 
 # import gene count data
-inputData <- read.csv(file="/Users/bamflappy/Repos/DGEAnalysis_ShinyApps/data/edgeR/example3_daphnia_counts.csv", row.names=1)
+inputData <- read.csv(file="/Users/bamflappy/Repos/freeCount/data/DA_DEAnalysis/example3_daphnia_counts.csv", row.names=1)
 
 # trim the data table of htseq stats
 removeList <- c("__no_feature", "__ambiguous", "__too_low_aQual", "__not_aligned", "__alignment_not_unique")
-inputTable <- inputData[!row.names(inputData) %in% removeList,]
+countsTable <- inputData[!row.names(inputData) %in% removeList,]
 
 # import grouping factor
-targets <- read.csv(file="/Users/bamflappy/Repos/DGEAnalysis_ShinyApps/data/edgeR/example3_daphnia_design_edgeR.csv", row.names=1)
+targets <- read.csv(file="/Users/bamflappy/Repos/freeCount/data/DA_DEAnalysis/example3_daphnia_design_edgeR.csv", row.names=1)
 
 # set LFC cut off
 cutLFC <- log2(1.2)
@@ -84,6 +86,19 @@ normList <- as_tibble(normList, rownames = "gene")
 #Write log transformed normalized counts to file
 normListLog <- cpm(list, normalized.lib.sizes=TRUE, log=TRUE)
 #write.table(normListLog, file="glmQLF_normalizedCounts_logTransformed.csv", sep=",", row.names=TRUE, quote=FALSE)
+
+# calculate the log CPM of the gene count data
+logcpm <- cpm(list, log=TRUE)
+
+# combine all columns into one period separated
+exp_factor <- data.frame(Sample = unlist(targets, use.names = FALSE))
+rownames(exp_factor) <- colnames(logcpm)
+#Create heatmap for Interaction Effect
+as.ggplot(
+  pheatmap(logcpm, scale="row", annotation_col = exp_factor, 
+           main="Heatmap of RNA-seq Samples", show_rownames = FALSE, fontsize = 12,
+           color = colorRampPalette(c(plotColors[5], "white", plotColors[6]))(100))
+)
 
 #Verify TMM normalization using a MD plot
 #Write plot to file
@@ -205,7 +220,6 @@ resultsTbl.filtered <- resultsTbl[resultsTbl.glm_keep,]
 # view DGE genes
 # subset counts table by DE gene set
 DGESubset <- resultsTbl[!grepl("NA", resultsTbl$topDE),]
-logcounts = cpm(list, log=TRUE)
 # subset the log2 CPM by the DGE set
 #logcpmSubset <- subset(logcpm,
 #                       grepl(
@@ -218,15 +232,10 @@ DGESubset.keep <- rownames(logcpm) %in% rownames(DGESubset)
 logcountsSubset <- logcpm[DGESubset.keep, ]
 heatmap(logcountsSubset, main= "Heatmap of DGE")
 
-# calculate the log CPM of the gene count data
-logcpm <- cpm(list, log=TRUE)
-
-# combine all columns into one period separated
-exp_factor <- data.frame(Sample = unlist(targets, use.names = FALSE))
-rownames(exp_factor) <- colnames(logcpm)
-#Create heatmap for Interaction Effect
+# create heatmap of raw CPM
 as.ggplot(
-  pheatmap(logcpm, scale="row", annotation_col = exp_factor, 
+  pheatmap(logcountsSubset, scale="row", annotation_col = exp_factor, 
            main="Heatmap of RNA-seq Samples", show_rownames = FALSE, fontsize = 12,
            color = colorRampPalette(c(plotColors[5], "white", plotColors[6]))(100))
 )
+

@@ -45,7 +45,13 @@ Results from the DE or network analyses can be used to perform downstream analys
 
 Each of the applications produces multiple resulting plots and tables, which are shown in the diagram below.
 
-![Analysis Results](images/shinyAppsFramework_resultsDiagram.jpg)
+![Analysis Results](images/freeCount_resultsDiagram.jpg)
+
+### Example Workflow
+
+A sample workflow using the freeCount applications is shown below, along with example results produced by each application.
+
+![Analysis Results](images/freeCount_exampleAnalysisResults.jpg)
 
 ## Tutorials
 

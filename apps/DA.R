@@ -34,6 +34,8 @@ plotColors <- carto_pal(12, "Safe")
 defaultLFC <- 1.2
 defaultFDR <- 0.05
 
+# TO-DO: add software version print out on information tab
+# TO-DO: add scree plot
 # TO-DO: double check pheatmap display
 # TO-DO: fix check of design file length (requires new line to match counts header length)
 # TO-DO: fix output table header, which is missing the "gene" column?

@@ -42,6 +42,7 @@ defaultP <- 0.05
 defaultTermOne <- "GO:0008150"
 defaultTermTwo <- "GO:0065007"
 
+# TO-DO: add software version print out on information tab
 # TO-DO: fix download tables for other ontology levels
 # TO-DO: change input expression to combo of text field and radio buttons
 # TO-DO: add bar plot of gene LFC (if DE genes)
