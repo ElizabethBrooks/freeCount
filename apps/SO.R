@@ -1,28 +1,31 @@
 # creator: Elizabeth Brooks
-# updated: 4 May 2024
+# updated: 29 May 2024
 
 #### Setup ####
 
 # install any missing packages
-packageList <- c("BiocManager", "shiny", "shinythemes", "ggplot2", "rcartocolor", "ggVennDiagram", "gplots")
+packageList <- c("BiocManager", "shiny", "bslib", "ggplot2", "rcartocolor", "ggVennDiagram", "gplots")
 newPackages <- packageList[!(packageList %in% installed.packages()[,"Package"])]
 if(length(newPackages)){
   install.packages(newPackages)
 }
+# install.packages("shinydashboard")
 
 # load packages
 suppressPackageStartupMessages({
   library(shiny)
-  library(shinythemes)
+  library(bslib)
   library(ggVennDiagram)
   library(ggplot2)
   library(rcartocolor)
   library(gplots)
+  #library(shinydashboard)
 })
 
 # color blind safe plotting palettes
 plotColors <- carto_pal(12, "Safe")
 
+# TO-DO: consider adding data summary tab
 # TO-DO: add software version print out on information tab
 # TO-DO: make upload button appear after at least two sets are input
 # TO-DO: check if headers are accounted for
@@ -32,15 +35,17 @@ plotColors <- carto_pal(12, "Safe")
 
 # Define UI 
 ui <- fluidPage(
-  # view available themes
-  #shinythemes::themeSelector(),
-  
   # use a theme
-  theme = shinytheme("yeti"),
-  #theme = shinytheme("superhero"),
+  theme = bs_theme(bootswatch = "minty"),
   
   # add application title
-  titlePanel("SO: Set Operations"),
+  #dashboardHeader(title = "freeCount SO"),
+  #titlePanel("freeCount SO"),
+  h1(id="app-heading", "freeCount SO"),
+  tags$style(HTML("#app-heading{
+                  color: white; 
+                  background-color: #78C2AD
+                  }")),
   
   # setup sidebar layout
   sidebarLayout(
@@ -175,6 +180,9 @@ ui <- fluidPage(
       # results text and plots
       conditionalPanel(
         condition = "output.twoDataUploaded",
+        # navigation bar
+        #navbarPage(
+          #"SO",
         # set of tab panels
         tabsetPanel(
           type = "tabs",
@@ -391,6 +399,8 @@ ui <- fluidPage(
 
 # Define server 
 server <- function(input, output, session) {
+  # view and adjust themes
+  #bs_themer()
   
   ##
   # Data Setup

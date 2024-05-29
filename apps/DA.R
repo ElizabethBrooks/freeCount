@@ -1,10 +1,10 @@
 # creator: Elizabeth Brooks
-# updated: 4 May 2024
+# updated: 29 May 2024
 
 #### Setup ####
 
 # install any missing packages
-packageList <- c("BiocManager", "shiny", "shinythemes", "ggplot2", "rcartocolor", "dplyr", "statmod", "pheatmap", "ggplotify")
+packageList <- c("BiocManager", "shiny", "bslib", "ggplot2", "rcartocolor", "dplyr", "statmod", "pheatmap", "ggplotify")
 biocList <- c("edgeR")
 newPackages <- packageList[!(packageList %in% installed.packages()[,"Package"])]
 newBioc <- biocList[!(biocList %in% installed.packages()[,"Package"])]
@@ -18,7 +18,7 @@ if(length(newBioc)){
 # load packages 
 suppressPackageStartupMessages({
   library(shiny)
-  library(shinythemes)
+  library(bslib)
   library(ggplot2)
   library(rcartocolor)
   library(edgeR)
@@ -34,6 +34,8 @@ plotColors <- carto_pal(12, "Safe")
 defaultLFC <- 1.2
 defaultFDR <- 0.05
 
+# TO-DO: consider adding data summary tab
+# TO-DO: replace design table in side bar with analysis settings
 # TO-DO: add software version print out on information tab
 # TO-DO: add scree plot
 # TO-DO: double check pheatmap display
@@ -48,14 +50,17 @@ defaultFDR <- 0.05
 
 # Define UI 
 ui <- fluidPage(
-  # view available themes
-  #shinythemes::themeSelector(),
-  
   # use a theme
-  theme = shinytheme("yeti"),
+  theme = bs_theme(bootswatch = "minty"),
   
   # add application title
-  titlePanel("DA: Differential Expression (DE) Analysis"),
+  #dashboardHeader(title = "freeCount DA"),
+  #titlePanel("freeCount DA"),
+  h1(id="app-heading", "freeCount DA"),
+  tags$style(HTML("#app-heading{
+                  color: white; 
+                  background-color: #78C2AD
+                  }")),
   
   # setup sidebar layout
   sidebarLayout(
@@ -446,27 +451,19 @@ ui <- fluidPage(
                   HTML("<b>Pairwise Results</b>")
                 ),
                 tags$br(),
-                fluidRow(
-                  column(
-                    width = 6,
-                    imageOutput(outputId = "pairwiseMD", height="100%", width="100%"),
-                    downloadButton(outputId = "downloadPairwiseMD", label = "Download Plot")
-                  ),
-                  column(
-                    width = 6,
-                    tags$p(
-                      HTML("<b>Number of Significantly DE Genes:</b>")
-                    ),
-                    tableOutput(outputId = "pairwiseSummary"),
-                    tags$p(
-                      "The above table shows the number of significantly DE genes that were up- or down-expressed in the input comparison. Signifigance was determined by the input LFC and FDR cut offs."
-                    )
-                  )
-                ),
+                imageOutput(outputId = "pairwiseMD", height="100%", width="100%"),
+                downloadButton(outputId = "downloadPairwiseMD", label = "Download Plot"),
                 tags$p(
                   "The mean-difference (MD) plot shows the log2 fold changes (LFCs) in expression differences versus average log2 CPM values.",
                   "Red points are significantly up-expressed genes and the blue points are significantly down-expressed, where signifigance was determined by the input FDR cut off.",
                   "The blue lines indicate the input LFC cut off, which will be used to further filter the set of significantly DE genes."
+                ),
+                tags$p(
+                  HTML("<b>Number of Significantly DE Genes:</b>")
+                ),
+                tableOutput(outputId = "pairwiseSummary"),
+                tags$p(
+                  "The above table shows the number of significantly DE genes that were up- or down-expressed in the input comparison. Signifigance was determined by the input LFC and FDR cut offs."
                 ),
                 tags$br(),
                 fluidRow(

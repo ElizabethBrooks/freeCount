@@ -1,10 +1,10 @@
 # creator: Elizabeth Brooks
-# updated: 4 May 2024
+# updated: 29 May 2024
 
 #### Setup ####
 
 # install any missing packages
-packageList <- c("BiocManager", "shiny", "shinythemes", "dplyr", "matrixStats", "Hmisc", "splines", "foreach", "doParallel", "fastcluster", "dynamicTreeCut", "survival")
+packageList <- c("BiocManager", "shiny", "bslib", "dplyr", "matrixStats", "Hmisc", "splines", "foreach", "doParallel", "fastcluster", "dynamicTreeCut", "survival")
 biocList <- c("WGCNA", "GO.db", "impute", "preprocessCore")
 newPackages <- packageList[!(packageList %in% installed.packages()[,"Package"])]
 newBioc <- biocList[!(biocList %in% installed.packages()[,"Package"])]
@@ -18,7 +18,7 @@ if(length(newBioc)){
 # load packages 
 suppressPackageStartupMessages({
   library(shiny)
-  library(shinythemes)
+  library(bslib)
   library(WGCNA)
   library(dplyr)
 })
@@ -32,6 +32,9 @@ options(stringsAsFactors = FALSE)
 # See note above.
 #enableWGCNAThreads()
 
+# TO-DO: consider adding data summary tab
+# TO-DO: replace design table in side bar with analysis settings
+# TO-DO: add update analysis buttons
 # TO-DO: add software version print out on information tab
 # TO-DO: store data and results in reactiveVal and reactiveValues
 # TO-DO: output example tables as csv
@@ -43,15 +46,17 @@ options(stringsAsFactors = FALSE)
 
 # Define UI 
 ui <- fluidPage(
-  # view available themes
-  #shinythemes::themeSelector(),
-  
   # use a theme
-  theme = shinytheme("yeti"),
-  #theme = shinytheme("superhero"),
+  theme = bs_theme(bootswatch = "minty"),
   
   # add application title
-  titlePanel("NA: Network Analysis"),
+  #dashboardHeader(title = "freeCount NA"),
+  #titlePanel("freeCount NA"),
+  h1(id="app-heading", "freeCount NA"),
+  tags$style(HTML("#app-heading{
+                  color: white; 
+                  background-color: #78C2AD
+                  }")),
   
   # setup sidebar layout
   sidebarLayout(
@@ -242,7 +247,7 @@ ui <- fluidPage(
         ),
         tags$br(),
         tags$p(
-          "The network analysis results and plots may take several moments to process depending on the size of the input normalized gene counts or experimental design tables."
+          "The network analysis results and plots may take several moments to process depending on the size of the input normalized gene counts table."
         )
         #tags$br(),
         #tags$p(

@@ -1,10 +1,10 @@
 # creator: Elizabeth Brooks
-# updated: 4 May 2024
+# updated: 29 May 2024
 
 #### Setup ####
 
 # install any missing packages
-packageList <- c("BiocManager", "shiny", "shinythemes", "ggplot2", "rcartocolor", "tidyr", "eulerr")
+packageList <- c("BiocManager", "shiny", "bslib", "ggplot2", "rcartocolor", "tidyr", "eulerr")
 biocList <- c("topGO", "Rgraphviz")
 newPackages <- packageList[!(packageList %in% installed.packages()[,"Package"])]
 newBioc <- biocList[!(biocList %in% installed.packages()[,"Package"])]
@@ -21,7 +21,7 @@ options(shiny.maxRequestSize=30*1024^2)
 # load packages
 suppressPackageStartupMessages({
   library(shiny)
-  library(shinythemes)
+  library(bslib)
   library(topGO)
   library(ggplot2)
   library(Rgraphviz)
@@ -42,6 +42,7 @@ defaultP <- 0.05
 defaultTermOne <- "GO:0008150"
 defaultTermTwo <- "GO:0065007"
 
+# TO-DO: consider adding data summary tab
 # TO-DO: add software version print out on information tab
 # TO-DO: fix download tables for other ontology levels
 # TO-DO: change input expression to combo of text field and radio buttons
@@ -53,15 +54,17 @@ defaultTermTwo <- "GO:0065007"
 
 # Define UI 
 ui <- fluidPage(
-  # view available themes
-  #shinythemes::themeSelector(),
-  
   # use a theme
-  theme = shinytheme("yeti"),
-  #theme = shinytheme("superhero"),
+  theme = bs_theme(bootswatch = "minty"),
   
   # add application title
-  titlePanel("FA: Functional Analysis"),
+  #dashboardHeader(title = "freeCount FA"),
+  #titlePanel("freeCount FA"),
+  h1(id="app-heading", "freeCount FA"),
+  tags$style(HTML("#app-heading{
+                  color: white; 
+                  background-color: #78C2AD
+                  }")),
   
   # setup sidebar layout
   sidebarLayout(
@@ -183,7 +186,7 @@ ui <- fluidPage(
         ),
         tags$br(),
         tags$p(
-          "Note that the GO term analysis results and plots may take several moments to process depending on the size of the input tables."
+          "Note that the GO term analysis results and plots may take several moments to process depending on the size of the input data tables."
         ),
         tags$hr(),
         tags$p(
