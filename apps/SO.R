@@ -9,7 +9,6 @@ newPackages <- packageList[!(packageList %in% installed.packages()[,"Package"])]
 if(length(newPackages)){
   install.packages(newPackages)
 }
-# install.packages("shinydashboard")
 
 # load packages
 suppressPackageStartupMessages({
@@ -19,12 +18,40 @@ suppressPackageStartupMessages({
   library(ggplot2)
   library(rcartocolor)
   library(gplots)
-  #library(shinydashboard)
+  library(shinyWidgets)
 })
 
 # color blind safe plotting palettes
 plotColors <- carto_pal(12, "Safe")
 
+# prepare styles for css
+css_styles <- "
+#app-heading {
+  color: white; 
+  background: linear-gradient(to right, #78c2ad, #f3969a);
+}
+.tabbable > .nav > li > a {
+  background-color: #f3969a;  
+  color:white; 
+  border-color: white;
+}
+.tab-pane.active {
+    background-color: white;
+    position: absolute;
+    width: -webkit-fill-available;
+    height: -webkit-fill-available;
+    border-color: white;
+    border-width: 10px;
+    border-style: solid;
+}
+"
+
+#.tabbable > .nav > li[class=active] > a { 
+#  background-color: #78c2ad; 
+#  color:white
+#}
+
+# TO-DO: update set names diagram using the input names
 # TO-DO: consider adding data summary tab
 # TO-DO: add software version print out on information tab
 # TO-DO: make upload button appear after at least two sets are input
@@ -35,23 +62,34 @@ plotColors <- carto_pal(12, "Safe")
 
 # Define UI 
 ui <- fluidPage(
+  # set background color
+  setBackgroundColor("#FFF4DD"),
+  
   # use a theme
   theme = bs_theme(bootswatch = "minty"),
   
+  # apply css styles
+  tags$style(
+    HTML(css_styles)
+  ),
+  
   # add application title
-  #dashboardHeader(title = "freeCount SO"),
-  #titlePanel("freeCount SO"),
-  h1(id="app-heading", "freeCount SO"),
-  tags$style(HTML("#app-heading{
-                  color: white; 
-                  background-color: #78C2AD
-                  }")),
+  h1(id="app-heading", 
+     tags$p(
+       "freeCount SO",
+        style = "margin-left: 10px"
+      )
+    ),
   
   # setup sidebar layout
   sidebarLayout(
     
     # setup sidebar panel
     sidebarPanel(
+      # setup the style
+      style = "
+          background-color: #F5E7C9;
+      ",
       
       # file uploads
       tags$p(
@@ -131,16 +169,36 @@ ui <- fluidPage(
             accept = ".csv"
           )
         )
-      )
+      ),
+      # add button to enable dark mode style
+      #tags$p(
+      #  "Select Color Mode:"
+      #),
+      #input_dark_mode()
     ),
     
-    # Output: Show plots
+    # setup the main panel
     mainPanel(
-      
       # getting started text
       conditionalPanel(
         condition = "!output.twoDataUploaded",
-        tags$h1("Getting Started", align = "center"),
+        # set the background color
+        style = "
+          background-color: white; 
+          border-color: white; 
+          border-width: 10px; 
+          border-style: solid
+        ",
+        # header
+        tags$h1(
+          "Getting Started", 
+          align = "center",
+          style = "
+            color: white; 
+            background: #78c2ad;
+            font-size: xx-large
+          "
+        ),
         tags$br(),
         # TO-DO: add input step numbers
         tags$p(
@@ -180,18 +238,19 @@ ui <- fluidPage(
       # results text and plots
       conditionalPanel(
         condition = "output.twoDataUploaded",
-        # navigation bar
-        #navbarPage(
-          #"SO",
         # set of tab panels
         tabsetPanel(
           type = "tabs",
           tabPanel(
             "Tips",
-            tags$br(),
-            tags$p(
+            tags$h1(
               align="center",
-              HTML("<b>Helpful Tips</b>")
+              "Helpful Tips",
+              style = "
+                color: white; 
+                background: #78c2ad;
+                font-size: x-large
+              "
             ),
             tags$p(
               HTML("<b>Tip 1:</b> The results may take several moments to appear depending on the size of the input data tables.")
@@ -213,12 +272,15 @@ ui <- fluidPage(
           # Venn Diagrams tab
           tabPanel(
             "Venn Diagrams",
-            tags$br(),
-            tags$p(
+            tags$h1(
               align="center",
-              HTML("<b>Venn Diagrams</b>")
+              "Venn Diagrams",
+              style = "
+                color: white; 
+                background: #78c2ad;
+                font-size: x-large
+              "
             ),
-            tags$br(),
             tags$p(
               "Displayed below are venn diagrams for exploring the relationship between sets of discrete values. It is possible to download the diagrams along with the unique values belonging to each set and their intersections."
             ),
@@ -365,10 +427,14 @@ ui <- fluidPage(
           # information tab
           tabPanel(
             "Information",
-            tags$br(),
-            tags$p(
+            tags$h1(
               align="center",
-              HTML("<b>Helpful Information</b>")
+              "Helpful Information",
+              style = "
+                color: white; 
+                background: #78c2ad;
+                font-size: x-large
+              "
             ),
             tags$p(
               "This application for creating venn diagrams to compare sets of values was created by",
