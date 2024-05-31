@@ -25,14 +25,18 @@ suppressPackageStartupMessages({
 plotColors <- carto_pal(12, "Safe")
 
 # prepare styles for css
+#font-family: Arial, sans-serif !important;
 css_styles <- "
+* {
+font-family: Arial, sans-serif;
+}
 #app-heading {
   color: white; 
   background: linear-gradient(to right, #78c2ad, #f3969a);
 }
 .tabbable > .nav > li > a {
   background-color: #f3969a;  
-  color:white; 
+  color: white; 
   border-color: white;
 }
 .tab-pane.active {
@@ -44,12 +48,12 @@ css_styles <- "
     border-width: 10px;
     border-style: solid;
 }
+.nav-tabs .nav-link.active,.nav-tabs>li>a.active,.nav-tabs .nav-pills>li>a.active,.nav-tabs :where(ul.nav.navbar-nav > li)>a.active,.nav-tabs .nav-item.show .nav-link,.nav-tabs .nav-item.in .nav-link,.nav-tabs .nav-item.show .nav-tabs>li>a,.nav-tabs .nav-item.in .nav-tabs>li>a,.nav-tabs .nav-item.show .nav-pills>li>a,.nav-tabs .nav-item.in .nav-pills>li>a,.nav-tabs>li.show .nav-link,.nav-tabs>li.in .nav-link,.nav-tabs>li.show .nav-tabs>li>a,.nav-tabs>li.in .nav-tabs>li>a,.nav-tabs>li.show .nav-pills>li>a,.nav-tabs>li.in .nav-pills>li>a,.nav-tabs .nav-pills>li.show .nav-link,.nav-tabs .nav-pills>li.in .nav-link,.nav-tabs .nav-pills>li.show .nav-tabs>li>a,.nav-tabs .nav-pills>li.in .nav-tabs>li>a,.nav-tabs .nav-pills>li.show .nav-pills>li>a,.nav-tabs .nav-pills>li.in .nav-pills>li>a,.nav-tabs .nav-item.show :where(ul.nav.navbar-nav > li)>a,.nav-tabs .nav-item.in :where(ul.nav.navbar-nav > li)>a,.nav-tabs>li.show :where(ul.nav.navbar-nav > li)>a,.nav-tabs>li.in :where(ul.nav.navbar-nav > li)>a,.nav-tabs .nav-pills>li.show :where(ul.nav.navbar-nav > li)>a,.nav-tabs .nav-pills>li.in :where(ul.nav.navbar-nav > li)>a,.nav-tabs .show:where(ul.nav.navbar-nav > li):not(.dropdown) .nav-link,.nav-tabs .in:where(ul.nav.navbar-nav > li):not(.dropdown) .nav-link,.nav-tabs .show:where(ul.nav.navbar-nav > li):not(.dropdown) .nav-tabs>li>a,.nav-tabs .in:where(ul.nav.navbar-nav > li):not(.dropdown) .nav-tabs>li>a,.nav-tabs .show:where(ul.nav.navbar-nav > li):not(.dropdown) .nav-pills>li>a,.nav-tabs .in:where(ul.nav.navbar-nav > li):not(.dropdown) .nav-pills>li>a,.nav-tabs .show:where(ul.nav.navbar-nav > li):not(.dropdown) :where(ul.nav.navbar-nav > li)>a,.nav-tabs .in:where(ul.nav.navbar-nav > li):not(.dropdown) :where(ul.nav.navbar-nav > li)>a {
+    color: white;
+    background-color: #5A5A5A;
+    border-color: #78c2ad
+}
 "
-
-#.tabbable > .nav > li[class=active] > a { 
-#  background-color: #78c2ad; 
-#  color:white
-#}
 
 # TO-DO: update set names diagram using the input names
 # TO-DO: consider adding data summary tab
@@ -77,7 +81,10 @@ ui <- fluidPage(
   h1(id="app-heading", 
      tags$p(
        "freeCount SO",
-        style = "margin-left: 10px"
+        style = "
+          margin-left: 10px; 
+          font-family: 'Lucida Console', monospace, Arial, sans-serif
+        "
       )
     ),
   
@@ -196,7 +203,8 @@ ui <- fluidPage(
           style = "
             color: white; 
             background: #78c2ad;
-            font-size: xx-large
+            font-size: xx-large;
+            font-family: 'Lucida Console', monospace, Arial, sans-serif
           "
         ),
         tags$br(),
@@ -249,7 +257,8 @@ ui <- fluidPage(
               style = "
                 color: white; 
                 background: #78c2ad;
-                font-size: x-large
+                font-size: x-large;
+                font-family: 'Lucida Console', monospace, Arial, sans-serif
               "
             ),
             tags$p(
@@ -278,7 +287,8 @@ ui <- fluidPage(
               style = "
                 color: white; 
                 background: #78c2ad;
-                font-size: x-large
+                font-size: x-large;
+                font-family: 'Lucida Console', monospace, Arial, sans-serif
               "
             ),
             tags$p(
@@ -433,7 +443,8 @@ ui <- fluidPage(
               style = "
                 color: white; 
                 background: #78c2ad;
-                font-size: x-large
+                font-size: x-large;
+                font-family: 'Lucida Console', monospace, Arial, sans-serif
               "
             ),
             tags$p(

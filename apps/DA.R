@@ -30,6 +30,33 @@ suppressPackageStartupMessages({
 # color blind safe plotting palettes
 plotColors <- carto_pal(12, "Safe")
 
+# prepare styles for css
+css_styles <- "
+#app-heading {
+  color: white; 
+  background: linear-gradient(to right, #78c2ad, #f3969a);
+}
+.tabbable > .nav > li > a {
+  background-color: #f3969a;  
+  color: white; 
+  border-color: white;
+}
+.tab-pane.active {
+    background-color: white;
+    position: absolute;
+    width: -webkit-fill-available;
+    height: -webkit-fill-available;
+    border-color: white;
+    border-width: 10px;
+    border-style: solid;
+}
+.nav-tabs .nav-link.active,.nav-tabs>li>a.active,.nav-tabs .nav-pills>li>a.active,.nav-tabs :where(ul.nav.navbar-nav > li)>a.active,.nav-tabs .nav-item.show .nav-link,.nav-tabs .nav-item.in .nav-link,.nav-tabs .nav-item.show .nav-tabs>li>a,.nav-tabs .nav-item.in .nav-tabs>li>a,.nav-tabs .nav-item.show .nav-pills>li>a,.nav-tabs .nav-item.in .nav-pills>li>a,.nav-tabs>li.show .nav-link,.nav-tabs>li.in .nav-link,.nav-tabs>li.show .nav-tabs>li>a,.nav-tabs>li.in .nav-tabs>li>a,.nav-tabs>li.show .nav-pills>li>a,.nav-tabs>li.in .nav-pills>li>a,.nav-tabs .nav-pills>li.show .nav-link,.nav-tabs .nav-pills>li.in .nav-link,.nav-tabs .nav-pills>li.show .nav-tabs>li>a,.nav-tabs .nav-pills>li.in .nav-tabs>li>a,.nav-tabs .nav-pills>li.show .nav-pills>li>a,.nav-tabs .nav-pills>li.in .nav-pills>li>a,.nav-tabs .nav-item.show :where(ul.nav.navbar-nav > li)>a,.nav-tabs .nav-item.in :where(ul.nav.navbar-nav > li)>a,.nav-tabs>li.show :where(ul.nav.navbar-nav > li)>a,.nav-tabs>li.in :where(ul.nav.navbar-nav > li)>a,.nav-tabs .nav-pills>li.show :where(ul.nav.navbar-nav > li)>a,.nav-tabs .nav-pills>li.in :where(ul.nav.navbar-nav > li)>a,.nav-tabs .show:where(ul.nav.navbar-nav > li):not(.dropdown) .nav-link,.nav-tabs .in:where(ul.nav.navbar-nav > li):not(.dropdown) .nav-link,.nav-tabs .show:where(ul.nav.navbar-nav > li):not(.dropdown) .nav-tabs>li>a,.nav-tabs .in:where(ul.nav.navbar-nav > li):not(.dropdown) .nav-tabs>li>a,.nav-tabs .show:where(ul.nav.navbar-nav > li):not(.dropdown) .nav-pills>li>a,.nav-tabs .in:where(ul.nav.navbar-nav > li):not(.dropdown) .nav-pills>li>a,.nav-tabs .show:where(ul.nav.navbar-nav > li):not(.dropdown) :where(ul.nav.navbar-nav > li)>a,.nav-tabs .in:where(ul.nav.navbar-nav > li):not(.dropdown) :where(ul.nav.navbar-nav > li)>a {
+    color: white;
+    background-color: #5A5A5A;
+    border-color: #78c2ad
+}
+"
+
 # set default values
 defaultLFC <- 1.2
 defaultFDR <- 0.05
@@ -50,17 +77,24 @@ defaultFDR <- 0.05
 
 # Define UI 
 ui <- fluidPage(
+  # set background color
+  setBackgroundColor("#FFF4DD"),
+  
   # use a theme
   theme = bs_theme(bootswatch = "minty"),
   
+  # apply css styles
+  tags$style(
+    HTML(css_styles)
+  ),
+  
   # add application title
-  #dashboardHeader(title = "freeCount DA"),
-  #titlePanel("freeCount DA"),
-  h1(id="app-heading", "freeCount DA"),
-  tags$style(HTML("#app-heading{
-                  color: white; 
-                  background-color: #78C2AD
-                  }")),
+  h1(id="app-heading", 
+     tags$p(
+       "freeCount DA",
+       style = "margin-left: 10px"
+     )
+  ),
   
   # setup sidebar layout
   sidebarLayout(
