@@ -33,25 +33,31 @@ font-family: Arial, sans-serif;
 #app-heading {
   color: white; 
   background: linear-gradient(to right, #78c2ad, #f3969a);
+  border-radius: 25px;
 }
 .tabbable > .nav > li > a {
   background-color: #f3969a;  
   color: white; 
   border-color: white;
-}
-.tab-pane.active {
-    background-color: white;
-    position: absolute;
-    width: -webkit-fill-available;
-    height: -webkit-fill-available;
-    border-color: white;
-    border-width: 10px;
-    border-style: solid;
+  border-width: 2px;
 }
 .nav-tabs .nav-link.active,.nav-tabs>li>a.active,.nav-tabs .nav-pills>li>a.active,.nav-tabs :where(ul.nav.navbar-nav > li)>a.active,.nav-tabs .nav-item.show .nav-link,.nav-tabs .nav-item.in .nav-link,.nav-tabs .nav-item.show .nav-tabs>li>a,.nav-tabs .nav-item.in .nav-tabs>li>a,.nav-tabs .nav-item.show .nav-pills>li>a,.nav-tabs .nav-item.in .nav-pills>li>a,.nav-tabs>li.show .nav-link,.nav-tabs>li.in .nav-link,.nav-tabs>li.show .nav-tabs>li>a,.nav-tabs>li.in .nav-tabs>li>a,.nav-tabs>li.show .nav-pills>li>a,.nav-tabs>li.in .nav-pills>li>a,.nav-tabs .nav-pills>li.show .nav-link,.nav-tabs .nav-pills>li.in .nav-link,.nav-tabs .nav-pills>li.show .nav-tabs>li>a,.nav-tabs .nav-pills>li.in .nav-tabs>li>a,.nav-tabs .nav-pills>li.show .nav-pills>li>a,.nav-tabs .nav-pills>li.in .nav-pills>li>a,.nav-tabs .nav-item.show :where(ul.nav.navbar-nav > li)>a,.nav-tabs .nav-item.in :where(ul.nav.navbar-nav > li)>a,.nav-tabs>li.show :where(ul.nav.navbar-nav > li)>a,.nav-tabs>li.in :where(ul.nav.navbar-nav > li)>a,.nav-tabs .nav-pills>li.show :where(ul.nav.navbar-nav > li)>a,.nav-tabs .nav-pills>li.in :where(ul.nav.navbar-nav > li)>a,.nav-tabs .show:where(ul.nav.navbar-nav > li):not(.dropdown) .nav-link,.nav-tabs .in:where(ul.nav.navbar-nav > li):not(.dropdown) .nav-link,.nav-tabs .show:where(ul.nav.navbar-nav > li):not(.dropdown) .nav-tabs>li>a,.nav-tabs .in:where(ul.nav.navbar-nav > li):not(.dropdown) .nav-tabs>li>a,.nav-tabs .show:where(ul.nav.navbar-nav > li):not(.dropdown) .nav-pills>li>a,.nav-tabs .in:where(ul.nav.navbar-nav > li):not(.dropdown) .nav-pills>li>a,.nav-tabs .show:where(ul.nav.navbar-nav > li):not(.dropdown) :where(ul.nav.navbar-nav > li)>a,.nav-tabs .in:where(ul.nav.navbar-nav > li):not(.dropdown) :where(ul.nav.navbar-nav > li)>a {
-    color: white;
-    background-color: #5A5A5A;
-    border-color: #78c2ad
+  color: white;
+  background-color: #5A5A5A;
+  border-color: #78c2ad;
+  border-width: 2px;
+}
+.tab-pane.active {
+  background-color: white;
+  position: absolute;
+  width: -webkit-fill-available;
+  height: -webkit-fill-available;
+  border-color: white;
+  border-width: 10px;
+  border-style: solid;
+  border-top-right-radius: 25px;
+  border-bottom-right-radius: 25px;
+  border-bottom-left-radius: 25px;
 }
 "
 
@@ -82,8 +88,8 @@ ui <- fluidPage(
      tags$p(
        "freeCount SO",
         style = "
-          margin-left: 10px; 
-          font-family: 'Lucida Console', monospace, Arial, sans-serif
+          margin-left: 25px; 
+          font-family: Georgia, Arial, sans-serif
         "
       )
     ),
@@ -194,7 +200,8 @@ ui <- fluidPage(
           background-color: white; 
           border-color: white; 
           border-width: 10px; 
-          border-style: solid
+          border-style: solid;
+          border-radius: 25px
         ",
         # header
         tags$h1(
@@ -204,7 +211,11 @@ ui <- fluidPage(
             color: white; 
             background: #78c2ad;
             font-size: xx-large;
-            font-family: 'Lucida Console', monospace, Arial, sans-serif
+            font-family: Georgia, Arial, sans-serif;
+            border-color: #78c2ad;
+            border-width: 4px;
+            border-style: solid;
+            border-radius: 25px
           "
         ),
         tags$br(),
@@ -258,7 +269,11 @@ ui <- fluidPage(
                 color: white; 
                 background: #78c2ad;
                 font-size: x-large;
-                font-family: 'Lucida Console', monospace, Arial, sans-serif
+                font-family: Georgia, Arial, sans-serif;
+                border-color: #78c2ad;
+                border-width: 4px;
+                border-style: solid;
+                border-radius: 25px;
               "
             ),
             tags$p(
@@ -288,7 +303,11 @@ ui <- fluidPage(
                 color: white; 
                 background: #78c2ad;
                 font-size: x-large;
-                font-family: 'Lucida Console', monospace, Arial, sans-serif
+                font-family: Georgia, Arial, sans-serif;
+                border-color: #78c2ad;
+                border-width: 4px;
+                border-style: solid;
+                border-radius: 25px
               "
             ),
             tags$p(
@@ -444,7 +463,11 @@ ui <- fluidPage(
                 color: white; 
                 background: #78c2ad;
                 font-size: x-large;
-                font-family: 'Lucida Console', monospace, Arial, sans-serif
+                font-family: Georgia, Arial, sans-serif;
+                border-color: #78c2ad;
+                border-width: 4px;
+                border-style: solid;
+                border-radius: 25px
               "
             ),
             tags$p(
