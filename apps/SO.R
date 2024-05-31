@@ -1,10 +1,10 @@
 # creator: Elizabeth Brooks
-# updated: 29 May 2024
+# updated: 31 May 2024
 
 #### Setup ####
 
 # install any missing packages
-packageList <- c("BiocManager", "shiny", "bslib", "ggplot2", "rcartocolor", "ggVennDiagram", "gplots")
+packageList <- c("BiocManager", "shiny", "bslib", "shinyWidgets", "ggplot2", "rcartocolor", "ggVennDiagram", "gplots")
 newPackages <- packageList[!(packageList %in% installed.packages()[,"Package"])]
 if(length(newPackages)){
   install.packages(newPackages)
@@ -28,10 +28,10 @@ plotColors <- carto_pal(12, "Safe")
 #font-family: Arial, sans-serif !important;
 css_styles <- "
 * {
-font-family: Arial, sans-serif;
+  font-family: Arial, sans-serif;
+  color: #5A5A5A;
 }
 #app-heading {
-  color: white; 
   background: linear-gradient(to right, #78c2ad, #f3969a);
   border-radius: 25px;
 }
@@ -49,15 +49,17 @@ font-family: Arial, sans-serif;
 }
 .tab-pane.active {
   background-color: white;
-  position: absolute;
-  width: -webkit-fill-available;
-  height: -webkit-fill-available;
   border-color: white;
   border-width: 10px;
   border-style: solid;
   border-top-right-radius: 25px;
   border-bottom-right-radius: 25px;
   border-bottom-left-radius: 25px;
+}
+#setOne, #setTwo, #setThree, #setFour {
+  border-color: #f3969a;
+  border-width: 2px;
+  border-style: solid;
 }
 "
 
@@ -89,10 +91,11 @@ ui <- fluidPage(
        "freeCount SO",
         style = "
           margin-left: 25px; 
-          font-family: Georgia, Arial, sans-serif
+          font-family: Georgia, Arial, sans-serif;
+          color: white
         "
       )
-    ),
+  ),
   
   # setup sidebar layout
   sidebarLayout(
@@ -101,9 +104,12 @@ ui <- fluidPage(
     sidebarPanel(
       # setup the style
       style = "
-          background-color: #F5E7C9;
+          background-color: white;
+          border-color: #F5E7C9; 
+          border-width: 10px; 
+          border-style: solid;
+          border-radius: 25px
       ",
-      
       # file uploads
       tags$p(
         "Enter set one name:"
@@ -195,7 +201,7 @@ ui <- fluidPage(
       # getting started text
       conditionalPanel(
         condition = "!output.twoDataUploaded",
-        # set the background color
+        # set the background style
         style = "
           background-color: white; 
           border-color: white; 
@@ -232,14 +238,13 @@ ui <- fluidPage(
         ),
         tags$br(),
         tags$p(
-          "Note that after uploading at least two files, it will be possible to view and download the venn diagrams along with the unique values belonging to each set and their intersections."
+          "After uploading at least two files, it will be possible to view and download the venn diagrams along with the unique values belonging to each set and their intersections."
         ),
         tags$hr(),
         tags$p(
           align="center",
           HTML("<b>Helpful Tips</b>")
         ),
-        tags$br(),
         tags$p(
           HTML("<b>Tip 1:</b> The first column of the <i>.csv</i> files are expected to contain the set values for comparison (e.g., gene IDs).")
         ),

@@ -1,10 +1,10 @@
 # creator: Elizabeth Brooks
-# updated: 29 May 2024
+# updated: 31 May 2024
 
 #### Setup ####
 
 # install any missing packages
-packageList <- c("BiocManager", "shiny", "bslib", "dplyr", "matrixStats", "Hmisc", "splines", "foreach", "doParallel", "fastcluster", "dynamicTreeCut", "survival")
+packageList <- c("BiocManager", "shiny", "bslib", "shinyWidgets", "dplyr", "matrixStats", "Hmisc", "splines", "foreach", "doParallel", "fastcluster", "dynamicTreeCut", "survival")
 biocList <- c("WGCNA", "GO.db", "impute", "preprocessCore")
 newPackages <- packageList[!(packageList %in% installed.packages()[,"Package"])]
 newBioc <- biocList[!(biocList %in% installed.packages()[,"Package"])]
@@ -19,12 +19,47 @@ if(length(newBioc)){
 suppressPackageStartupMessages({
   library(shiny)
   library(bslib)
+  library(shinyWidgets)
   library(WGCNA)
   library(dplyr)
 })
 
 # the following setting is important, do not omit.
 options(stringsAsFactors = FALSE)
+
+# prepare styles for css
+#font-family: Arial, sans-serif !important;
+css_styles <- "
+* {
+  font-family: Arial, sans-serif;
+  color: #5A5A5A;
+}
+#app-heading {
+  background: linear-gradient(to right, #78c2ad, #f3969a);
+  border-radius: 25px;
+}
+.tabbable > .nav > li > a {
+  background-color: #f3969a;  
+  color: white; 
+  border-color: white;
+  border-width: 2px;
+}
+.nav-tabs .nav-link.active,.nav-tabs>li>a.active,.nav-tabs .nav-pills>li>a.active,.nav-tabs :where(ul.nav.navbar-nav > li)>a.active,.nav-tabs .nav-item.show .nav-link,.nav-tabs .nav-item.in .nav-link,.nav-tabs .nav-item.show .nav-tabs>li>a,.nav-tabs .nav-item.in .nav-tabs>li>a,.nav-tabs .nav-item.show .nav-pills>li>a,.nav-tabs .nav-item.in .nav-pills>li>a,.nav-tabs>li.show .nav-link,.nav-tabs>li.in .nav-link,.nav-tabs>li.show .nav-tabs>li>a,.nav-tabs>li.in .nav-tabs>li>a,.nav-tabs>li.show .nav-pills>li>a,.nav-tabs>li.in .nav-pills>li>a,.nav-tabs .nav-pills>li.show .nav-link,.nav-tabs .nav-pills>li.in .nav-link,.nav-tabs .nav-pills>li.show .nav-tabs>li>a,.nav-tabs .nav-pills>li.in .nav-tabs>li>a,.nav-tabs .nav-pills>li.show .nav-pills>li>a,.nav-tabs .nav-pills>li.in .nav-pills>li>a,.nav-tabs .nav-item.show :where(ul.nav.navbar-nav > li)>a,.nav-tabs .nav-item.in :where(ul.nav.navbar-nav > li)>a,.nav-tabs>li.show :where(ul.nav.navbar-nav > li)>a,.nav-tabs>li.in :where(ul.nav.navbar-nav > li)>a,.nav-tabs .nav-pills>li.show :where(ul.nav.navbar-nav > li)>a,.nav-tabs .nav-pills>li.in :where(ul.nav.navbar-nav > li)>a,.nav-tabs .show:where(ul.nav.navbar-nav > li):not(.dropdown) .nav-link,.nav-tabs .in:where(ul.nav.navbar-nav > li):not(.dropdown) .nav-link,.nav-tabs .show:where(ul.nav.navbar-nav > li):not(.dropdown) .nav-tabs>li>a,.nav-tabs .in:where(ul.nav.navbar-nav > li):not(.dropdown) .nav-tabs>li>a,.nav-tabs .show:where(ul.nav.navbar-nav > li):not(.dropdown) .nav-pills>li>a,.nav-tabs .in:where(ul.nav.navbar-nav > li):not(.dropdown) .nav-pills>li>a,.nav-tabs .show:where(ul.nav.navbar-nav > li):not(.dropdown) :where(ul.nav.navbar-nav > li)>a,.nav-tabs .in:where(ul.nav.navbar-nav > li):not(.dropdown) :where(ul.nav.navbar-nav > li)>a {
+  color: white;
+  background-color: #5A5A5A;
+  border-color: #78c2ad;
+  border-width: 2px;
+}
+.tab-pane.active {
+  background-color: white;
+  border-color: white;
+  border-width: 10px;
+  border-style: solid;
+  border-top-right-radius: 25px;
+  border-bottom-right-radius: 25px;
+  border-bottom-left-radius: 25px;
+}
+"
 
 # Allow multi-threading within WGCNA. At present this call is necessary.
 # Any error here may be ignored but you may want to update WGCNA if you see one.
@@ -46,24 +81,42 @@ options(stringsAsFactors = FALSE)
 
 # Define UI 
 ui <- fluidPage(
+  # set background color
+  setBackgroundColor("#FFF4DD"),
+  
   # use a theme
   theme = bs_theme(bootswatch = "minty"),
   
+  # apply css styles
+  tags$style(
+    HTML(css_styles)
+  ),
+  
   # add application title
-  #dashboardHeader(title = "freeCount NA"),
-  #titlePanel("freeCount NA"),
-  h1(id="app-heading", "freeCount NA"),
-  tags$style(HTML("#app-heading{
-                  color: white; 
-                  background-color: #78C2AD
-                  }")),
+  h1(id="app-heading", 
+     tags$p(
+       "freeCount NA",
+       style = "
+          margin-left: 25px; 
+          font-family: Georgia, Arial, sans-serif;
+          color: white
+        "
+     )
+  ),
   
   # setup sidebar layout
   sidebarLayout(
     
     # setup sidebar panel
     sidebarPanel(
-      
+      # setup the style
+      style = "
+          background-color: white;
+          border-color: #F5E7C9; 
+          border-width: 10px; 
+          border-style: solid;
+          border-radius: 25px
+      ",
       # show panel depending on run button
       conditionalPanel(
         condition = "!input.runUpload",
@@ -130,7 +183,29 @@ ui <- fluidPage(
       conditionalPanel(
         #condition = "!output.inputsUploaded", 
         condition = "!input.runAnalysis",
-        tags$h1("Getting Started", align = "center"),
+        # set the background style
+        style = "
+          background-color: white; 
+          border-color: white; 
+          border-width: 10px; 
+          border-style: solid;
+          border-radius: 25px
+        ",
+        # header
+        tags$h1(
+          "Getting Started", 
+          align = "center",
+          style = "
+            color: white; 
+            background: #78c2ad;
+            font-size: xx-large;
+            font-family: Georgia, Arial, sans-serif;
+            border-color: #78c2ad;
+            border-width: 4px;
+            border-style: solid;
+            border-radius: 25px
+          "
+        ),
         tags$br(),
         tags$p(
           HTML("<b>Hello!</b>"),
@@ -241,9 +316,28 @@ ui <- fluidPage(
       # processing text
       conditionalPanel(
         condition = "input.runAnalysis && output.inputCheck && !output.resultsCompleted",
+        # set the background style
+        style = "
+          background-color: white; 
+          border-color: white; 
+          border-width: 10px; 
+          border-style: solid;
+          border-radius: 25px
+        ",
+        # header
         tags$h1(
           "Processing", 
-          align="center"
+          align = "center",
+          style = "
+            color: white; 
+            background: #78c2ad;
+            font-size: xx-large;
+            font-family: Georgia, Arial, sans-serif;
+            border-color: #78c2ad;
+            border-width: 4px;
+            border-style: solid;
+            border-radius: 25px
+          "
         ),
         tags$br(),
         tags$p(
@@ -267,12 +361,20 @@ ui <- fluidPage(
           type = "tabs",
           tabPanel(
             "Tips",
-            tags$br(),
-            tags$p(
+            tags$h1(
               align="center",
-              HTML("<b>Helpful Tips</b>")
+              "Helpful Tips",
+              style = "
+                color: white; 
+                background: #78c2ad;
+                font-size: x-large;
+                font-family: Georgia, Arial, sans-serif;
+                border-color: #78c2ad;
+                border-width: 4px;
+                border-style: solid;
+                border-radius: 25px;
+              "
             ),
-            tags$br(),
             tags$p(
               HTML("<b>Tip 1:</b> The plots and results may take several moments to appear depending on the size of the input normalized gene counts table.")
             ),
@@ -299,12 +401,20 @@ ui <- fluidPage(
           # data cleaning tab
           tabPanel(
             "Data Cleaning",
-            tags$br(),
-            tags$p(
+            tags$h1(
               align="center",
-              HTML("<b>Data Input and Cleaning</b>")
+              "Data Input and Cleaning",
+              style = "
+                color: white; 
+                background: #78c2ad;
+                font-size: x-large;
+                font-family: Georgia, Arial, sans-serif;
+                border-color: #78c2ad;
+                border-width: 4px;
+                border-style: solid;
+                border-radius: 25px;
+              "
             ),
-            tags$br(),
             fluidRow(
               column(
                 width = 4,
@@ -392,12 +502,20 @@ ui <- fluidPage(
           # network construction tab
           tabPanel(
             "Network Construction",
-            tags$br(),
-            tags$p(
+            tags$h1(
               align="center",
-              HTML("<b>Network Construction and Module Detection</b>")
+              "Network Construction and Module Detection",
+              style = "
+                color: white; 
+                background: #78c2ad;
+                font-size: x-large;
+                font-family: Georgia, Arial, sans-serif;
+                border-color: #78c2ad;
+                border-width: 4px;
+                border-style: solid;
+                border-radius: 25px;
+              "
             ),
-            tags$br(),
             sliderInput(
               "setPowersRange", 
               tags$p("Soft Thresholding Power Range"), 
@@ -544,12 +662,20 @@ ui <- fluidPage(
           # results tab
           tabPanel(
             "Results",
-            tags$br(),
-            tags$p(
+            tags$h1(
               align="center",
-              HTML("<b>Network Analysis Results</b>")
+              "Network Analysis Results",
+              style = "
+                color: white; 
+                background: #78c2ad;
+                font-size: x-large;
+                font-family: Georgia, Arial, sans-serif;
+                border-color: #78c2ad;
+                border-width: 4px;
+                border-style: solid;
+                border-radius: 25px;
+              "
             ),
-            tags$br(),
             tags$p(
               "Results from the co-expression network analysis may be downloaded below."
             ),
@@ -576,12 +702,20 @@ ui <- fluidPage(
           # information tab
           tabPanel(
             "Information",
-            tags$br(),
-            tags$p(
+            tags$h1(
               align="center",
-              HTML("<b>Helpful Information</b>")
+              "Helpful Information",
+              style = "
+                color: white; 
+                background: #78c2ad;
+                font-size: x-large;
+                font-family: Georgia, Arial, sans-serif;
+                border-color: #78c2ad;
+                border-width: 4px;
+                border-style: solid;
+                border-radius: 25px;
+              "
             ),
-            tags$br(),
             tags$p(
               "This application for expression network analysis was created by ",
               tags$a("Elizabeth Brooks",href = "https://www.linkedin.com/in/elizabethmbrooks/"),

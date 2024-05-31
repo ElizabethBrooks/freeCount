@@ -1,10 +1,10 @@
 # creator: Elizabeth Brooks
-# updated: 29 May 2024
+# updated: 31 May 2024
 
 #### Setup ####
 
 # install any missing packages
-packageList <- c("BiocManager", "shiny", "bslib", "ggplot2", "rcartocolor", "tidyr", "eulerr")
+packageList <- c("BiocManager", "shiny", "bslib", "shinyWidgets", "ggplot2", "rcartocolor", "tidyr", "eulerr")
 biocList <- c("topGO", "Rgraphviz")
 newPackages <- packageList[!(packageList %in% installed.packages()[,"Package"])]
 newBioc <- biocList[!(biocList %in% installed.packages()[,"Package"])]
@@ -22,6 +22,7 @@ options(shiny.maxRequestSize=30*1024^2)
 suppressPackageStartupMessages({
   library(shiny)
   library(bslib)
+  library(shinyWidgets)
   library(topGO)
   library(ggplot2)
   library(Rgraphviz)
@@ -34,6 +35,40 @@ suppressPackageStartupMessages({
 plotColors <- carto_pal(12, "Safe")
 dotPlotColors <- c(plotColors[5], plotColors[6])
 eulerPlotColors <- c(plotColors[6], plotColors[7])
+
+# prepare styles for css
+#font-family: Arial, sans-serif !important;
+css_styles <- "
+* {
+  font-family: Arial, sans-serif;
+  color: #5A5A5A;
+}
+#app-heading {
+  background: linear-gradient(to right, #78c2ad, #f3969a);
+  border-radius: 25px;
+}
+.tabbable > .nav > li > a {
+  background-color: #f3969a;  
+  color: white; 
+  border-color: white;
+  border-width: 2px;
+}
+.nav-tabs .nav-link.active,.nav-tabs>li>a.active,.nav-tabs .nav-pills>li>a.active,.nav-tabs :where(ul.nav.navbar-nav > li)>a.active,.nav-tabs .nav-item.show .nav-link,.nav-tabs .nav-item.in .nav-link,.nav-tabs .nav-item.show .nav-tabs>li>a,.nav-tabs .nav-item.in .nav-tabs>li>a,.nav-tabs .nav-item.show .nav-pills>li>a,.nav-tabs .nav-item.in .nav-pills>li>a,.nav-tabs>li.show .nav-link,.nav-tabs>li.in .nav-link,.nav-tabs>li.show .nav-tabs>li>a,.nav-tabs>li.in .nav-tabs>li>a,.nav-tabs>li.show .nav-pills>li>a,.nav-tabs>li.in .nav-pills>li>a,.nav-tabs .nav-pills>li.show .nav-link,.nav-tabs .nav-pills>li.in .nav-link,.nav-tabs .nav-pills>li.show .nav-tabs>li>a,.nav-tabs .nav-pills>li.in .nav-tabs>li>a,.nav-tabs .nav-pills>li.show .nav-pills>li>a,.nav-tabs .nav-pills>li.in .nav-pills>li>a,.nav-tabs .nav-item.show :where(ul.nav.navbar-nav > li)>a,.nav-tabs .nav-item.in :where(ul.nav.navbar-nav > li)>a,.nav-tabs>li.show :where(ul.nav.navbar-nav > li)>a,.nav-tabs>li.in :where(ul.nav.navbar-nav > li)>a,.nav-tabs .nav-pills>li.show :where(ul.nav.navbar-nav > li)>a,.nav-tabs .nav-pills>li.in :where(ul.nav.navbar-nav > li)>a,.nav-tabs .show:where(ul.nav.navbar-nav > li):not(.dropdown) .nav-link,.nav-tabs .in:where(ul.nav.navbar-nav > li):not(.dropdown) .nav-link,.nav-tabs .show:where(ul.nav.navbar-nav > li):not(.dropdown) .nav-tabs>li>a,.nav-tabs .in:where(ul.nav.navbar-nav > li):not(.dropdown) .nav-tabs>li>a,.nav-tabs .show:where(ul.nav.navbar-nav > li):not(.dropdown) .nav-pills>li>a,.nav-tabs .in:where(ul.nav.navbar-nav > li):not(.dropdown) .nav-pills>li>a,.nav-tabs .show:where(ul.nav.navbar-nav > li):not(.dropdown) :where(ul.nav.navbar-nav > li)>a,.nav-tabs .in:where(ul.nav.navbar-nav > li):not(.dropdown) :where(ul.nav.navbar-nav > li)>a {
+  color: white;
+  background-color: #5A5A5A;
+  border-color: #78c2ad;
+  border-width: 2px;
+}
+.tab-pane.active {
+  background-color: white;
+  border-color: white;
+  border-width: 10px;
+  border-style: solid;
+  border-top-right-radius: 25px;
+  border-bottom-right-radius: 25px;
+  border-bottom-left-radius: 25px;
+}
+"
 
 # setup defaults
 defaultAlg <- "weight01"
@@ -54,24 +89,42 @@ defaultTermTwo <- "GO:0065007"
 
 # Define UI 
 ui <- fluidPage(
+  # set background color
+  setBackgroundColor("#FFF4DD"),
+  
   # use a theme
   theme = bs_theme(bootswatch = "minty"),
   
+  # apply css styles
+  tags$style(
+    HTML(css_styles)
+  ),
+  
   # add application title
-  #dashboardHeader(title = "freeCount FA"),
-  #titlePanel("freeCount FA"),
-  h1(id="app-heading", "freeCount FA"),
-  tags$style(HTML("#app-heading{
-                  color: white; 
-                  background-color: #78C2AD
-                  }")),
+  h1(id="app-heading", 
+     tags$p(
+       "freeCount FA",
+       style = "
+          margin-left: 25px; 
+          font-family: Georgia, Arial, sans-serif;
+          color: white
+        "
+     )
+  ),
   
   # setup sidebar layout
   sidebarLayout(
     
     # setup sidebar panel
     sidebarPanel(
-      
+      # setup the style
+      style = "
+          background-color: white;
+          border-color: #F5E7C9; 
+          border-width: 10px; 
+          border-style: solid;
+          border-radius: 25px
+      ",
       # TO-DO: fix scoreStat to allow or prohibit "color"
       # also, limit the input stat options
       # show panel depending on run analysis check
@@ -139,9 +192,28 @@ ui <- fluidPage(
       # getting started text
       conditionalPanel(
         condition = "!input.runAnalysis",
+        # set the background style
+        style = "
+          background-color: white; 
+          border-color: white; 
+          border-width: 10px; 
+          border-style: solid;
+          border-radius: 25px
+        ",
+        # header
         tags$h1(
+          "Getting Started", 
           align = "center",
-          "Getting Started"
+          style = "
+            color: white; 
+            background: #78c2ad;
+            font-size: xx-large;
+            font-family: Georgia, Arial, sans-serif;
+            border-color: #78c2ad;
+            border-width: 4px;
+            border-style: solid;
+            border-radius: 25px
+          "
         ),
         tags$br(),
         tags$p(
@@ -193,7 +265,6 @@ ui <- fluidPage(
           align="center",
           HTML("<b>Helpful Tips</b>")
         ),
-        tags$br(),
         tags$p(
           HTML("<b>Tip 1:</b> The topGO package expects gene-to-GO mappings files to be specifically formatted where:")
         ),
@@ -331,9 +402,28 @@ ui <- fluidPage(
       # processing text
       conditionalPanel(
         condition = "input.runAnalysis && !output.resultsCompleted",
+        # set the background style
+        style = "
+          background-color: white; 
+          border-color: white; 
+          border-width: 10px; 
+          border-style: solid;
+          border-radius: 25px
+        ",
+        # header
         tags$h1(
           "Processing", 
-          align="center"
+          align = "center",
+          style = "
+            color: white; 
+            background: #78c2ad;
+            font-size: xx-large;
+            font-family: Georgia, Arial, sans-serif;
+            border-color: #78c2ad;
+            border-width: 4px;
+            border-style: solid;
+            border-radius: 25px
+          "
         ),
         tags$br(),
         tags$p(
@@ -349,12 +439,20 @@ ui <- fluidPage(
           type = "tabs",
           tabPanel(
             "Tips",
-            tags$br(),
-            tags$p(
+            tags$h1(
               align="center",
-              HTML("<b>Helpful Tips</b>")
+              "Helpful Tips",
+              style = "
+                color: white; 
+                background: #78c2ad;
+                font-size: x-large;
+                font-family: Georgia, Arial, sans-serif;
+                border-color: #78c2ad;
+                border-width: 4px;
+                border-style: solid;
+                border-radius: 25px;
+              "
             ),
-            tags$br(),
             tags$p(
               HTML("<b>Tip 1:</b> The plots and results may take several moments to appear depending on the size of the input data tables.")
             ),
@@ -379,10 +477,19 @@ ui <- fluidPage(
           # Analysis tab
           tabPanel(
             "Analysis",
-            tags$br(),
-            tags$p(
-              align = "center",
-              HTML("<b>Functional Analysis</b>")
+            tags$h1(
+              align="center",
+              "Functional Analysis",
+              style = "
+                color: white; 
+                background: #78c2ad;
+                font-size: x-large;
+                font-family: Georgia, Arial, sans-serif;
+                border-color: #78c2ad;
+                border-width: 4px;
+                border-style: solid;
+                border-radius: 25px;
+              "
             ),
             tags$p(
               "Begin the functional enrichment or over-representation analysis by selecting a test statistic, algorithm, and p-value cut off."
@@ -475,10 +582,19 @@ ui <- fluidPage(
           # Exploration tab
           tabPanel(
             "Exploration",
-            tags$br(),
-            tags$p(
-              align = "center",
-              HTML("<b>Exploration</b>")
+            tags$h1(
+              align="center",
+              "Exploration",
+              style = "
+                color: white; 
+                background: #78c2ad;
+                font-size: x-large;
+                font-family: Georgia, Arial, sans-serif;
+                border-color: #78c2ad;
+                border-width: 4px;
+                border-style: solid;
+                border-radius: 25px;
+              "
             ),
             tags$p(
               "Begin exploring the GO term data and functional analysis results by selecting a GO term category (e.g., ontology level) below."
@@ -703,10 +819,19 @@ ui <- fluidPage(
           # results tab
           tabPanel(
             "Results",
-            tags$br(),
-            tags$p(
+            tags$h1(
               align="center",
-              HTML("<b>Functional Analysis Results</b>")
+              "Functional Analysis Results",
+              style = "
+                color: white; 
+                background: #78c2ad;
+                font-size: x-large;
+                font-family: Georgia, Arial, sans-serif;
+                border-color: #78c2ad;
+                border-width: 4px;
+                border-style: solid;
+                border-radius: 25px;
+              "
             ),
             tags$p(
               "Results from the GO term functional analysis may be viewed or downloaded below."
@@ -830,12 +955,20 @@ ui <- fluidPage(
           # information tab
           tabPanel(
             "Information",
-            tags$br(),
-            tags$p(
+            tags$h1(
               align="center",
-              HTML("<b>Helpful Information</b>")
+              "Helpful Information",
+              style = "
+                color: white; 
+                background: #78c2ad;
+                font-size: x-large;
+                font-family: Georgia, Arial, sans-serif;
+                border-color: #78c2ad;
+                border-width: 4px;
+                border-style: solid;
+                border-radius: 25px;
+              "
             ),
-            tags$br(),
             tags$p(
               "This application for functional enrichment analysis was created by ",
               tags$a("Elizabeth Brooks",href = "https://www.linkedin.com/in/elizabethmbrooks/"),

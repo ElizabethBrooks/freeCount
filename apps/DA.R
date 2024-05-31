@@ -1,10 +1,10 @@
 # creator: Elizabeth Brooks
-# updated: 29 May 2024
+# updated: 31 May 2024
 
 #### Setup ####
 
 # install any missing packages
-packageList <- c("BiocManager", "shiny", "bslib", "ggplot2", "rcartocolor", "dplyr", "statmod", "pheatmap", "ggplotify")
+packageList <- c("BiocManager", "shiny", "bslib", "shinyWidgets", "ggplot2", "rcartocolor", "dplyr", "statmod", "pheatmap", "ggplotify")
 biocList <- c("edgeR")
 newPackages <- packageList[!(packageList %in% installed.packages()[,"Package"])]
 newBioc <- biocList[!(biocList %in% installed.packages()[,"Package"])]
@@ -19,6 +19,7 @@ if(length(newBioc)){
 suppressPackageStartupMessages({
   library(shiny)
   library(bslib)
+  library(shinyWidgets)
   library(ggplot2)
   library(rcartocolor)
   library(edgeR)
@@ -31,29 +32,36 @@ suppressPackageStartupMessages({
 plotColors <- carto_pal(12, "Safe")
 
 # prepare styles for css
+#font-family: Arial, sans-serif !important;
 css_styles <- "
+* {
+  font-family: Arial, sans-serif;
+  color: #5A5A5A;
+}
 #app-heading {
-  color: white; 
   background: linear-gradient(to right, #78c2ad, #f3969a);
+  border-radius: 25px;
 }
 .tabbable > .nav > li > a {
   background-color: #f3969a;  
   color: white; 
   border-color: white;
-}
-.tab-pane.active {
-    background-color: white;
-    position: absolute;
-    width: -webkit-fill-available;
-    height: -webkit-fill-available;
-    border-color: white;
-    border-width: 10px;
-    border-style: solid;
+  border-width: 2px;
 }
 .nav-tabs .nav-link.active,.nav-tabs>li>a.active,.nav-tabs .nav-pills>li>a.active,.nav-tabs :where(ul.nav.navbar-nav > li)>a.active,.nav-tabs .nav-item.show .nav-link,.nav-tabs .nav-item.in .nav-link,.nav-tabs .nav-item.show .nav-tabs>li>a,.nav-tabs .nav-item.in .nav-tabs>li>a,.nav-tabs .nav-item.show .nav-pills>li>a,.nav-tabs .nav-item.in .nav-pills>li>a,.nav-tabs>li.show .nav-link,.nav-tabs>li.in .nav-link,.nav-tabs>li.show .nav-tabs>li>a,.nav-tabs>li.in .nav-tabs>li>a,.nav-tabs>li.show .nav-pills>li>a,.nav-tabs>li.in .nav-pills>li>a,.nav-tabs .nav-pills>li.show .nav-link,.nav-tabs .nav-pills>li.in .nav-link,.nav-tabs .nav-pills>li.show .nav-tabs>li>a,.nav-tabs .nav-pills>li.in .nav-tabs>li>a,.nav-tabs .nav-pills>li.show .nav-pills>li>a,.nav-tabs .nav-pills>li.in .nav-pills>li>a,.nav-tabs .nav-item.show :where(ul.nav.navbar-nav > li)>a,.nav-tabs .nav-item.in :where(ul.nav.navbar-nav > li)>a,.nav-tabs>li.show :where(ul.nav.navbar-nav > li)>a,.nav-tabs>li.in :where(ul.nav.navbar-nav > li)>a,.nav-tabs .nav-pills>li.show :where(ul.nav.navbar-nav > li)>a,.nav-tabs .nav-pills>li.in :where(ul.nav.navbar-nav > li)>a,.nav-tabs .show:where(ul.nav.navbar-nav > li):not(.dropdown) .nav-link,.nav-tabs .in:where(ul.nav.navbar-nav > li):not(.dropdown) .nav-link,.nav-tabs .show:where(ul.nav.navbar-nav > li):not(.dropdown) .nav-tabs>li>a,.nav-tabs .in:where(ul.nav.navbar-nav > li):not(.dropdown) .nav-tabs>li>a,.nav-tabs .show:where(ul.nav.navbar-nav > li):not(.dropdown) .nav-pills>li>a,.nav-tabs .in:where(ul.nav.navbar-nav > li):not(.dropdown) .nav-pills>li>a,.nav-tabs .show:where(ul.nav.navbar-nav > li):not(.dropdown) :where(ul.nav.navbar-nav > li)>a,.nav-tabs .in:where(ul.nav.navbar-nav > li):not(.dropdown) :where(ul.nav.navbar-nav > li)>a {
-    color: white;
-    background-color: #5A5A5A;
-    border-color: #78c2ad
+  color: white;
+  background-color: #5A5A5A;
+  border-color: #78c2ad;
+  border-width: 2px;
+}
+.tab-pane.active {
+  background-color: white;
+  border-color: white;
+  border-width: 10px;
+  border-style: solid;
+  border-top-right-radius: 25px;
+  border-bottom-right-radius: 25px;
+  border-bottom-left-radius: 25px;
 }
 "
 
@@ -92,7 +100,11 @@ ui <- fluidPage(
   h1(id="app-heading", 
      tags$p(
        "freeCount DA",
-       style = "margin-left: 10px"
+       style = "
+          margin-left: 25px; 
+          font-family: Georgia, Arial, sans-serif;
+          color: white
+        "
      )
   ),
   
@@ -101,7 +113,14 @@ ui <- fluidPage(
     
     # setup sidebar panel
     sidebarPanel(
-      
+      # setup the style
+      style = "
+          background-color: white;
+          border-color: #F5E7C9; 
+          border-width: 10px; 
+          border-style: solid;
+          border-radius: 25px
+      ",
       # show panel depending on run button
       conditionalPanel(
         condition = "!input.runAnalysis",
@@ -189,7 +208,29 @@ ui <- fluidPage(
       # getting started text
       conditionalPanel(
         condition = "!input.runAnalysis",
-        tags$h1("Getting Started", align = "center"),
+        # set the background style
+        style = "
+          background-color: white; 
+          border-color: white; 
+          border-width: 10px; 
+          border-style: solid;
+          border-radius: 25px
+        ",
+        # header
+        tags$h1(
+          "Getting Started", 
+          align = "center",
+          style = "
+            color: white; 
+            background: #78c2ad;
+            font-size: xx-large;
+            font-family: Georgia, Arial, sans-serif;
+            border-color: #78c2ad;
+            border-width: 4px;
+            border-style: solid;
+            border-radius: 25px
+          "
+        ),
         tags$br(),
         tags$p(
           HTML("<b>Hello!</b>"),
@@ -305,9 +346,28 @@ ui <- fluidPage(
       # processing text
       conditionalPanel(
         condition = "output.inputCheck && !output.normalizeResultsCompleted",
+        # set the background style
+        style = "
+          background-color: white; 
+          border-color: white; 
+          border-width: 10px; 
+          border-style: solid;
+          border-radius: 25px
+        ",
+        # header
         tags$h1(
           "Processing", 
-          align="center"
+          align = "center",
+          style = "
+            color: white; 
+            background: #78c2ad;
+            font-size: xx-large;
+            font-family: Georgia, Arial, sans-serif;
+            border-color: #78c2ad;
+            border-width: 4px;
+            border-style: solid;
+            border-radius: 25px
+          "
         ),
         tags$br(),
         "The DE analysis results and plots may take several moments to process depending on the size of the input gene counts or experimental design tables."
@@ -321,10 +381,19 @@ ui <- fluidPage(
           type = "tabs",
           tabPanel(
             "Tips",
-            tags$br(),
-            tags$p(
+            tags$h1(
               align="center",
-              HTML("<b>Helpful Tips</b>")
+              "Helpful Tips",
+              style = "
+                color: white; 
+                background: #78c2ad;
+                font-size: x-large;
+                font-family: Georgia, Arial, sans-serif;
+                border-color: #78c2ad;
+                border-width: 4px;
+                border-style: solid;
+                border-radius: 25px;
+              "
             ),
             tags$br(),
             tags$p(
@@ -347,10 +416,19 @@ ui <- fluidPage(
           # data normalization tab
           tabPanel(
             "Data Normalization",
-            tags$br(),
-            tags$p(
+            tags$h1(
               align="center",
-              HTML("<b>Data Normalization</b>")
+              "Data Normalization",
+              style = "
+                color: white; 
+                background: #78c2ad;
+                font-size: x-large;
+                font-family: Georgia, Arial, sans-serif;
+                border-color: #78c2ad;
+                border-width: 4px;
+                border-style: solid;
+                border-radius: 25px;
+              "
             ),
             imageOutput(outputId = "librarySizes", height="100%", width="100%"),
             downloadButton(outputId = "downloadLibrarySizes", label = "Download Plot"),
@@ -381,10 +459,19 @@ ui <- fluidPage(
           # data exploration tab
           tabPanel(
             "Data Exploration",
-            tags$br(),
-            tags$p(
+            tags$h1(
               align="center",
-              HTML("<b>Data Exploration</b>")
+              "Data Exploration",
+              style = "
+                color: white; 
+                background: #78c2ad;
+                font-size: x-large;
+                font-family: Georgia, Arial, sans-serif;
+                border-color: #78c2ad;
+                border-width: 4px;
+                border-style: solid;
+                border-radius: 25px;
+              "
             ),
             imageOutput(outputId = "PCA", height="100%", width="100%"),
             downloadButton(outputId = "downloadPCA", label = "Download Plot"),
@@ -434,12 +521,21 @@ ui <- fluidPage(
             # show pairwise results
             conditionalPanel(
               condition = "input.analysisType == 'pairwise'",
-              tags$br(),
-              tags$p(
+              tags$h1(
                 align="center",
-                HTML("<b>Pairwise Comparison</b>")
+                "Pairwise Comparison",
+                style = "
+                color: white; 
+                background: #78c2ad;
+                font-size: x-large;
+                font-family: Georgia, Arial, sans-serif;
+                border-color: #78c2ad;
+                border-width: 4px;
+                border-style: solid;
+                border-radius: 25px;
+              "
               ),
-              span(
+              tags$h4(
                 textOutput(outputId = "pairwiseComparison"), 
                 align="center"
               ),
@@ -572,12 +668,21 @@ ui <- fluidPage(
             # show GLM comparison
             conditionalPanel(
               condition = "input.analysisType == 'GLM'",
-              tags$br(),
-              tags$p(
+              tags$h1(
                 align="center",
-                HTML("<b>GLM Comparison</b>")
+                "GLM Comparison",
+                style = "
+                color: white; 
+                background: #78c2ad;
+                font-size: x-large;
+                font-family: Georgia, Arial, sans-serif;
+                border-color: #78c2ad;
+                border-width: 4px;
+                border-style: solid;
+                border-radius: 25px;
+              "
               ),
-              span(
+              tags$h4(
                 textOutput(outputId = "glmComparison"), 
                 align="center"
               ),
@@ -738,12 +843,20 @@ ui <- fluidPage(
           # information tab
           tabPanel(
             "Information",
-            tags$br(),
-            tags$p(
+            tags$h1(
               align="center",
-              HTML("<b>Helpful Information</b>")
+              "Helpful Information",
+              style = "
+                color: white; 
+                background: #78c2ad;
+                font-size: x-large;
+                font-family: Georgia, Arial, sans-serif;
+                border-color: #78c2ad;
+                border-width: 4px;
+                border-style: solid;
+                border-radius: 25px;
+              "
             ),
-            tags$br(),
             tags$p(
               "This application for DE analysis was created by ",
               tags$a("Elizabeth Brooks",href = "https://www.linkedin.com/in/elizabethmbrooks/"),
