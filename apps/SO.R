@@ -1,6 +1,7 @@
 # creator: Elizabeth Brooks
 # updated: 4 June 2024
 
+# TO-DO: add funding acknowledgement for NDR
 # TO-DO: improve detail of output error messages (using console?)
 # TO-DO: update set names diagram using the input names
 # TO-DO: consider adding data summary tab

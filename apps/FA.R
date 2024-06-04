@@ -1,11 +1,13 @@
 # creator: Elizabeth Brooks
 # updated: 4 June 2024
 
+# TO-DO: update the dot plot legend name
+# TO-DO: add funding acknowledgement for NDR
 # TO-DO: improve detail of output error messages (using console?)
+# TO-DO: fix download tables for other ontology levels
 # TO-DO: update helpful tips for input GO mapping files
 # TO-DO: consider adding data summary tab
 # TO-DO: add software version print out on information tab
-# TO-DO: fix download tables for other ontology levels
 # TO-DO: change input expression to combo of text field and radio buttons
 # TO-DO: add bar plot of gene LFC (if DE genes)
 # TO-DO: output example tables as csv
@@ -852,7 +854,7 @@ ui <- fluidPage(
             downloadButton(outputId = "downloadDotPlot", label = "Download Plot"),
             # TO-DO: make sure to note enriched or overrepresented for outputs
             tags$p(
-              HTML("The above dot plot shows <i>up to the top 5</i> most significant (lowest p-value) GO terms for each ontology level (BP, MF, CC). The significance is determined by the input unadjusted p-value cut off. The size of the dots indicate the number of significant genes annotated to the GO term. The dots are colored by the enrichment test p-values.")
+              HTML("The above dot plot shows <i>up to the top 5</i> most significant (lowest p-value) GO terms for each ontology level (BP, MF, CC). The significance is determined by the input unadjusted p-value cut off. The size of the dots indicate the number of observed significant features (e.g., genes) annotated to the GO term, which is compared to the expected number based on the null hypothesis. The dots are colored by the enrichment test p-values.")
             ),
             tags$hr(),
             tags$p(
@@ -1685,7 +1687,8 @@ server <- function(input, output, session) {
     facet <- factor(plotTable$ID, levels = c('BP', 'CC', 'MF'))
     # create dot plot
     dotplot <- ggplot(data = plotTable, aes(x = "Enrichment", y = GO.ID, size = Significant, color = as.numeric(weightFisher))) + 
-      facet_grid(rows = facet, space = 'free_y', scales = 'free') +
+      #facet_grid(rows = facet, space = 'free_y', scales = 'free') +
+      facet_wrap(facet, ncol = 1, nrow = length(facet), scales = 'free') +
       geom_point() +
       #scale_color_gradientn(colors = heat.colors(10), limits=c(0, 0.05)) + 
       scale_color_gradientn(colors = dotPlotColors) +
@@ -1694,7 +1697,8 @@ server <- function(input, output, session) {
       xlab('Score') +
       ylab('Term') + 
       #scale_x_discrete(labels=c("Interaction"=expression(italic("Interaction")), parse=TRUE)) +
-      labs(color = 'P-Value', size = 'Significant')
+      #labs(color = 'P-Value', size = 'Significant')
+      labs(color = 'p-Value', size = 'Observed')
     # view plot
     dotplot
   }
