@@ -1,5 +1,15 @@
 # creator: Elizabeth Brooks
-# updated: 31 May 2024
+# updated: 4 June 2024
+
+# TO-DO: improve detail of output error messages (using console?)
+# TO-DO: update helpful tips for input GO mapping files
+# TO-DO: consider adding data summary tab
+# TO-DO: add software version print out on information tab
+# TO-DO: fix download tables for other ontology levels
+# TO-DO: change input expression to combo of text field and radio buttons
+# TO-DO: add bar plot of gene LFC (if DE genes)
+# TO-DO: output example tables as csv
+# TO-DO: check mappings table output (error for two rows with duplicate names)
 
 #### Setup ####
 
@@ -46,6 +56,9 @@ css_styles <- "
 #app-heading {
   background: linear-gradient(to right, #78c2ad, #f3969a);
   border-radius: 25px;
+  border-color: #F5E7C9;
+  border-width: 8px;
+  border-style: solid;
 }
 .tabbable > .nav > li > a {
   background-color: #f3969a;  
@@ -77,14 +90,6 @@ defaultP <- 0.05
 defaultTermOne <- "GO:0008150"
 defaultTermTwo <- "GO:0065007"
 
-# TO-DO: consider adding data summary tab
-# TO-DO: add software version print out on information tab
-# TO-DO: fix download tables for other ontology levels
-# TO-DO: change input expression to combo of text field and radio buttons
-# TO-DO: add bar plot of gene LFC (if DE genes)
-# TO-DO: output example tables as csv
-# TO-DO: check mappings table output (error for two rows with duplicate names)
-
 #### UI ####
 
 # Define UI 
@@ -105,6 +110,7 @@ ui <- fluidPage(
      tags$p(
        "freeCount FA",
        style = "
+          margin-top: 14px;
           margin-left: 25px; 
           font-family: Georgia, Arial, sans-serif;
           color: white

@@ -1,5 +1,18 @@
 # creator: Elizabeth Brooks
-# updated: 31 May 2024
+# updated: 4 June 2024
+
+# TO-DO: improve detail of output error messages (using console?)
+# TO-DO: consider adding data summary tab
+# TO-DO: replace design table in side bar with analysis settings
+# TO-DO: add software version print out on information tab
+# TO-DO: add scree plot
+# TO-DO: double check pheatmap display
+# TO-DO: fix check of design file length (requires new line to match counts header length)
+# TO-DO: fix output table header, which is missing the "gene" column?
+# TO-DO: store data and results in reactiveVal and reactiveValues
+# TO-DO: add bar plots of gene counts and LFC
+# TO-DO: output example tables as csv
+# TO-DO: consider separating analysis and results into different tabs
 
 #### Setup ####
 
@@ -41,6 +54,9 @@ css_styles <- "
 #app-heading {
   background: linear-gradient(to right, #78c2ad, #f3969a);
   border-radius: 25px;
+  border-color: #F5E7C9;
+  border-width: 8px;
+  border-style: solid;
 }
 .tabbable > .nav > li > a {
   background-color: #f3969a;  
@@ -69,18 +85,6 @@ css_styles <- "
 defaultLFC <- 1.2
 defaultFDR <- 0.05
 
-# TO-DO: consider adding data summary tab
-# TO-DO: replace design table in side bar with analysis settings
-# TO-DO: add software version print out on information tab
-# TO-DO: add scree plot
-# TO-DO: double check pheatmap display
-# TO-DO: fix check of design file length (requires new line to match counts header length)
-# TO-DO: fix output table header, which is missing the "gene" column?
-# TO-DO: store data and results in reactiveVal and reactiveValues
-# TO-DO: add bar plots of gene counts and LFC
-# TO-DO: output example tables as csv
-# TO-DO: consider separating analysis and results into different tabs
-
 #### UI ####
 
 # Define UI 
@@ -101,6 +105,7 @@ ui <- fluidPage(
      tags$p(
        "freeCount DA",
        style = "
+          margin-top: 14px;
           margin-left: 25px; 
           font-family: Georgia, Arial, sans-serif;
           color: white

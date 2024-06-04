@@ -1,5 +1,16 @@
 # creator: Elizabeth Brooks
-# updated: 31 May 2024
+# updated: 4 June 2024
+
+# TO-DO: improve detail of output error messages (using console?)
+# TO-DO: consider adding data summary tab
+# TO-DO: replace design table in side bar with analysis settings
+# TO-DO: add update analysis buttons
+# TO-DO: add software version print out on information tab
+# TO-DO: store data and results in reactiveVal and reactiveValues
+# TO-DO: output example tables as csv
+# TO-DO: hide plots for invalid inputs
+# TO-DO: fix Windows OS images not showing
+# https://stackoverflow.com/questions/38011285/image-not-showing-in-shiny-app-r
 
 #### Setup ####
 
@@ -37,6 +48,9 @@ css_styles <- "
 #app-heading {
   background: linear-gradient(to right, #78c2ad, #f3969a);
   border-radius: 25px;
+  border-color: #F5E7C9;
+  border-width: 8px;
+  border-style: solid;
 }
 .tabbable > .nav > li > a {
   background-color: #f3969a;  
@@ -67,16 +81,6 @@ css_styles <- "
 # See note above.
 #enableWGCNAThreads()
 
-# TO-DO: consider adding data summary tab
-# TO-DO: replace design table in side bar with analysis settings
-# TO-DO: add update analysis buttons
-# TO-DO: add software version print out on information tab
-# TO-DO: store data and results in reactiveVal and reactiveValues
-# TO-DO: output example tables as csv
-# TO-DO: hide plots for invalid inputs
-# TO-DO: fix Windows OS images not showing
-# https://stackoverflow.com/questions/38011285/image-not-showing-in-shiny-app-r
-
 #### UI ####
 
 # Define UI 
@@ -97,6 +101,7 @@ ui <- fluidPage(
      tags$p(
        "freeCount NA",
        style = "
+          margin-top: 14px;
           margin-left: 25px; 
           font-family: Georgia, Arial, sans-serif;
           color: white

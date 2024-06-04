@@ -1,5 +1,13 @@
 # creator: Elizabeth Brooks
-# updated: 31 May 2024
+# updated: 4 June 2024
+
+# TO-DO: improve detail of output error messages (using console?)
+# TO-DO: update set names diagram using the input names
+# TO-DO: consider adding data summary tab
+# TO-DO: add software version print out on information tab
+# TO-DO: make upload button appear after at least two sets are input
+# TO-DO: check if headers are accounted for
+# TO-DO: store data and results in reactiveVal and reactiveValues
 
 #### Setup ####
 
@@ -34,6 +42,9 @@ css_styles <- "
 #app-heading {
   background: linear-gradient(to right, #78c2ad, #f3969a);
   border-radius: 25px;
+  border-color: #F5E7C9;
+  border-width: 8px;
+  border-style: solid;
 }
 .tabbable > .nav > li > a {
   background-color: #f3969a;  
@@ -63,13 +74,6 @@ css_styles <- "
 }
 "
 
-# TO-DO: update set names diagram using the input names
-# TO-DO: consider adding data summary tab
-# TO-DO: add software version print out on information tab
-# TO-DO: make upload button appear after at least two sets are input
-# TO-DO: check if headers are accounted for
-# TO-DO: store data and results in reactiveVal and reactiveValues
-
 #### UI ####
 
 # Define UI 
@@ -90,6 +94,7 @@ ui <- fluidPage(
      tags$p(
        "freeCount SO",
         style = "
+          margin-top: 14px;
           margin-left: 25px; 
           font-family: Georgia, Arial, sans-serif;
           color: white
@@ -106,7 +111,7 @@ ui <- fluidPage(
       style = "
           background-color: white;
           border-color: #F5E7C9; 
-          border-width: 10px; 
+          border-width: 8px; 
           border-style: solid;
           border-radius: 25px
       ",
