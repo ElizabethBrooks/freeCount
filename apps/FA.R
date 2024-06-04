@@ -1,6 +1,7 @@
 # creator: Elizabeth Brooks
 # updated: 4 June 2024
 
+# TO-DO: fix the dot plot to only show whole numbers in the scale legend
 # TO-DO: update the dot plot legend name
 # TO-DO: add funding acknowledgement for NDR
 # TO-DO: improve detail of output error messages (using console?)
@@ -1688,7 +1689,7 @@ server <- function(input, output, session) {
     # create dot plot
     dotplot <- ggplot(data = plotTable, aes(x = "Enrichment", y = GO.ID, size = Significant, color = as.numeric(weightFisher))) + 
       #facet_grid(rows = facet, space = 'free_y', scales = 'free') +
-      facet_wrap(facet, ncol = 1, nrow = length(facet), scales = 'free') +
+      facet_wrap(facet, ncol = 1, nrow = length(facet), scales = 'free', strip.position="right") +
       geom_point() +
       #scale_color_gradientn(colors = heat.colors(10), limits=c(0, 0.05)) + 
       scale_color_gradientn(colors = dotPlotColors) +
