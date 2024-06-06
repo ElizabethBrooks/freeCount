@@ -156,7 +156,7 @@ ui <- fluidPage(
         tags$p(
           "Click to Upload Data:"
         ),  
-        # TO-DO: remove
+        # TO-DO: remove Upload button
         actionButton("runUpload", "Upload")
       ),
       # show panel depending on input files check
@@ -973,7 +973,7 @@ server <- function(input, output, session) {
     datExpr0
   }
   
-  ## TO-DO: fix issue with additional goodSamplesGenes function runs
+  # TO-DO: fix issue with additional goodSamplesGenes function runs
   # https://stackoverflow.com/questions/55650524/avoid-multiple-function-calls-in-server-shiny
   # function to test data
   testCheckData <- function(){

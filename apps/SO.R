@@ -125,7 +125,7 @@ ui <- fluidPage(
         label = NULL,
         value = "Set One"
       ),
-      ## TO-DO: consider allowing other file types to be uploaded
+      # TO-DO: consider allowing other file types to be uploaded
       tags$p(
         "Upload set one table (*.csv):"
       ),

@@ -135,7 +135,7 @@ ui <- fluidPage(
           border-radius: 25px
       ",
       # TO-DO: fix scoreStat to allow or prohibit "color"
-      # also, limit the input stat options
+      # TO-DO: also, limit the input stat options
       # show panel depending on run analysis check
       conditionalPanel(
         condition = "!input.runAnalysis",
@@ -643,7 +643,7 @@ ui <- fluidPage(
             tags$p(
               HTML("<b>Tip 2:</b> Make sure that the GO category is valid for the input GO term IDs.")
             ),
-            # To-DO : make the current results load after completed
+            # TO-DO : make the current results load after completed
             # show results
             #conditionalPanel(
             #condition = "output.levelResultsCompleted",
@@ -1634,7 +1634,7 @@ server <- function(input, output, session) {
     createDensity()
   })
   
-  # TO-DO: fix
+  # TO-DO: fix download handler for the density plot
   # download handler for the density plot
   output$downloadDensity <- downloadHandler(
     filename = function() {

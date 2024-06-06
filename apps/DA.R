@@ -1236,7 +1236,7 @@ server <- function(input, output, session) {
     group <- designFactors()
     # calculate scaling factors
     list <- filterNorm()
-    ## TO-DO: consider allowing users to input shapes and colors or other features
+    # TO-DO: consider allowing users to input shapes and colors or other features
     # retrieve the number of grouping levels
     stringLevels <- gsub("\\..*","", (levels(group)))
     # setup colors and points
@@ -1282,7 +1282,7 @@ server <- function(input, output, session) {
     group <- designFactors()
     # calculate scaling factors
     list <- filterNorm()
-    ## TO-DO: consider allowing users to input shapes and colors or other features
+    # TO-DO: consider allowing users to input shapes and colors or other features
     # retrieve the number of grouping levels
     stringLevels <- gsub("\\..*","", (levels(group)))
     # setup colors and points
@@ -1601,7 +1601,7 @@ server <- function(input, output, session) {
     }
   )
   
-  ## TO-DO: allow users to select plot points
+  # TO-DO: allow users to select plot points and render text from brushed plot points
   # render text from brushed plot points
   #output$volcanoInfo <- renderText({
   # perform exact test
@@ -1632,7 +1632,7 @@ server <- function(input, output, session) {
     }
   )
   
-  # TO-DO: note LFC cut off filter
+  # TO-DO: note LFC cut off filter with glmTREAT
   # https://www.ncbi.nlm.nih.gov/pmc/articles/PMC2654802/#:~:text=Results%3A%20We%20present%20a%20method,given%20(biologically%20meaningful)%20threshold.
   # download table with number of filtered DE genes
   output$pairwiseSigResults <- downloadHandler(
