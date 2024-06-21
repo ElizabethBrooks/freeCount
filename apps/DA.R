@@ -14,6 +14,9 @@
 # TO-DO: add bar plots of gene counts and LFC
 # TO-DO: output example tables as csv
 # TO-DO: consider separating analysis and results into different tabs
+# TO-DO: add legend to volcano plots
+# TO-DO: allow input lists and tables of dispersion values
+# TO-DO: hide pheatmap when not enough DGE
 
 #### Setup ####
 
@@ -85,6 +88,8 @@ css_styles <- "
 # set default values
 defaultLFC <- 1.2
 defaultFDR <- 0.05
+defaultPairwiseDisp <- "auto"
+defaultGLMDisp <- "NULL"
 
 #### UI ####
 
@@ -164,47 +169,22 @@ ui <- fluidPage(
       conditionalPanel(
         condition = "input.runAnalysis && output.normalizeResultsCompleted",
         tags$p(
-          "Select Analysis Type:"
-        ),
-        selectInput(
-          inputId = "analysisType",
-          label = NULL,
-          choices = list("pairwise", "GLM")
-        ),
-        tags$hr(),
-        tags$p(
-          "Set Cut Offs:"
-        ),
-        # glmTreat vs exactTest
-        sliderInput(
-          "cutLFC", 
-          tags$p("LFC Cut Off"), 
-          min=0, 
-          max=10, 
-          step=0.1,
-          value=defaultLFC
-        ),
-        sliderInput(
-          "cutFDR",
-          tags$p("FDR Cut Off"),
-          min = 0, 
-          max = 0.1, 
-          value=defaultFDR 
-        ),
-        tags$br(),
-        tags$p(
-          "Click to Update Analysis:"
-        ),  
-        actionButton("inputsUpdate", "Update Analysis"),
-        tags$hr(),
-        tags$p(
-          "Design Table:"
-        ),
-        fluidRow(
-          align = "center",
+          "Current Analysis Settings:"
+        ), 
+        tableOutput(outputId = "inputSettings"),
+        #tags$hr(),
+        #tags$p(
+        #  "Click to Download Analysis Report:"
+        #),
+        #downloadButton("report", "Download Report")
+        #tags$p(
+          #"Design Table:"
+        #),
+        #fluidRow(
+          #align = "center",
           # display input design table
-          tableOutput(outputId = "designTable")
-        )
+          #tableOutput(outputId = "designTable")
+        #)
       )
     ),
     
@@ -419,6 +399,224 @@ ui <- fluidPage(
             )
           ),
           
+          # Analysis tab
+          tabPanel(
+            "Analysis",
+            tags$h1(
+              align="center",
+              "DE Analysis",
+              style = "
+                color: white; 
+                background: #78c2ad;
+                font-size: x-large;
+                font-family: Georgia, Arial, sans-serif;
+                border-color: #78c2ad;
+                border-width: 4px;
+                border-style: solid;
+                border-radius: 25px;
+              "
+            ),
+            tags$p(
+              "Begin the differential expression (DE) analysis by selecting an analysis type, log2-fold change (LFC) cut off, and false discovery rate (FDR) adjusted p-value cut off."
+            ),
+            tags$br(),
+            fluidRow(
+              column(
+                width = 6,
+                tags$p(
+                  HTML("<b>Select LFC Cut Off:</b>")
+                ),
+                sliderInput(
+                  "cutLFC", 
+                  label=NULL,
+                  min=0, 
+                  max=10, 
+                  step=0.1,
+                  value=defaultLFC
+                ),
+                tags$p(
+                  HTML("<b>Select FDR Adjusted p-Value Cut Off:</b>")
+                ),
+                sliderInput(
+                  "cutFDR",
+                  label=NULL,
+                  min = 0, 
+                  max = 0.1, 
+                  value=defaultFDR 
+                )
+              ),
+              column(
+                width = 6,
+                tags$p(
+                  HTML("<b>Select Analysis Type:</b>")
+                ),
+                selectInput(
+                  inputId = "analysisType",
+                  label = NULL,
+                  choices = list("pairwise", "GLM")
+                )
+              )
+            ),
+            tags$br(),
+            # show pairwise analysis inputs
+            conditionalPanel(
+              condition = "input.analysisType == 'pairwise'",
+              tags$h1(
+                align="center",
+                "Pairwise Comparison",
+                style = "
+                color: white; 
+                background: #78c2ad;
+                font-size: x-large;
+                font-family: Georgia, Arial, sans-serif;
+                border-color: #78c2ad;
+                border-width: 4px;
+                border-style: solid;
+                border-radius: 25px;
+              "
+              ),
+              tags$h4(
+                textOutput(outputId = "pairwiseComparison"), 
+                align="center"
+              ),
+              tags$br(),
+              tags$p(
+                "Exact tests are performed to identify differences in the means between two groups of negative-binomially distributed counts.",
+                "A comparison or contrast is a linear combination of means for groups of samples."
+              ),
+              tags$br(),
+              fluidRow(
+                column(
+                  width = 6,
+                  tags$p(
+                    HTML("<b>Choose Factor Levels for Comparison:</b>")
+                  ),
+                  # select variable for the first level
+                  selectInput(
+                    inputId = "levelOne",
+                    label = "First Level",
+                    choices = c("")
+                  ),
+                  # select variable for the second level
+                  selectInput(
+                    inputId = "levelTwo",
+                    label = "Second Level",
+                    choices = c("")
+                  )
+                ),
+                column(
+                  width = 6,
+                  tags$p(
+                    HTML("<b>Enter Dispersion Value:</b>")
+                  ),
+                  textInput(
+                    inputId = "inputPairwiseDisp", 
+                    label = NULL,
+                    value = defaultPairwiseDisp
+                  )
+                )
+              ),
+              tags$p(
+                "The dispersion value may be either a character string indicating that dispersions should be taken from the data or a numeric vector of dispersions.",
+                HTML("Allowable character values are <i>common</i>, <i>trended</i>, <i>tagwise</i> or <i>auto</i>."),
+                "If the input is numeric, then it can be a common value for all genes."
+                #"If the input is numeric, then it can be either of length one or of length equal to the number of genes."
+              ),
+              tags$p(
+                HTML("<b>Note</b> that the default dispersion value is <i>auto</i>, which uses the most complex dispersions found in data."),
+              )
+            ),
+            # show GLM analysis inputs
+            conditionalPanel(
+              condition = "input.analysisType == 'GLM'",
+              tags$h1(
+                align="center",
+                "GLM Comparison",
+                style = "
+                color: white; 
+                background: #78c2ad;
+                font-size: x-large;
+                font-family: Georgia, Arial, sans-serif;
+                border-color: #78c2ad;
+                border-width: 4px;
+                border-style: solid;
+                border-radius: 25px;
+              "
+              ),
+              tags$h4(
+                textOutput(outputId = "glmComparison"), 
+                align="center"
+              ),
+              tags$br(),
+              tags$p(
+                "The GLM is used to perform an ANOVA-like analysis to identify any significant main effect associated with an explanatory variable.",
+                "An explanatory variable may be a categorical factor with two or more levels, such as treat and cntrl."
+              ),
+              tags$p(
+                "Additionally, genes above the input log2 fold change (LFC) threshold are identified as significantly DE using t-tests relative to a threshold (TREAT) with the glmTreat function of edgeR.",
+                "If the input LFC cut off is set to 0, then the glmQLFTest function is used instead."
+              ),
+              tags$br(),
+              fluidRow(
+                column(
+                  width = 6,
+                  tags$p(
+                    HTML("<b>Enter Expression for Comparison:</b>")
+                  ),
+                  textInput(
+                    "compareExpression", 
+                    label = NULL
+                  )
+                ),
+                column(
+                  width = 6,
+                  tags$p(
+                    HTML("<b>Enter Dispersion Value:</b>")
+                  ),
+                  textInput(
+                    inputId = "inputGLMDisp", 
+                    label = NULL,
+                    value = defaultGLMDisp
+                  )
+                )
+              ),
+              tags$br(),
+              tags$p(
+                HTML("<b>Tip!</b> Make sure that the factors used in the expression are spelled the same as in the experimental design file and shown in the left-hand sidebar.")
+              ),
+              #tags$p(
+              #  "Valid expressions must consist of the factors contained in the input experimental design file, which is displayed in the left-hand sidebar."
+              #),
+              tags$p(
+                "Examples of designing model expressions for ANOVA-like tests are availble in the",
+                tags$a("edgeR manual", href = "https://www.bioconductor.org/packages/release/bioc/vignettes/edgeR/inst/doc/edgeRUsersGuide.pdf"),
+                " (e.g., sections 3.2.6 & 4.4.9).",
+                HTML("A detailed description of designing model expressions is also provided in the paper \"A guide to creating design matrices for gene expression experiments\" <i>doi: 10.12688/f1000research.27893.1</i> (e.g., studies with multiple factors).")
+              ),
+              tags$p(
+                "The dispersion value may be either a NULL, numeric scalar, vector or matrix of negative binomial dispersions.", 
+                "If the input is NULL, then the dispersions will be extracted from the data.",
+                "The order of precedence is genewise dispersion, trended dispersions, common dispersion.",
+                "If the input it numeric, then the dispersion value can be a common value for all genes."
+                #"If the input it numeric, then the dispersion value can be a common value for all genes, a vector of dispersion values with one for each gene, or a matrix of dispersion values with one for each observation."
+              ),
+              tags$p(
+                HTML("<b>Note</b> that the default dispersion value is <i>NULL</i>.")
+              )
+            ),
+            tags$p(
+              "Examples of typical dispersion values and methods for obtaining dispersions may be found in the ",
+              tags$a("edgeR manual", href = "https://www.bioconductor.org/packages/release/bioc/vignettes/edgeR/inst/doc/edgeRUsersGuide.pdf"),
+              " (e.g., section 2.12).",
+              "For example, the common BCV (square-root dispersion) values typically are 0.4 for human data, 0.1 for data on genetically identical model organisms or 0.01 for technical replicates.",
+              "Furthermore, the dispersion may be estimated from the data given a sizeable number of control transcripts that should not be DE."
+            ),
+            tags$p(
+              HTML("<b>Click to Analyze:</b>")
+            ),  
+            actionButton("analysisUpdate", "Analyze")
+          ),
+          
           # data normalization tab
           tabPanel(
             "Data Normalization",
@@ -523,10 +721,30 @@ ui <- fluidPage(
           
           # analysis & results tab
           tabPanel(
-            "Analysis & Results", 
+            "Results", 
+            tags$h1(
+              align="center",
+              "DE Analysis Results",
+              style = "
+                color: white; 
+                background: #78c2ad;
+                font-size: x-large;
+                font-family: Georgia, Arial, sans-serif;
+                border-color: #78c2ad;
+                border-width: 4px;
+                border-style: solid;
+                border-radius: 25px;
+              "
+            ),
+            tags$p(
+              HTML("Begin the differential expression (DE) analysis on the <i>Analysis</i> tab by selecting input values and clicking the <i>Analyze</i> button.")
+            ),
+            tags$p(
+              HTML("The inputs may also be adjusted on the <i>Analysis</i> tab and updated by clicking the <i>Analyze</i> button.")
+            ),
             # show pairwise results
             conditionalPanel(
-              condition = "input.analysisType == 'pairwise'",
+              condition = "input.analysisType == 'pairwise' && input.analysisUpdate",
               tags$h1(
                 align="center",
                 "Pairwise Comparison",
@@ -541,47 +759,16 @@ ui <- fluidPage(
                 border-radius: 25px;
               "
               ),
-              tags$h4(
-                textOutput(outputId = "pairwiseComparison"), 
-                align="center"
-              ),
-              tags$br(),
-              tags$p(
-                "Exact tests are performed to identify differences in the means between two groups of negative-binomially distributed counts.",
-                "A comparison or contrast is a linear combination of means for groups of samples."
-              ),
-              tags$br(),
-              fluidRow(
-                column(
-                  width = 6,
-                  tags$p(
-                    HTML("<b>Choose Factor Levels for Comparison:</b>")
-                  ),
-                  # select variable for the first level
-                  selectInput(
-                    inputId = "levelOne",
-                    label = "First Level",
-                    choices = c("")
-                  ),
-                  # select variable for the second level
-                  selectInput(
-                    inputId = "levelTwo",
-                    label = "Second Level",
-                    choices = c("")
-                  )
-                ),
-                column(
-                  width = 6,
-                  tags$p(
-                    HTML("<b>Click to Analyze:</b>")
-                  ),  
-                  actionButton("pairwiseUpdate", "Analyze")
+              # show error message
+              conditionalPanel(
+                condition = "!output.pairwiseResultsCompleted",
+                tags$p(
+                  HTML("<b>Note</b> that results will not appear if there are invalid input values (e.g., dispersions).")
                 )
               ),
               # show pairwise results
               conditionalPanel(
                 condition = "output.pairwiseResultsCompleted",
-                tags$hr(),
                 tags$p(
                   align="center",
                   HTML("<b>Pairwise Results</b>")
@@ -673,7 +860,7 @@ ui <- fluidPage(
             ),
             # show GLM comparison
             conditionalPanel(
-              condition = "input.analysisType == 'GLM'",
+              condition = "input.analysisType == 'GLM' && input.analysisUpdate",
               tags$h1(
                 align="center",
                 "GLM Comparison",
@@ -688,57 +875,16 @@ ui <- fluidPage(
                 border-radius: 25px;
               "
               ),
-              tags$h4(
-                textOutput(outputId = "glmComparison"), 
-                align="center"
-              ),
-              tags$br(),
-              tags$p(
-                "The GLM is used to perform an ANOVA-like analysis to identify any significant main effect associated with an explanatory variable.",
-                "An explanatory variable may be a categorical factor with two or more levels, such as treat and cntrl."
-              ),
-              tags$br(),
-              tags$p(
-                "Additionally, genes above the input log2 fold change (LFC) threshold are identified as significantly DE using t-tests relative to a threshold (TREAT) with the glmTreat function of edgeR.",
-                "If the input LFC cut off is set to 0, then the glmQLFTest function is used instead."
-              ),
-              tags$br(),
-              fluidRow(
-                column(
-                  width = 6,
-                  tags$p(
-                    HTML("<b>Enter Expression for Comparison:</b>")
-                  ),
-                  textInput("compareExpression", "Expression")
-                ),
-                column(
-                  width = 6,
-                  tags$p(
-                    HTML("<b>Click to Analyze:</b>")
-                  ),  
-                  actionButton("glmUpdate", "Analyze")
+              # show error message
+              conditionalPanel(
+                condition = "!output.glmResultsCompleted",
+                tags$p(
+                  HTML("<b>Note</b> that results will not appear if there are invalid input values (e.g., dispersions).")
                 )
-              ),
-              tags$br(),
-              tags$p(
-                HTML("<b>Tip!</b> Make sure that the factors used in the expression are spelled the same as in the experimental design file and shown in the left-hand sidebar.")
-              ),
-              tags$br(),
-              tags$p(
-                "Valid expressions must consist of the factors contained in the input experimental design file, which is displayed in the left-hand sidebar."
-              ),
-              tags$p(
-                "Examples of designing model expressions for ANOVA-like tests are availble in the",
-                tags$a("edgeR manual", href = "https://www.bioconductor.org/packages/release/bioc/vignettes/edgeR/inst/doc/edgeRUsersGuide.pdf"),
-                " (e.g., sections 3.2.6 & 4.4.9)."
-              ),
-              tags$p(
-                HTML("A detailed description of designing model expressions is provided in the paper \"A guide to creating design matrices for gene expression experiments\" <i>doi: 10.12688/f1000research.27893.1</i> (e.g., studies with multiple factors).")
               ),
               # show glm results
               conditionalPanel(
                 condition = "output.glmResultsCompleted",
-                tags$hr(),
                 tags$p(
                   align="center",
                   HTML("<b>GLM Results</b>")
@@ -1105,7 +1251,7 @@ server <- function(input, output, session) {
   valueLFC <- reactiveVal(defaultLFC)
   
   # update LFC value
-  observeEvent(input$inputsUpdate, {
+  observeEvent(input$analysisUpdate, {
     valueLFC(input$cutLFC)
   })
   
@@ -1113,24 +1259,60 @@ server <- function(input, output, session) {
   valueFDR <- reactiveVal(defaultFDR)
   
   # update FDR value
-  observeEvent(input$inputsUpdate, {
+  observeEvent(input$analysisUpdate, {
     valueFDR(input$cutFDR)
   })
   
-  # render experimental design table
-  output$designTable <- renderTable({
-    # retrieve input design table
-    group <- designFactors()
-    # retrieve input gene counts table
-    geneCounts <- countsType()
-    # retrieve column names
-    sampleNames <- colnames(geneCounts)
-    # create data frame
-    design <- data.frame(
-      Sample = sampleNames,
-      Factors = group
-    )
+  # setup reactive pairwise dispersion value
+  valuePairwiseDisp <- reactiveVal(defaultPairwiseDisp)
+  
+  # update pairwise dispersion value
+  observeEvent(input$analysisUpdate, {
+    valuePairwiseDisp(input$inputPairwiseDisp)
   })
+  
+  # setup reactive GLM dispersion value
+  valueGLMDisp <- reactiveVal(defaultGLMDisp)
+  
+  # update GLM dispersion value
+  observeEvent(input$analysisUpdate, {
+    valueGLMDisp(input$inputGLMDisp)
+  })
+  
+  # render table with input settings
+  output$inputSettings <- renderTable({
+    # check input analysis type
+    if(input$analysisType == "GLM"){
+      # create table with factor levels
+      settings <- data.frame(
+        Setting = c("Analysis", "LFC", "FDR", "Dispersion", "Comparison"),
+        Value = c(input$analysisType, valueLFC(), valueFDR(), valueGLMDisp(), input$compareExpression)
+      )
+    }else{
+      # create table with factor levels
+      settings <- data.frame(
+        Setting = c("Analysis", "LFC", "FDR", "Dispersion", "Comparison"),
+        Value = c(input$analysisType, valueLFC(), valueFDR(), valuePairwiseDisp(), paste(input$levelTwo, input$levelOne, sep = " vs "))
+      )
+    }
+    # return the settings data frame
+    settings
+  })
+  
+  # render experimental design table
+  #output$designTable <- renderTable({
+    # retrieve input design table
+    #group <- designFactors()
+    # retrieve input gene counts table
+    #geneCounts <- countsType()
+    # retrieve column names
+    #sampleNames <- colnames(geneCounts)
+    # create data frame
+    #design <- data.frame(
+      #Sample = sampleNames,
+      #Factors = group
+    #)
+  #})
   
   ##
   # Data Normalization & Exploration
@@ -1414,7 +1596,7 @@ server <- function(input, output, session) {
   })
   
   # function to calculate table of DE genes
-  pairwiseTest <- eventReactive(list(input$inputsUpdate, input$pairwiseUpdate), {
+  pairwiseTest <- eventReactive(list(input$analysisUpdate), {
     # require valid inputs
     if(is.null(compareSamples())){
       return(NULL)
@@ -1426,7 +1608,7 @@ server <- function(input, output, session) {
     # estimate common dispersion and tagwise dispersions to produce a matrix of pseudo-counts
     list <- estimateDisp(list)
     # perform exact test
-    exactTest(list, pair=c(input$levelOne, input$levelTwo))
+    exactTest(list, pair=c(input$levelOne, input$levelTwo), dispersion=valuePairwiseDisp())
   })
   
   # check if results have completed
@@ -1748,8 +1930,14 @@ server <- function(input, output, session) {
     design <- glmDesign()
     # estimate common dispersion and tagwise dispersions to produce a matrix of pseudo-counts
     list <- estimateDisp(list, design, robust=TRUE)
-    # estimate the QL dispersions
-    glmQLFit(list, design, robust=TRUE)
+    # check the input dispersion value
+    if(tolower(valueGLMDisp()) == tolower("NULL")){ # case insensitive check for NULL or null input
+      # estimate the QL dispersions using the data object to estimate dispersion values
+      glmQLFit(list, design, robust=TRUE)
+    }else{
+      # estimate the QL dispersions using the input dispersion value(s)
+      glmQLFit(list, design, robust=TRUE, dispersion=valueGLMDisp())
+    }
   }
   
   # plot of QL dispersions
@@ -1797,7 +1985,7 @@ server <- function(input, output, session) {
   })
   
   # function to perform glm contrasts
-  glmContrast <- eventReactive(list(input$inputsUpdate, input$glmUpdate), {
+  glmContrast <- eventReactive(list(input$analysisUpdate), {
     # require the expression
     req(input$compareExpression)
     # set the input expression as global
@@ -1851,14 +2039,7 @@ server <- function(input, output, session) {
     # calculate the log2 CPM of the gene count data
     logcpm <- cpm(list, log=TRUE)
     # subset the log2 CPM by the DGE set
-    #logcpmSubset <- subset(logcpm,
-    #                       grepl(
-    #                         paste0(rownames(DGESubset), collapse = "|"),
-    #                         rownames(logcpm),
-    #                         ignore.case = TRUE
-    #                       )
-    #)
-    DGESubset.keep <- rownames(logcpm) %in% rownames(DGESubset)
+    DGESubset.keep <- rownames(logcpm) %in% rownames(resultsTbl)
     logcpmSubset <- logcpm[DGESubset.keep, ]
     # combine all columns into one period separated
     exp_factor <- data.frame(Sample = unlist(targets, use.names = FALSE))
@@ -2078,6 +2259,32 @@ server <- function(input, output, session) {
       resultsTblNames <- retrieveGLMSigGeneIDs()
       # output table
       writeLines(resultsTblNames, con = file, sep = "")
+    }
+  )
+  
+  # download Rmd HTML report with the current inputs
+  # https://shiny.posit.co/r/articles/build/generating-reports/
+  output$report <- downloadHandler(
+    # For PDF output, change this to "report.pdf"
+    filename = "DA_report.html",
+    content = function(file) {
+      # Copy the report file to a temporary directory before processing it, in
+      # case we don't have write permissions to the current working dir
+      tempReport <- file.path(tempdir(), "DA_report.Rmd")
+      file.copy("../markdown/DA_report.Rmd", tempReport, overwrite = TRUE)
+      # Set up parameters to pass to Rmd document
+      params <- list(
+        inputDataIn = input$geneCountsTable$datapath,
+        targetsIn = input$expDesignTable$datapath,
+        cutLFCIn = valueLFC(),
+        cutFDRIn = valueFDR()
+      )
+      # Knit the document, passing in the `params` list, and eval it in a
+      # child of the global environment
+      rmarkdown::render(tempReport, output_file = file,
+                        params = params#,
+                        #envir = new.env(parent = globalenv())
+      )
     }
   )
 }

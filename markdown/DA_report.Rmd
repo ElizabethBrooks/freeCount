@@ -1,8 +1,19 @@
-#!/usr/bin/env Rscript
-
 # creator: Elizabeth Brooks
-# updated: 4 May 2024
+# updated: 15 June 2024
 
+---
+title: "DA Report"
+output: html_document
+params:
+  inputDataIn: NA
+  targetsIn: NA
+  cutLFCIn: NA
+  cutFDRIn: NA
+---
+
+# Package Installation & Loading
+
+```{r}
 # install any missing packages
 packageList <- c("BiocManager", "shiny", "shinythemes", "ggplot2", "rcartocolor", "dplyr", "statmod", "pheatmap", "ggplotify")
 biocList <- c("edgeR")
@@ -26,36 +37,39 @@ suppressPackageStartupMessages({
   library(pheatmap)
   library(ggplotify)
 })
+```
 
+# Plotting Color Palettes
+
+```{r}
 #  plotting palettes
 plotColors <- carto_pal(12, "Safe")
 plotColorSubset <- c(plotColors[4], plotColors[5], plotColors[6])
+```
 
-
-##
 # Data Input
-##
 
+```{r}
 # import gene count data
-inputData <- read.csv(file="/Users/bamflappy/Repos/freeCount/data/DA/example3_daphnia_counts.csv", row.names=1)
+inputData <- read.csv(file=params$inputDataIn, row.names=1)
 
 # trim the data table of htseq stats
 removeList <- c("__no_feature", "__ambiguous", "__too_low_aQual", "__not_aligned", "__alignment_not_unique")
 countsTable <- inputData[!row.names(inputData) %in% removeList,]
 
 # import grouping factor
-targets <- read.csv(file="/Users/bamflappy/Repos/freeCount/data/DA/example3_daphnia_design_edgeR.csv", row.names=1)
+targets <- read.csv(file=params$targetsIn, row.names=1)
 
 # set LFC cut off
-cutLFC <- log2(1.2)
+cutLFC <- params$cutLFCIn
 
 # set FDR cut off
-cutFDR <- 0.05
+cutFDR <- params$cutFDRIn
+```
 
-##
-# Analysis
-##
+# Analysis Setup
 
+```{r}
 #Setup a design matrix
 group <- factor(targets[,1])
 #cbind(targets,Group=group)
@@ -135,8 +149,11 @@ dev.off()
 #jpeg("glmQLF_plotPCA_noLegend.jpg")
 plotMDS(list, col=colors[group], pch=points[group], gene.selection="common")
 #dev.off()
+```
 
-##
+# DE Analysis
+
+```{r}
 #The experimental design is parametrized with a one-way layout, 
 # where one coefficient is assigned to each group
 design <- model.matrix(~ 0 + group)
@@ -162,7 +179,6 @@ plotQLDisp(fit)
 
 # view column order
 colnames(fit)
-
 
 # testing explicit nested contrast
 con.all.nest <- makeContrasts(treatment = (treat.high + treat.low) - (cntrl.high + cntrl.low),
@@ -238,3 +254,4 @@ as.ggplot(
            main="Heatmap of RNA-seq Samples", show_rownames = FALSE, fontsize = 12,
            color = colorRampPalette(c(plotColors[5], "white", plotColors[6]))(100))
 )
+```

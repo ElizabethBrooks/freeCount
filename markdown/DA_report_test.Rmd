@@ -1,0 +1,15 @@
+# creator: Elizabeth Brooks
+# updated: 15 June 2024
+
+---
+title: "DA Report"
+output: html_document
+params:
+  test: NA
+---
+
+# Package Installation & Loading
+
+```{r}
+params$test
+```

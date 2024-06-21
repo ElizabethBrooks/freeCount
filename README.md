@@ -60,7 +60,7 @@ The following user journey diagram depicts the user-centered process of count da
 
 ![Analysis Framework](images/freeCount_userJourneyDiagram_cropped.jpg)
 
-The typical user is a student or researcher who begins their journey as a novice analyst. In the first phase the novice analyst has received count data, but they are unsure how to proceed. The second phase is where the analyst completes our web tutorials and now has an idea how to proceed with analyzing their data. In the third phase the analyst uses our shiny applications to produce high-quality analysis results.
+The typical user is a student or researcher who begins their journey as a novice analyst. In the first phase the novice analyst has received count data, but they are unsure how to proceed. The second phase is where the analyst completes our web tutorials and now has an idea about how to proceed with analyzing their data. In the third phase the analyst uses our shiny applications to produce high-quality analysis results.
 
 ## Tutorials
 
@@ -181,22 +181,79 @@ The intersection of DE genes and modules can be identified by comparing the sets
 
 ## References
 
-Chen, Y., Lun, A. T., & Smyth, G. K. (2016). From reads to genes to pathways: differential expression analysis of RNA-Seq experiments using Rsubread and the edgeR quasi-likelihood pipeline. F1000Research, 5, 1438. https://doi.org/10.12688/f1000research.8987.2.
+[1] Adrian Alexa and Jorg Rahnenfuhrer. 2023. topGO: Enrichment Analysis for Gene
+Ontology. https://doi.org/10.18129/B9.bioc.topGO R package version 2.52.0.
 
-R Core Team (2023). _R: A Language and Environment for Statistical Computing_. R Foundation for Statistical Computing, Vienna, Austria. <https://www.R-project.org/>.
+[2] Patrick Blumenkamp, Max Pfister, Sonja Diedrich, Karina Brinkrolf, Sebastian
+Jaenicke, and Alexander Goesmann. 2024. Curare and GenExVis: a versatile
+toolkit for analyzing and visualizing RNA-Seq data. BMC Bioinformatics 25, 1
+(March 2024).
 
-Davis J. McCarthy, Gordon K. Smyth, Testing significance relative to a fold-change threshold is a TREAT, Bioinformatics, Volume 25, Issue 6, March 2009, Pages 765–771, https://doi.org/10.1093/bioinformatics/btp053.
+[3] Winston Chang, Joe Cheng, JJ Allaire, Carson Sievert, Barret Schloerke, Yihui Xie,
+Jeff Allen, Jonathan McPherson, Alan Dipert, and Barbara Borges. 2024. shiny:
+Web Application Framework for R. https://shiny.posit.co/ R package version
+1.8.1.9000, https://github.com/rstudio/shiny.
 
-Langfelder, P., Horvath, S. WGCNA: an R package for weighted correlation network analysis. BMC Bioinformatics 9, 559 (2008). https://doi.org/10.1186/1471-2105-9-559
+[4] Yunshun Chen, Lizhong Chen, Aaron T. L. Lun, Pedro L. Baldoni, and Gordon K.
+Smyth. 2024. edgeR 4.0: powerful differential analysis of sequencing data
+with expanded functionality and improved support for small counts and
+larger datasets. bioRxiv (2024). https://doi.org/10.1101/2024.01.21.576131
+arXiv:https://www.biorxiv.org/content/early/2024/01/24/2024.01.21.576131.full.pdf
 
-Horvath S (2011) Weighted Network Analysis. Applications in Genomics and Systems Biology. Springer Book. ISBN: 978-1-4419-8818-8.
+[5] The Galaxy Community. 2022. The Galaxy platform for accessible, reproducible
+and collaborative biomedical analyses: 2022 update. Nucleic Acids Res. 50, W1
+(2022), W345–W351. https://doi.org/10.1093/nar/gkac247
 
-Alexa A, Rahnenfuhrer J (2023). topGO: Enrichment Analysis for Gene Ontology. doi:10.18129/B9.bioc.topGO, R package version 2.54.0, https://bioconductor.org/packages/topGO.
+[6] David Y Hancock, Jeremy Fischer, John Michael Lowe, Winona Snapp-Childs,
+Marlon Pierce, Suresh Marru, J Eric Coulter, Matthew Vaughn, Brian Beck, Nirav
+Merchant, Edwin Skidmore, and Gwen Jacobs. 2021. Jetstream2: Accelerating
+cloud computing via Jetstream. In Practice and Experience in Advanced Research
+Computing (Boston MA USA). ACM, New York, NY, USA.
 
-Gao, C.-H., Chen, C., Akyol, T., Dușa, A., Yu, G., Cao, B., and Cai, P. (2024). ggVennDiagram: intuitive Venn diagram software extended. iMeta 3, 69. doi: 10.1002/imt2.177.
+[7] Steve Horvath. 2011. Weighted network analysis (2011 ed.). Springer, New York,
+NY.
 
-## Acknowledgements
+[8] Wolfgang Huber, Vince Carey, Robert Gentleman, Simon Anders, Marc Carlson,
+Benilton Carvalho, Hector Corrada Bravo, Sean Davis, Laurent Gatto, Thomas
+Girke, Raphael Gottardo, Florian Hahne, Kasper Hansen, Rafael Irizarry, Michael
+Lawrence, Michael Love, James MacDonald, Valerie Obenchain, Andrzej Oleś,
+and Martin Morgan. 2015. Orchestrating high-throughput genomic analysis with
+Bioconductor. Nature methods 12 (01 2015), 115–21. https://doi.org/10.1038/
+nmeth.3252
 
-The applications were created by [Elizabeth Brooks](https://www.linkedin.com/in/elizabethmbrooks/).
+[9] Alper Kucukural, Onur Yukselen, Deniz M Ozata, Melissa J Moore, and Manuel
+Garber. 2019. DEBrowser: interactive differential expression analysis and visual-
+ization tool for count data. BMC Genomics 20, 1 (Jan. 2019), 6.
 
-This project was supported by the National Science Foundation grant "Collaborative Research: EDGE FGT: Genome-wide Knock-out mutant libraries for the microcrustacean Daphnia"  (2220695/2324639  to Sen Xu and 2220696 to Michael E. Pfrender).
+[10] Peter Langfelder and Steve Horvath. 2012. Fast R Functions For Robust Corre-
+lations And Hierarchical Clustering. Journal of statistical software 46 (03 2012).
+https://doi.org/10.18637/jss.v046.i11
+
+[11] Federico Marini, Jan Linke, and Harald Binder. 2020. ideal: an R/Bioconductor
+package for interactive differential expression analysis. BMC Bioinformatics 21, 1
+(Dec. 2020), 565.
+
+[12] Davis J McCarthy and Gordon K Smyth. 2009. Testing significance relative to a
+fold-change threshold is a TREAT. Bioinformatics 25, 6 (March 2009), 765–771.
+
+[13] R Core Team. 2023. R: A Language and Environment for Statistical Computing. R
+Foundation for Statistical Computing, Vienna, Austria. https://www.R-project.
+org/
+
+[14] Himangi Srivastava, Drew Ferrell, and George V Popescu. 2022. NetSeekR: a
+network analysis pipeline for RNA-Seq time series data. BMC Bioinformatics 23,
+1 (Jan. 2022), 54.
+
+[15] Guy Teichman, Dror Cohen, Or Ganon, Netta Dunsky, Shachar Shani, Hila Gin-
+gold, and Oded Rechavi. 2023. RNAlysis: analyze your RNA sequencing data
+without writing a single line of code. BMC Biol. 21, 1 (April 2023), 74.
+
+[16] Qin Zhu, Stephen A Fisher, Hannah Dueck, Sarah Middleton, Mugdha Khal-
+adkar, and Junhyong Kim. 2018. PIVOT: platform for interactive analysis and
+visualization of transcriptomics data. BMC Bioinformatics 19, 1 (Dec. 2018).
+
+## Contributions & Acknowledgements
+
+These applications were developed by [Elizabeth Brooks](https://www.linkedin.com/in/elizabethmbrooks/) with the guidance and support of Sheri Sanders and Michael Pfrender.
+
+We would like to thank the students and researchers at ND who provided feedback for the application tools and tutorials. A special thank you to the Schorey (William McManus) and Pfrender (Neil McAdams, Bret Coggins, Nitin Vincent) labs for feature feedback. This project was supported by Notre Dame Research and the National Science Foundation (NSF) grant "Collaborative Research: EDGE FGT: Genome-wide Knock-out mutant libraries for the microcrustacean Daphnia" (2220695/2324639 to Sen Xu and 2220696 to Michael E. Pfrender). This work used Jetstream2 at Indiana University through allocation BIO230029 from the Advanced Cyberinfrastructure Coordination Ecosystem: Services \& Support (ACCESS) program, which is supported by NSF grants 2138259, 2138286, 2138307, 2137603, and 2138296.
