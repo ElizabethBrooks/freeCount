@@ -1,19 +1,15 @@
 # creator: Elizabeth Brooks
-# updated: 4 June 2024
+# updated: 21 June 2024
 
-# TO-DO: add funding acknowledgement for NDR
 # TO-DO: improve detail of output error messages (using console?)
 # TO-DO: consider adding data summary tab
-# TO-DO: replace design table in side bar with analysis settings
 # TO-DO: add software version print out on information tab
 # TO-DO: add scree plot
 # TO-DO: double check pheatmap display
 # TO-DO: fix check of design file length (requires new line to match counts header length)
 # TO-DO: fix output table header, which is missing the "gene" column?
-# TO-DO: store data and results in reactiveVal and reactiveValues
 # TO-DO: add bar plots of gene counts and LFC
 # TO-DO: output example tables as csv
-# TO-DO: consider separating analysis and results into different tabs
 # TO-DO: add legend to volcano plots
 # TO-DO: allow input lists and tables of dispersion values
 # TO-DO: hide pheatmap when not enough DGE
@@ -172,11 +168,11 @@ ui <- fluidPage(
           "Current Analysis Settings:"
         ), 
         tableOutput(outputId = "inputSettings"),
-        #tags$hr(),
-        #tags$p(
-        #  "Click to Download Analysis Report:"
-        #),
-        #downloadButton("report", "Download Report")
+        tags$hr(),
+        tags$p(
+          "Click to Download Analysis Report:"
+        ),
+        downloadButton("report", "Download Report")
         #tags$p(
           #"Design Table:"
         #),
@@ -523,7 +519,7 @@ ui <- fluidPage(
                 #"If the input is numeric, then it can be either of length one or of length equal to the number of genes."
               ),
               tags$p(
-                HTML("<b>Note</b> that the default dispersion value is <i>auto</i>, which uses the most complex dispersions found in data."),
+                HTML("<b>Note</b> that the default dispersion value is <i>auto</i>, which uses the most complex dispersions found in the data."),
               )
             ),
             # show GLM analysis inputs
@@ -1016,12 +1012,12 @@ ui <- fluidPage(
             ),
             tags$p(
               "The latest version of this application may be downloaded from ",
-              tags$a("GitHub",href = "https://github.com/ElizabethBrooks/DGEAnalysis_ShinyApps"),
+              tags$a("GitHub",href = "https://github.com/ElizabethBrooks/freeCount"),
               "."
             ),
             tags$p(
               "Example gene counts and experimental design tables are also provided on ",
-              tags$a("GitHub", href = "https://github.com/ElizabethBrooks/DGEAnalysis_ShinyApps/tree/main/data/edgeR"),
+              tags$a("GitHub", href = "https://github.com/ElizabethBrooks/freeCount/tree/main/data/edgeR"),
               "."
             ),
             tags$p(
@@ -1035,7 +1031,10 @@ ui <- fluidPage(
               "."
             ),
             tags$p(
-              "This project was funded by the National Science Foundation grant \"Collaborative Research: EDGE FGT: Genome-wide Knock-out mutant libraries for the microcrustacean Daphnia\" (2220695/2324639 to Sen Xu and 2220696 to Michael E. Pfrender)."
+              "We would like to thank the students and researchers at ND who provided feedback for the application tools and tutorials.",
+              "A special thank you to the Schorey (William McManus) and Pfrender (Neil McAdams, Bret Coggins, Nitin Vincent) labs for feature feedback.",
+              "This project was funded by the National Science Foundation grant \"Collaborative Research: EDGE FGT: Genome-wide Knock-out mutant libraries for the microcrustacean Daphnia\" (2220695/2324639 to Sen Xu and 2220696 to Michael E. Pfrender).",
+              "This work used Jetstream2 at Indiana University through allocation BIO230029 from the Advanced Cyberinfrastructure Coordination Ecosystem: Services & Support (ACCESS) program, which is supported by NSF grants 2138259, 2138286, 2138307, 2137603, and 2138296."
             )
           )
         )

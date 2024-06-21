@@ -1,9 +1,8 @@
 # creator: Elizabeth Brooks
-# updated: 4 June 2024
+# updated: 21 June 2024
 
 # TO-DO: fix the dot plot to only show whole numbers in the scale legend
 # TO-DO: update the dot plot legend name
-# TO-DO: add funding acknowledgement for NDR
 # TO-DO: improve detail of output error messages (using console?)
 # TO-DO: fix download tables for other ontology levels
 # TO-DO: update helpful tips for input GO mapping files
@@ -13,6 +12,7 @@
 # TO-DO: add bar plot of gene LFC (if DE genes)
 # TO-DO: output example tables as csv
 # TO-DO: check mappings table output (error for two rows with duplicate names)
+# TO-DO: add tutorial MD links to info tab
 
 #### Setup ####
 
@@ -985,12 +985,12 @@ ui <- fluidPage(
             ),
             tags$p(
               "The latest version of this application may be downloaded from ",
-              tags$a("GitHub",href = "https://github.com/ElizabethBrooks/DGEAnalysis_ShinyApps/tree/main/apps"),
+              tags$a("GitHub",href = "https://github.com/ElizabethBrooks/freeCount/tree/main/apps"),
               "."
             ),
             tags$p(
               "Example gene scores and mappings tables are also provided on ",
-              tags$a("GitHub", href = "https://github.com/ElizabethBrooks/DGEAnalysis_ShinyApps/tree/main/data/topGO"),
+              tags$a("GitHub", href = "https://github.com/ElizabethBrooks/freeCount/tree/main/data/topGO"),
               "."
             ),
             tags$p(
@@ -1004,7 +1004,10 @@ ui <- fluidPage(
               "."
             ),
             tags$p(
-              "This project was funded by the National Science Foundation grant \"Collaborative Research: EDGE FGT: Genome-wide Knock-out mutant libraries for the microcrustacean Daphnia\" (2220695/2324639 to Sen Xu and 2220696 to Michael E. Pfrender)."
+              "We would like to thank the students and researchers at ND who provided feedback for the application tools and tutorials.",
+              "A special thank you to the Schorey (William McManus) and Pfrender (Neil McAdams, Bret Coggins, Nitin Vincent) labs for feature feedback.",
+              "This project was funded by the National Science Foundation grant \"Collaborative Research: EDGE FGT: Genome-wide Knock-out mutant libraries for the microcrustacean Daphnia\" (2220695/2324639 to Sen Xu and 2220696 to Michael E. Pfrender).",
+              "This work used Jetstream2 at Indiana University through allocation BIO230029 from the Advanced Cyberinfrastructure Coordination Ecosystem: Services & Support (ACCESS) program, which is supported by NSF grants 2138259, 2138286, 2138307, 2137603, and 2138296."
             )
           )
         )
