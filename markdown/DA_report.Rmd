@@ -1,18 +1,24 @@
-# creator: Elizabeth Brooks
-# updated: 15 June 2024
+<!-- # creator: Elizabeth Brooks -->
+<!-- # updated: 1 July 2024 -->
 
 ---
 title: "DA Report"
 output: html_document
 params:
+  analysisIn: NA
   inputDataIn: NA
   targetsIn: NA
   cutLFCIn: NA
   cutFDRIn: NA
+  dispersionsIn: NA
+  comparisonIn: NA
 ---
 
-# Package Installation & Loading
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, fig.keep='all')
+```
 
+# Package Installation & Loading
 ```{r}
 # install any missing packages
 packageList <- c("BiocManager", "shiny", "shinythemes", "ggplot2", "rcartocolor", "dplyr", "statmod", "pheatmap", "ggplotify")
@@ -40,16 +46,17 @@ suppressPackageStartupMessages({
 ```
 
 # Plotting Color Palettes
-
-```{r}
+```{r, fig.keep='all'}
 #  plotting palettes
 plotColors <- carto_pal(12, "Safe")
 plotColorSubset <- c(plotColors[4], plotColors[5], plotColors[6])
 ```
 
 # Data Input
+```{r, fig.keep='all'}
+# set analysis type
+analysisType <- params$analysisIn
 
-```{r}
 # import gene count data
 inputData <- read.csv(file=params$inputDataIn, row.names=1)
 
@@ -65,11 +72,16 @@ cutLFC <- params$cutLFCIn
 
 # set FDR cut off
 cutFDR <- params$cutFDRIn
+
+# set dispersions value
+dispersionsVal <- params$dispersionsIn
+
+# set comparison
+comparisonExp <- params$comparisonIn
 ```
 
 # Analysis Setup
-
-```{r}
+```{r, fig.keep='all'}
 #Setup a design matrix
 group <- factor(targets[,1])
 #cbind(targets,Group=group)
@@ -107,8 +119,9 @@ logcpm <- cpm(list, log=TRUE)
 # combine all columns into one period separated
 exp_factor <- data.frame(Sample = unlist(targets, use.names = FALSE))
 rownames(exp_factor) <- colnames(logcpm)
-#Create heatmap for Interaction Effect
-as.ggplot(
+
+# create heatmap for samples
+samplesHeat <- as.ggplot(
   pheatmap(logcpm, scale="row", annotation_col = exp_factor, 
            main="Heatmap of RNA-seq Samples", show_rownames = FALSE, fontsize = 12,
            color = colorRampPalette(c(plotColors[5], "white", plotColors[6]))(100))
@@ -121,137 +134,185 @@ plotMD(cpm(list, log=TRUE), column=1)
 abline(h=0, col=plotColorSubset[3], lty=2, lwd=2)
 #dev.off()
 
-#Use a MDS plot to visualizes the differences
-# between the expression profiles of different samples
-points <- c(0,1,2,3,15,16,17,18)
-colors <- rep(c(plotColors[4], plotColors[5], plotColors[6], plotColors[11]), 2)
-#Write plot with legend to file
-#jpeg("glmQLF_plotMDS.jpg")
-par(mar=c(5.1, 4.1, 4.1, 11.1), xpd=TRUE)
-plotMDS(list, col=colors[group], pch=points[group])
-legend("topright", inset=c(-0.8,0), legend=levels(group), pch=points, col=colors, ncol=2)
-#legend("topleft", legend=levels(group), pch=points, col=colors, ncol=2)
-dev.off()
-#Write plot without legend to file
-#jpeg("glmQLF_plotMDS_noLegend.jpg")
-plotMDS(list, col=colors[group], pch=points[group])
-#dev.off()
-
-# Create a PCA plot with a legend
-#jpeg("glmQLF_plotPCA.jpg")
-par(mar=c(5.1, 4.1, 4.1, 11.1), xpd=TRUE)
-plotMDS(list, col=colors[group], pch=points[group], gene.selection="common")
-legend("topright", inset=c(-0.8,0), legend=levels(group), pch=points, col=colors, ncol=2)
-#legend("topleft", legend=levels(group), pch=points, col=colors, ncol=2)
-dev.off()
-
-# Create a PCA plot without a legend
-#jpeg("glmQLF_plotPCA_noLegend.jpg")
-plotMDS(list, col=colors[group], pch=points[group], gene.selection="common")
-#dev.off()
+# check the input dispersion value for indication of replication
+if(tolower(valueDisp()) == "common" ||
+       tolower(valueDisp()) == "trended" ||
+       tolower(valueDisp()) == "tagwise" ||
+       tolower(valueDisp()) == "auto" ||
+       tolower(valueDisp()) == "null"){ # case insensitive check string inputs
+  #Use a MDS plot to visualizes the differences
+  # between the expression profiles of different samples
+  points <- c(0,1,2,3,15,16,17,18)
+  colors <- rep(c(plotColors[4], plotColors[5], plotColors[6], plotColors[11]), 2)
+  #Write plot with legend to file
+  #jpeg("glmQLF_plotMDS.jpg")
+  par(mar=c(5.1, 4.1, 4.1, 11.1), xpd=TRUE)
+  plotMDS(list, col=colors[group], pch=points[group])
+  legend("topright", inset=c(-0.8,0), legend=levels(group), pch=points, col=colors, ncol=2)
+  #legend("topleft", legend=levels(group), pch=points, col=colors, ncol=2)
+  dev.off()
+  #Write plot without legend to file
+  #jpeg("glmQLF_plotMDS_noLegend.jpg")
+  plotMDS(list, col=colors[group], pch=points[group])
+  #dev.off()
+  
+  # Create a PCA plot with a legend
+  #jpeg("glmQLF_plotPCA.jpg")
+  par(mar=c(5.1, 4.1, 4.1, 11.1), xpd=TRUE)
+  plotMDS(list, col=colors[group], pch=points[group], gene.selection="common")
+  legend("topright", inset=c(-0.8,0), legend=levels(group), pch=points, col=colors, ncol=2)
+  #legend("topleft", legend=levels(group), pch=points, col=colors, ncol=2)
+  dev.off()
+  
+  # Create a PCA plot without a legend
+  #jpeg("glmQLF_plotPCA_noLegend.jpg")
+  plotMDS(list, col=colors[group], pch=points[group], gene.selection="common")
+  #dev.off()
+}
 ```
 
-# DE Analysis
+# Analysis
+```{r, fig.keep='all'}
+# check input analysis type
+if(analysisType == tolower("pairwise")){
+  ##
+  # Pairwise Comparisons (Contrasts)
+  ##
+  
+  # check the input dispersion value for indication of replication
+  if(tolower(dispersionsVal) == tolower("common") ||
+     tolower(dispersionsVal) == tolower("trended") ||
+     tolower(dispersionsVal) == tolower("tagwise") ||
+     tolower(dispersionsVal) == tolower("auto")){ # case insensitive check string inputs
+    # estimate common dispersion and tagwise dispersions to produce a matrix of pseudo-counts
+    listDisp <- estimateDisp(list)
+    # perform exact test
+    tested <- exactTest(listDisp, pair=comparisonExp)
+  }else{ # assumes numeric
+    # perform exact test
+    tested <- exactTest(list, pair=comparisonExp, dispersion=as.numeric(dispersionsVal))
+  }
+}else if(analysisType == "GLM"){
+  ##
+  # GLM Fitting
+  ##
+  
+  #The experimental design is parametrized with a one-way layout, 
+  # where one coefficient is assigned to each group
+  design <- model.matrix(~ 0 + group)
+  colnames(design) <- levels(group)
+  #design
+  
+  # check the input dispersion value
+  if(tolower(dispersionsVal) == "null"){ # case insensitive check for NULL string input
+    #Next, the NB dispersion is estimated
+    listDisp <- estimateDisp(list, design, robust=TRUE)
+    #listDisp$common.dispersion
+    #Visualize the dispersion estimates with a BCV plot
+    #Write plot to file
+    #jpeg("glmQLF_plotBCV.jpg")
+    plotBCV(listDisp)
+    #dev.off()
+    # estimate the QL dispersions using the data object to estimate dispersion values
+    fit <- glmQLFit(listDisp, design, robust=TRUE)
+    #head(fit$coefficients)
+    #Write plot to file
+    #jpeg("glmQLF_plotQLDisp.jpg")
+    plotQLDisp(fit)
+    #dev.off()
+    # view column order
+    colnames(fit)
+    ##
+    # GLM Contrasts
+    ##
+    # testing explicit nested contrast
+    glmContrast <- makeContrasts(glmSet = comparisonExp,
+                                 levels = design)
+    # results table
+    tested <- glmTreat(fit, contrast=glmContrast, lfc=cutLFC)
+  }else{ # assumes numeric
+    # replace the dispersion value in the DGE object
+    list$common.dispersion <- as.numeric(dispersionsVal)
+    # estimate the QL dispersions using the input dispersion value(s)
+    fit <- glmFit(list, design)
+    ##
+    # GLM Contrasts
+    ##
+    # testing explicit nested contrast
+    glmContrast <- makeContrasts(glmSet = comparisonExp,
+                                 levels = design)
+    # results table
+    tested <- glmLRT(fit, contrast=glmContrast)
+  }
+}
 
-```{r}
-#The experimental design is parametrized with a one-way layout, 
-# where one coefficient is assigned to each group
-design <- model.matrix(~ 0 + group)
-colnames(design) <- levels(group)
-#design
-
-#Next, the NB dispersion is estimated
-list <- estimateDisp(list, design, robust=TRUE)
-#list$common.dispersion
-#Visualize the dispersion estimates with a BCV plot
-#Write plot to file
-#jpeg("glmQLF_plotBCV.jpg")
-plotBCV(list)
-#dev.off()
-
-#Now, estimate and plot the QL dispersions
-fit <- glmQLFit(list, design, robust=TRUE)
-#head(fit$coefficients)
-#Write plot to file
-#jpeg("glmQLF_plotQLDisp.jpg")
-plotQLDisp(fit)
-#dev.off()
-
-# view column order
-colnames(fit)
-
-# testing explicit nested contrast
-con.all.nest <- makeContrasts(treatment = (treat.high + treat.low) - (cntrl.high + cntrl.low),
-                              levels=design)
 # summary table
-treat.anov <- glmTreat(fit, contrast=con.all.nest[,"treatment"], lfc=cutLFC)
-summary(decideTests(treat.anov))
+summary(decideTests(tested))
+```
 
-
+# Results Visualization
+```{r, fig.keep='all'}
+# create a results table of DE genes by FDR and LFC
+resultsTbl <- topTags(tested, n=nrow(tested$table), adjust.method="fdr", p.value=cutFDR)$table
 # export tables of DE genes
 #Write tags table of DE genes to file
-resultsTbl <- topTags(treat.anov, n=nrow(treat.anov$table), adjust.method="fdr")$table
 #write.table(resultsTbl, file="glmQLF_topTags.csv", sep=",", row.names=TRUE, quote=FALSE)
 
-# filter by FDR and LFC cut off
-DGESubset <- resultsTbl[(resultsTbl$logFC > cutLFC & resultsTbl$FDR < cutFDR) | (resultsTbl$logFC < (-1*cutLFC) & resultsTbl$FDR < cutFDR),]
+# calculate the log2 CPM of the gene count data
+logcpm <- cpm(list, log=TRUE)
+
+# identify significantly DE genes
+DGESubset <- resultsTbl[resultsTbl$logFC > cutLFC | resultsTbl$logFC < (-1*cutLFC),]
+# subset the log2 CPM by the DGE set
+DGESubset.keep <- rownames(logcpm) %in% rownames(DGESubset)
+logcpmSubset <- logcpm[DGESubset.keep, ]
+
+# combine all columns into one period separated
+exp_factor <- data.frame(Sample = unlist(targets, use.names = FALSE))
+rownames(exp_factor) <- colnames(logcpmSubset)
+
+# TO-DO: use color blind safe pallette for sample dendrogram
+#Create heatmap for DGE
+resultsHeat <- as.ggplot(
+  pheatmap(logcpmSubset, scale="row", annotation_col = exp_factor, 
+           main="Heatmap of Pairwise DE Genes", show_rownames = FALSE,
+           color = colorRampPalette(c(plotColors[5], "white", plotColors[6]))(100))
+)
 
 # MD plots
 #Write plot to file
 #jpeg("glmQLF_plotMD.jpg")
-plotMD(treat.anov)
-abline(h=c((-1*cutLFC), cutLFC), col="blue")
+# return MD plot
+plotMD(tested, main = "Mean-Differences of Pairwise DE Genes", adjust.method="fdr", p.value=cutFDR)
+# add blue lines to indicate 2-fold changes
+abline(h=c((-1*cutLFC), cutLFC), col="blue") 
 #dev.off()
-
 
 # Volcano plots
+# create a results table of DE genes
+resultsTbl <- topTags(tested, n=nrow(tested$table), adjust.method="fdr")$table
 # add column for identifying direction of DE gene expression
-resultsTbl$topDE <- "NA"
+resultsTbl$colorDE <- plotColors[5]
+resultsTbl$alphaDE <- 0.75
 # identify significantly up DE genes
-resultsTbl$topDE[resultsTbl$logFC > 1 & resultsTbl$FDR < cutFDR] <- "UP"
+resultsTbl$colorDE[resultsTbl$logFC > cutLFC & resultsTbl$FDR < cutFDR] <- plotColors[4]
+resultsTbl$alphaDE[resultsTbl$logFC > cutLFC & resultsTbl$FDR < cutFDR] <- 1
+#resultsTbl$colorDE[sign(resultsTbl$logFC) == 1 & resultsTbl$FDR < cutFDR] <- "Up"
 # identify significantly down DE genes
-resultsTbl$topDE[resultsTbl$logFC < -1 & resultsTbl$FDR < cutFDR] <- "DOWN"
+resultsTbl$colorDE[resultsTbl$logFC < (-1*cutLFC) & resultsTbl$FDR < cutFDR] <- plotColors[6]
+resultsTbl$alphaDE[resultsTbl$logFC < (-1*cutLFC) & resultsTbl$FDR < cutFDR] <- 1
+#resultsTbl$colorDE[sign(resultsTbl$logFC) == -1 & resultsTbl$FDR < cutFDR] <- "Down"
+# add column with -log10(FDR) values
+resultsTbl$negLog10FDR <- -log10(resultsTbl$FDR)
+
 # create volcano plot
-#jpeg("glmQLF_volcano.jpg")
-ggplot(data=resultsTbl, aes(x=logFC, y=-log10(FDR), color = topDE)) + 
+ggplot(data=resultsTbl, aes(x=logFC, y=negLog10FDR, color = colorDE, alpha = alphaDE)) + 
   geom_point() +
   theme_minimal() +
-  scale_colour_discrete(type = plotColorSubset, breaks = c("Up", "Down"))
-#dev.off()
-# create volcano plot with labels
-labelSetTreatment <- resultsTbl[resultsTbl$topDE == "UP" | resultsTbl$topDE == "DOWN",]
-#jpeg("glmQLF_volcanoLabeled.jpg")
-ggplot(data=resultsTbl, aes(x=logFC, y=-log10(FDR), color = topDE)) + 
-  geom_point() +
-  ggrepel::geom_text_repel(data = labelSetTreatment, aes(label = row.names(labelSetTreatment))) +
-  theme_minimal() +
-  scale_colour_discrete(type = plotColorSubset, breaks = c("Up", "Down"))
-#dev.off()
-# identify significantly DE genes by FDR
-resultsTbl.glm_keep <- resultsTbl$FDR < cutFDR
-# create filtered results table of DE genes
-resultsTbl.filtered <- resultsTbl[resultsTbl.glm_keep,]
-
-# heatmap
-# view DGE genes
-# subset counts table by DE gene set
-DGESubset <- resultsTbl[!grepl("NA", resultsTbl$topDE),]
-# subset the log2 CPM by the DGE set
-#logcpmSubset <- subset(logcpm,
-#                       grepl(
-#                         paste0(rownames(DGESubset), collapse = "|"),
-#                         rownames(logcpm),
-#                         ignore.case = TRUE
-#                       )
-#)
-DGESubset.keep <- rownames(logcpm) %in% rownames(DGESubset)
-logcountsSubset <- logcpm[DGESubset.keep, ]
-heatmap(logcountsSubset, main= "Heatmap of DGE")
-
-# create heatmap of raw CPM
-as.ggplot(
-  pheatmap(logcountsSubset, scale="row", annotation_col = exp_factor, 
-           main="Heatmap of RNA-seq Samples", show_rownames = FALSE, fontsize = 12,
-           color = colorRampPalette(c(plotColors[5], "white", plotColors[6]))(100))
-)
+  scale_color_identity() +
+  scale_alpha(guide = 'none') +
+  ggtitle("Volcano Plot of Pairwise DE Genes") +
+  theme(plot.title = element_text(hjust = 0.5)) +
+  theme(plot.title = element_text(face="bold")) +
+  xlab("LFC")
 ```

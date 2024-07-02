@@ -1,5 +1,5 @@
 # creator: Elizabeth Brooks
-# updated: 21 June 2024
+# updated: 1 July 2024
 
 # TO-DO: improve detail of output error messages (using console?)
 # TO-DO: consider adding data summary tab
@@ -13,6 +13,15 @@
 # TO-DO: add legend to volcano plots
 # TO-DO: allow input lists and tables of dispersion values
 # TO-DO: hide pheatmap when not enough DGE
+# TO-DO: add tutorial MD links to info tab
+# TO-DO: note that htseq stats are auto removed
+# TO-DO: note that the sample names need to be carefully formatted, for example:
+### don't include mathematical symbols like - that can confuse the GLM contrasts
+### don't have the same names between samples and groups
+# TO-DO: add not that plotMDS can't show if only 2 columns of data: need at least 3
+# TO-DO: plotBCV and plotQLDisp are only appropriate with replicates
+# TO-DO: note that LFC cut is only auto taken into consideration using GLMs with replicates
+# TO-DO: specifically set up-expressed genes as pink and down as blue, not-sig as green
 
 #### Setup ####
 
@@ -82,10 +91,12 @@ css_styles <- "
 "
 
 # set default values
+defaultAnalysis <- "pairwise"
 defaultLFC <- 1.2
 defaultFDR <- 0.05
 defaultPairwiseDisp <- "auto"
 defaultGLMDisp <- "NULL"
+defaultExp <- "NA"
 
 #### UI ####
 
@@ -382,16 +393,20 @@ ui <- fluidPage(
               HTML("<b>Tip 1:</b> The plots and results may take several moments to appear depending on the size of the input gene counts table.")
             ),
             tags$p(
-              HTML("<b>Tip 2:</b> Navigate to the <i>Data Normalization</i>, <i>Data Exploration</i>, or <i>Analysis & Results</i> steps by clicking the tabs above.")
+              HTML("<b>Tip 2:</b> Navigate to the <i>Analysis</i>, <i>Data Normalization</i>, <i>Data Exploration</i>, or <i>Results</i> steps by clicking the tabs above.")
             ),
             tags$p(
-              HTML("<b>Tip 3:</b> It is possible to change the type of analysis (pairwise or GLM) in the left-hand sidebar.")
+              HTML("<b>Tip 3:</b> Further information about choosing dispersion values and methods for obtaining dispersions may be found in the "),
+              tags$a("edgeR manual", href = "https://www.bioconductor.org/packages/release/bioc/vignettes/edgeR/inst/doc/edgeRUsersGuide.pdf"),
+              " (e.g., section 2.12)."
             ),
             tags$p(
-              HTML("<b>Tip 4:</b> It is possible to change the LFC and FDR cut offs for both the pairwise or GLM analysis in the left-hand sidebar")
+              HTML("<b>Tip 4:</b> Examples of designing model expressions for ANOVA-like tests are availble in the"),
+              tags$a("edgeR manual", href = "https://www.bioconductor.org/packages/release/bioc/vignettes/edgeR/inst/doc/edgeRUsersGuide.pdf"),
+              " (e.g., sections 3.2.6 & 4.4.9)."
             ),
             tags$p(
-              HTML("<b>Tip 6:</b> If the normalizaion plot or other results look strange, make sure that the input table contains raw gene counts that have not been normalized.")
+              HTML("<b>Tip 5:</b> If the normalizaion plot or other results look strange, make sure that the input table contains raw gene counts that have not been normalized.")
             )
           ),
           
@@ -513,7 +528,9 @@ ui <- fluidPage(
                 )
               ),
               tags$p(
-                "The dispersion value may be either a character string indicating that dispersions should be taken from the data or a numeric vector of dispersions.",
+                "The dispersion value may be either a character string or a numeric value.",
+                "The character string is used to indicate that dispersions should be taken from the data.",
+                #"The dispersion value may be either a character string indicating that dispersions should be taken from the data or a numeric vector of dispersions.",
                 HTML("Allowable character values are <i>common</i>, <i>trended</i>, <i>tagwise</i> or <i>auto</i>."),
                 "If the input is numeric, then it can be a common value for all genes."
                 #"If the input is numeric, then it can be either of length one or of length equal to the number of genes."
@@ -590,11 +607,12 @@ ui <- fluidPage(
                 HTML("A detailed description of designing model expressions is also provided in the paper \"A guide to creating design matrices for gene expression experiments\" <i>doi: 10.12688/f1000research.27893.1</i> (e.g., studies with multiple factors).")
               ),
               tags$p(
-                "The dispersion value may be either a NULL, numeric scalar, vector or matrix of negative binomial dispersions.", 
+                "The dispersion value may be either a NULL or numeric scalar.", 
+                #"The dispersion value may be either a NULL, numeric scalar, vector or matrix of negative binomial dispersions.", 
                 "If the input is NULL, then the dispersions will be extracted from the data.",
                 "The order of precedence is genewise dispersion, trended dispersions, common dispersion.",
-                "If the input it numeric, then the dispersion value can be a common value for all genes."
-                #"If the input it numeric, then the dispersion value can be a common value for all genes, a vector of dispersion values with one for each gene, or a matrix of dispersion values with one for each observation."
+                "If the input is numeric, then the dispersion value can be a common value for all genes."
+                #"If the input is numeric, then the dispersion value can be a common value for all genes, a vector of dispersion values with one for each gene, or a matrix of dispersion values with one for each observation."
               ),
               tags$p(
                 HTML("<b>Note</b> that the default dispersion value is <i>NULL</i>.")
@@ -797,11 +815,11 @@ ui <- fluidPage(
                     ),
                     tags$br(),
                     tags$p(
-                      HTML("<b>DE Analysis Significant Results Table:</b>")
+                      HTML("<b>Significant DE Analysis Results Table:</b>")
                     ),
                     downloadButton(outputId = "pairwiseSigResults", label = "Download Table"),
                     tags$p(
-                      "A table of pairwise DE analysis significant results sorted by increasing FDR adjusted p-values may be downloaded by clicking the above button.",
+                      "A table of significant pairwise DE analysis results sorted by increasing FDR adjusted p-values may be downloaded by clicking the above button.",
                       "Signifigance was determined by the input LFC and FDR cut offs."
                     )
                   ),
@@ -886,28 +904,19 @@ ui <- fluidPage(
                   HTML("<b>GLM Results</b>")
                 ),
                 tags$br(),
-                fluidRow(
-                  column(
-                    width = 6,
-                    imageOutput(outputId = "glmMD", height="100%", width="100%"),
-                    downloadButton(outputId = "downloadGLMMD", label = "Download Plot")
-                  ),
-                  column(
-                    width = 6,
-                    tags$p(
-                      HTML("<b>Number of Significantly DE Genes:</b>")
-                    ),
-                    tableOutput(outputId = "glmSummary"),
-                    tags$p(
-                      "The above table shows the number of significantly DE genes that were up- or down-expressed in the input comparison.",
-                      "Signifigance was determined by the input LFC and FDR cut offs."
-                    )
-                  )
+                imageOutput(outputId = "glmMD", height="100%", width="100%"),
+                downloadButton(outputId = "downloadGLMMD", label = "Download Plot"),
+                tags$p(
+                  "The mean-difference (MD) plot shows the log2 fold changes (LFCs) in expression differences versus average log2 CPM values.",
+                  "Red points are significantly up-expressed genes and the blue points are significantly down-expressed, where signifigance was determined by the input FDR cut off.",
+                  "The blue lines indicate the input LFC cut off, which will be used to further filter the set of significantly DE genes."
                 ),
                 tags$p(
-                  "The mean-difference (MD) plot shows the LFCs in expression differences versus average log2 CPM values.",
-                  "Red points are significantly up-expressed genes and the blue points are significantly down-expressed, where signifigance was determined by the input FDR and LFC cut offs.",
-                  "The blue lines indicate the input LFC cut off, which was used by the glmTreat function to determine significantly DE genes relative to the LFC threshold."
+                  HTML("<b>Number of Significantly DE Genes:</b>")
+                ),
+                tableOutput(outputId = "glmSummary"),
+                tags$p(
+                  "The above table shows the number of significantly DE genes that were up- or down-expressed in the input comparison. Signifigance was determined by the input LFC and FDR cut offs."
                 ),
                 tags$br(),
                 fluidRow(
@@ -922,11 +931,11 @@ ui <- fluidPage(
                     ),
                     tags$br(),
                     tags$p(
-                      HTML("<b>DE Analysis Significant Results Table:</b>")
+                      HTML("<b>Significant DE Analysis Results Table:</b>")
                     ),
                     downloadButton(outputId = "glmSigResults", label = "Download Table"),
                     tags$p(
-                      "A table of GLM DE analysis significant results sorted by increasing FDR adjusted p-values may be downloaded by clicking the above button.",
+                      "A table of significant GLM DE analysis results sorted by increasing FDR adjusted p-values may be downloaded by clicking the above button.",
                       "Signifigance was determined by the input LFC and FDR cut offs."
                     )
                   ),
@@ -1219,31 +1228,12 @@ server <- function(input, output, session) {
   }
   outputOptions(output, 'inputCheck', suspendWhenHidden=FALSE)
   
-  # update inputs for comparisons
-  observeEvent(input$runAnalysis, {
-    # retrieve input design table
-    group <- levels(designFactors())
-    # update and set the first select items
-    updateSelectInput(
-      session, 
-      "levelOne",
-      choices = group,
-    )
-    # update and set the second select items
-    updateSelectInput(
-      session, 
-      "levelTwo",
-      choices = group,
-      selected = tail(group, 1)
-    )
-    # create temporary expression
-    tmpExpression <- paste(head(group, 1), tail(group, 1), sep = "-")
-    # update and set the glm comparison expression
-    updateTextInput(
-      session,
-      "compareExpression",
-      value = tmpExpression
-    )
+  # setup reactive analysis type value
+  valueAnalysis <- reactiveVal(defaultAnalysis)
+  
+  # update analysis type value
+  observeEvent(input$analysisUpdate, {
+    valueAnalysis(input$analysisType)
   })
   
   # setup reactive LFC value
@@ -1262,40 +1252,78 @@ server <- function(input, output, session) {
     valueFDR(input$cutFDR)
   })
   
-  # setup reactive pairwise dispersion value
-  valuePairwiseDisp <- reactiveVal(defaultPairwiseDisp)
-  
-  # update pairwise dispersion value
-  observeEvent(input$analysisUpdate, {
-    valuePairwiseDisp(input$inputPairwiseDisp)
-  })
-  
-  # setup reactive GLM dispersion value
-  valueGLMDisp <- reactiveVal(defaultGLMDisp)
+  # setup reactive dispersion value
+  valueDisp <- reactiveVal(defaultPairwiseDisp)
   
   # update GLM dispersion value
   observeEvent(input$analysisUpdate, {
-    valueGLMDisp(input$inputGLMDisp)
+    if(valueAnalysis() == "GLM"){
+      valueDisp(input$inputGLMDisp)
+    }else{
+      valueDisp(input$inputPairwiseDisp)
+    }
+  })
+  
+  # setup reactive expression value
+  valueExp <- reactiveVal(defaultExp)
+  
+  # update expression value
+  observeEvent(input$analysisUpdate, {
+    if(valueAnalysis() == "GLM"){
+      valueExp(input$compareExpression)
+    }else{
+      valueExp(c(input$levelOne, input$levelTwo))
+    }
+  })
+  
+  # update inputs for comparisons
+  observeEvent(input$runAnalysis, {
+    # retrieve input design table
+    group <- levels(designFactors())
+    # update and set the first select items
+    updateSelectInput(
+      session, 
+      "levelOne",
+      choices = group,
+    )
+    # update and set the second select items
+    updateSelectInput(
+      session, 
+      "levelTwo",
+      choices = group,
+      selected = tail(group, 1)
+    )
+    # update reactive expression value with a temporary pairwise expression
+    valueExp(c(head(group, 1), tail(group, 1)))
+    # create temporary GLM expression
+    tmpExpression <- paste(tail(group, 1), head(group, 1), sep = "-")
+    # update and set the glm comparison expression
+    updateTextInput(
+      session,
+      "compareExpression",
+      value = tmpExpression
+    )
   })
   
   # render table with input settings
   output$inputSettings <- renderTable({
-    # check input analysis type
-    if(input$analysisType == "GLM"){
+    if(valueAnalysis() == "GLM"){
       # create table with factor levels
       settings <- data.frame(
         Setting = c("Analysis", "LFC", "FDR", "Dispersion", "Comparison"),
-        Value = c(input$analysisType, valueLFC(), valueFDR(), valueGLMDisp(), input$compareExpression)
+        Value = c(valueAnalysis(), valueLFC(), valueFDR(), valueDisp(), valueExp())
       )
     }else{
+      # input expression
+      listExp <- valueExp()
+      # pairwise expression
+      inputExp <- paste(listExp[2], listExp[1], sep = " vs ")
       # create table with factor levels
       settings <- data.frame(
         Setting = c("Analysis", "LFC", "FDR", "Dispersion", "Comparison"),
-        Value = c(input$analysisType, valueLFC(), valueFDR(), valuePairwiseDisp(), paste(input$levelTwo, input$levelOne, sep = " vs "))
+        Value = c(valueAnalysis(), valueLFC(), valueFDR(), valueDisp(), inputExp)
       )
     }
-    # return the settings data frame
-    settings
   })
   
   # render experimental design table
@@ -1589,9 +1617,11 @@ server <- function(input, output, session) {
   # render text with pairwise comparison
   output$pairwiseComparison <- renderText({
     # require input data
-    req(input$levelOne, input$levelTwo)
+    #req(input$levelOne, input$levelTwo)
+    # input expression
+    listExp <- valueExp()
     # create string with factor levels
-    paste(input$levelTwo, input$levelOne, sep = " vs ")
+    paste(listExp[2], listExp[1], sep = " vs ")
   })
   
   # function to calculate table of DE genes
@@ -1601,13 +1631,22 @@ server <- function(input, output, session) {
       return(NULL)
     }
     # require input data
-    req(input$levelOne, input$levelTwo)
+    #req(input$levelOne, input$levelTwo)
     # calculate scaling factors
     list <- filterNorm()
-    # estimate common dispersion and tagwise dispersions to produce a matrix of pseudo-counts
-    list <- estimateDisp(list)
-    # perform exact test
-    exactTest(list, pair=c(input$levelOne, input$levelTwo), dispersion=valuePairwiseDisp())
+    # check the input dispersion value for indication of replication
+    if(tolower(valueDisp()) == "common" ||
+       tolower(valueDisp()) == "trended" ||
+       tolower(valueDisp()) == "tagwise" ||
+       tolower(valueDisp()) == "auto"){ # case insensitive check string inputs
+      # estimate common dispersion and tagwise dispersions to produce a matrix of pseudo-counts
+      listDisp <- estimateDisp(list)
+      # perform exact test
+      exactTest(listDisp, pair=valueExp(), dispersion=tolower(valueDisp()))
+    }else{ # assumes numeric
+      # perform exact test
+      tested <- exactTest(list, pair=valueExp(), dispersion=as.numeric(valueDisp()))
+    }
   })
   
   # check if results have completed
@@ -1624,7 +1663,7 @@ server <- function(input, output, session) {
     # perform exact test
     tested <- pairwiseTest()
     # view the total number of differentially expressed genes at a FDR and LFC cut off
-    DGEgenes = decideTests(tested,p.value=valueFDR(), lfc=valueLFC())
+    DGEgenes = decideTests(tested, p.value=valueFDR(), lfc=valueLFC())
     resultsSummary <- summary(DGEgenes)
     # create the results summary
     resultsTable <- data.frame(
@@ -1650,13 +1689,6 @@ server <- function(input, output, session) {
     # calculate the log2 CPM of the gene count data
     logcpm <- cpm(list, log=TRUE)
     # subset the log2 CPM by the DGE set
-    #logcpmSubset <- subset(logcpm,
-    #                       grepl(
-    #                         paste0(rownames(DGESubset), collapse = "|"),
-    #                         rownames(logcpm),
-    #                         ignore.case = TRUE
-    #                       )
-    #)
     DGESubset.keep <- rownames(logcpm) %in% rownames(DGESubset)
     logcpmSubset <- logcpm[DGESubset.keep, ]
     # combine all columns into one period separated
@@ -1798,8 +1830,10 @@ server <- function(input, output, session) {
   # download table with number of DE genes
   output$pairwiseResults <- downloadHandler(
     filename = function() {
+      # input expression
+      listExp <- valueExp()
       # setup output file name
-      paste(input$levelTwo, input$levelOne, "pairwiseDE_genes.csv", sep = "_")
+      paste(listExp[2], listExp[1], "pairwiseDE_genes.csv", sep = "_")
     },
     content = function(file) {
       # perform exact test
@@ -1818,8 +1852,10 @@ server <- function(input, output, session) {
   # download table with number of filtered DE genes
   output$pairwiseSigResults <- downloadHandler(
     filename = function() {
+      # input expression
+      listExp <- valueExp()
       # setup output file name
-      paste(input$levelTwo, input$levelOne, "pairwiseSigDE_genes.csv", sep = "_")
+      paste(listExp[2], listExp[1], "pairwiseSigDE_genes.csv", sep = "_")
     },
     content = function(file) {
       # perform exact test
@@ -1876,8 +1912,10 @@ server <- function(input, output, session) {
   # download table with number of DE genes IDs
   output$pairwiseResultsIDs <- downloadHandler(
     filename = function() {
+      # input expression
+      listExp <- valueExp()
       # setup output file name
-      paste(input$levelTwo, input$levelOne, "pairwiseDE_geneIDs.csv", sep = "_")
+      paste(listExp[2], listExp[1], "pairwiseDE_geneIDs.csv", sep = "_")
     },
     content = function(file) {
       # add commas
@@ -1890,8 +1928,10 @@ server <- function(input, output, session) {
   # download table with number of filtered DE genes IDs
   output$pairwiseSigResultsIDs <- downloadHandler(
     filename = function() {
+      # input expression
+      listExp <- valueExp()
       # setup output file name
-      paste(input$levelTwo, input$levelOne, "pairwiseSigDE_geneIDs.csv", sep = "_")
+      paste(listExp[2], listExp[1], "pairwiseSigDE_geneIDs.csv", sep = "_")
     },
     content = function(file) {
       # add commas
@@ -1927,15 +1967,17 @@ server <- function(input, output, session) {
     list <- filterNorm()
     # retrieve the experimental design 
     design <- glmDesign()
-    # estimate common dispersion and tagwise dispersions to produce a matrix of pseudo-counts
-    list <- estimateDisp(list, design, robust=TRUE)
     # check the input dispersion value
-    if(tolower(valueGLMDisp()) == tolower("NULL")){ # case insensitive check for NULL or null input
+    if(tolower(valueDisp()) == "null"){ # case insensitive check for NULL string input
+      # estimate common dispersion and tagwise dispersions to produce a matrix of pseudo-counts
+      listDisp <- estimateDisp(list, design, robust=TRUE)
       # estimate the QL dispersions using the data object to estimate dispersion values
-      glmQLFit(list, design, robust=TRUE)
+      glmQLFit(listDisp, design, robust=TRUE)
     }else{
+      # replace the dispersion value in the DGE object
+      list$common.dispersion <- as.numeric(valueDisp())
       # estimate the QL dispersions using the input dispersion value(s)
-      glmQLFit(list, design, robust=TRUE, dispersion=valueGLMDisp())
+      glmFit(list, design)
     }
   }
   
@@ -1978,17 +2020,17 @@ server <- function(input, output, session) {
   # render text with glm comparison
   output$glmComparison <- renderText({
     # require the expression
-    req(input$compareExpression)
+    #req(input$compareExpression)
     # return the expression
-    input$compareExpression
+    valueExp()
   })
   
   # function to perform glm contrasts
   glmContrast <- eventReactive(list(input$analysisUpdate), {
     # require the expression
-    req(input$compareExpression)
+    #req(input$compareExpression)
     # set the input expression as global
-    inputExpression <<- input$compareExpression
+    inputExpression <<- valueExp()
     # retrieve the fitted glm
     fit <- glmFitting()
     # retrieve the experimental design 
@@ -1996,8 +2038,14 @@ server <- function(input, output, session) {
     # examine the overall effect of treatment
     glmContrast <- makeContrasts(glmSet = inputExpression,
                                  levels=design)
-    # look at genes with significant expression across all UV groups
-    glmTreat(fit, contrast=glmContrast, lfc=valueLFC())
+    # check the input dispersion value
+    if(tolower(valueDisp()) == "null"){ # case insensitive check for NULL string input
+      # look at genes with significant expression across all groups
+      glmTreat(fit, contrast=glmContrast, lfc=valueLFC())
+    }else{
+      # look at genes with significant expression across all groups
+      glmLRT(fit, contrast=glmContrast)
+    }
   })
   
   # check if results have completed
@@ -2035,10 +2083,12 @@ server <- function(input, output, session) {
     list <- filterNorm()
     # create a results table of DE genes by FDR and LFC
     resultsTbl <- topTags(tested, n=nrow(tested$table), adjust.method="fdr", p.value=valueFDR())$table
+    # identify significantly DE genes
+    DGESubset <- resultsTbl[resultsTbl$logFC > valueLFC() | resultsTbl$logFC < (-1*valueLFC()),]
     # calculate the log2 CPM of the gene count data
     logcpm <- cpm(list, log=TRUE)
     # subset the log2 CPM by the DGE set
-    DGESubset.keep <- rownames(logcpm) %in% rownames(resultsTbl)
+    DGESubset.keep <- rownames(logcpm) %in% rownames(DGESubset)
     logcpmSubset <- logcpm[DGESubset.keep, ]
     # combine all columns into one period separated
     exp_factor <- data.frame(Sample = unlist(targets, use.names = FALSE))
@@ -2165,7 +2215,7 @@ server <- function(input, output, session) {
   output$glmResults <- downloadHandler(
     filename = function() {
       # setup output file name
-      paste(input$compareExpression, "glmDE_genes.csv", sep = "_")
+      paste(valueExp(), "glmDE_genes.csv", sep = "_")
     },
     content = function(file) {
       # perform glm test
@@ -2183,15 +2233,17 @@ server <- function(input, output, session) {
   output$glmSigResults <- downloadHandler(
     filename = function() {
       # setup output file name
-      paste(input$compareExpression, "glmSigDE_genes.csv", sep = "_")
+      paste(valueExp(), "glmSigDE_genes.csv", sep = "_")
     },
     content = function(file) {
       # perform glm test
       tested <- glmContrast()
       # create a results table of DE genes by FDR and LFC
       resultsTbl <- topTags(tested, n=nrow(tested$table), adjust.method="fdr", p.value=valueFDR())$table
+      # identify significantly DE genes by LFC cut offs
+      DGESubset <- resultsTbl[resultsTbl$logFC > valueLFC() | resultsTbl$logFC < (-1*valueLFC()),]
       # add gene row name tag
-      resultsTbl.out <- as_tibble(resultsTbl, rownames = "gene")
+      resultsTbl.out <- as_tibble(DGESubset, rownames = "gene")
       # output table
       write.table(resultsTbl.out, file, sep=",", row.names=FALSE, quote=FALSE)
     }
@@ -2221,6 +2273,8 @@ server <- function(input, output, session) {
     tested <- glmContrast()
     # create a results table of DE genes by FDR and LFC
     resultsTbl <- topTags(tested, n=nrow(tested$table), adjust.method="fdr", p.value=valueFDR())$table
+    # identify significantly DE genes by LFC cut offs
+    DGESubset <- resultsTbl[resultsTbl$logFC > valueLFC() | resultsTbl$logFC < (-1*valueLFC()),]
     # retrieve gene IDS
     resultsTblNames <- rownames(DGESubset)
     # add commas
@@ -2237,7 +2291,7 @@ server <- function(input, output, session) {
   output$glmResultsIDs <- downloadHandler(
     filename = function() {
       # setup output file name
-      paste(input$compareExpression, "glmcolorGs_geneIDs.csv", sep = "_")
+      paste(valueExp(), "glmcolorGs_geneIDs.csv", sep = "_")
     },
     content = function(file) {
       # retrieve gene IDS
@@ -2251,7 +2305,7 @@ server <- function(input, output, session) {
   output$glmSigResultsIDs <- downloadHandler(
     filename = function() {
       # setup output file name
-      paste(input$compareExpression, "glmSigDE_geneIDs.csv", sep = "_")
+      paste(valueExp(), "glmSigDE_geneIDs.csv", sep = "_")
     },
     content = function(file) {
       # retrieve gene IDS
@@ -2273,10 +2327,13 @@ server <- function(input, output, session) {
       file.copy("../markdown/DA_report.Rmd", tempReport, overwrite = TRUE)
       # Set up parameters to pass to Rmd document
       params <- list(
+        analysisIn = valueAnalysis(),
         inputDataIn = input$geneCountsTable$datapath,
         targetsIn = input$expDesignTable$datapath,
         cutLFCIn = valueLFC(),
-        cutFDRIn = valueFDR()
+        cutFDRIn = valueFDR(),
+        dispersionsIn = valueDisp(),
+        comparisonIn = valueExp()
       )
       # Knit the document, passing in the `params` list, and eval it in a
       # child of the global environment
