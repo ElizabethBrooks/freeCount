@@ -37,12 +37,13 @@ plotColorSubset <- c(plotColors[4], plotColors[5], plotColors[6])
 ##
 
 # set analysis type
-#analysisType <- "pairwise"
-analysisType <- "GLM"
+analysisType <- "pairwise"
+#analysisType <- "GLM"
 
 # import gene count data
 #inputData <- read.csv(file="/Users/bamflappy/Repos/freeCount/data/DA/example3_daphnia_counts.csv", row.names=1)
-inputData <- read.csv(file="/Users/bamflappy/GBCF/freeCount/data/MusabEdgeR.fmt.csv", row.names=1)
+#inputData <- read.csv(file="/Users/bamflappy/GBCF/freeCount/data/MusabEdgeR.fmt.csv", row.names=1)
+inputData <- read.csv(file="/Users/bamflappy/GBCF/freeCount/data/MusabEdgeR.csv", row.names=1)
 
 # trim the data table of htseq stats
 removeList <- c("__no_feature", "__ambiguous", "__too_low_aQual", "__not_aligned", "__alignment_not_unique")
@@ -50,7 +51,8 @@ countsTable <- inputData[!row.names(inputData) %in% removeList,]
 
 # import grouping factor
 #targets <- read.csv(file="/Users/bamflappy/Repos/freeCount/data/DA/example3_daphnia_design_edgeR.csv", row.names=1)
-targets <- read.csv(file="/Users/bamflappy/GBCF/freeCount/data/MusabEdgeRDesign.fmt.csv", row.names=1)
+#targets <- read.csv(file="/Users/bamflappy/GBCF/freeCount/data/MusabEdgeRDesign.fmt.csv", row.names=1)
+targets <- read.csv(file="/Users/bamflappy/GBCF/freeCount/data/MusabEdgeRDesign.csv", row.names=1)
 
 # set LFC cut off
 cutLFC <- log2(1.2)

@@ -22,6 +22,7 @@
 # TO-DO: plotBCV and plotQLDisp are only appropriate with replicates
 # TO-DO: note that LFC cut is only auto taken into consideration using GLMs with replicates
 # TO-DO: specifically set up-expressed genes as pink and down as blue, not-sig as green
+# TO-DO: check if sample and group names need to be different
 
 #### Setup ####
 
