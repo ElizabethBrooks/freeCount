@@ -182,6 +182,12 @@ Significantly over-represented or enriched GO terms can be determined using the 
 
 The intersection of DE genes and modules can be identified by comparing the sets of genes placed in each network module to the set of DE genes. The genes contained in the intersections of sets are extracted using the venn function of the gplots R package (Warnes et al., 2022). The set relationships are visualized using the ggVennDiagram package (Gao et al., 2024).
 
+## Contributions & Acknowledgements
+
+These applications were developed by [Elizabeth Brooks](https://www.linkedin.com/in/elizabethmbrooks/) with the guidance and support of Sheri Sanders and Michael Pfrender.
+
+We would like to thank the students and researchers at ND who provided feedback for the application tools and tutorials. A special thank you to the Schorey (William McManus) and Pfrender (Neil McAdams, Bret Coggins, Nitin Vincent) labs for feature feedback. This project was supported by Notre Dame Research and the National Science Foundation (NSF) grant "Collaborative Research: EDGE FGT: Genome-wide Knock-out mutant libraries for the microcrustacean Daphnia" (2220695/2324639 to Sen Xu and 2220696 to Michael E. Pfrender). This work used Jetstream2 at Indiana University through allocation BIO230029 from the Advanced Cyberinfrastructure Coordination Ecosystem: Services \& Support (ACCESS) program, which is supported by NSF grants 2138259, 2138286, 2138307, 2137603, and 2138296.
+
 ## References
 
 [1] Adrian Alexa and Jorg Rahnenfuhrer. 2023. topGO: Enrichment Analysis for Gene
@@ -254,9 +260,3 @@ without writing a single line of code. BMC Biol. 21, 1 (April 2023), 74.
 [16] Qin Zhu, Stephen A Fisher, Hannah Dueck, Sarah Middleton, Mugdha Khal-
 adkar, and Junhyong Kim. 2018. PIVOT: platform for interactive analysis and
 visualization of transcriptomics data. BMC Bioinformatics 19, 1 (Dec. 2018).
-
-## Contributions & Acknowledgements
-
-These applications were developed by [Elizabeth Brooks](https://www.linkedin.com/in/elizabethmbrooks/) with the guidance and support of Sheri Sanders and Michael Pfrender.
-
-We would like to thank the students and researchers at ND who provided feedback for the application tools and tutorials. A special thank you to the Schorey (William McManus) and Pfrender (Neil McAdams, Bret Coggins, Nitin Vincent) labs for feature feedback. This project was supported by Notre Dame Research and the National Science Foundation (NSF) grant "Collaborative Research: EDGE FGT: Genome-wide Knock-out mutant libraries for the microcrustacean Daphnia" (2220695/2324639 to Sen Xu and 2220696 to Michael E. Pfrender). This work used Jetstream2 at Indiana University through allocation BIO230029 from the Advanced Cyberinfrastructure Coordination Ecosystem: Services \& Support (ACCESS) program, which is supported by NSF grants 2138259, 2138286, 2138307, 2137603, and 2138296.
