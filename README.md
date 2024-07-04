@@ -2,6 +2,9 @@
 
 These are R Shiny applications that provide a framework for analyzing biological data produced by genomic sequencing technologies, such as RNA-seq. Users are guided through biological data assessment, processing and analysis. The different analyses available include differential expression (DE), network, and functional analysis.
 
+## Cite
+Elizabeth Brooks, Sheri Sanders, Michael Pfrender. 2024. freeCount: A Coding Free Framework for Guided Count Data Visualization and Analysis. In Practice and Experience in Advanced Research Computing (PEARC '24). Association for Computing Machinery, New York, NY, USA. https://doi.org/10.1145/3626203.3670605
+
 ## Tools & Features
 
 * **DA**: **D**E **A**nalysis
