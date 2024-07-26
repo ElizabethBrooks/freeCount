@@ -1,17 +1,5 @@
 # creator: Elizabeth Brooks
-# updated: 21 June 2024
-
-# TO-DO: improve detail of output error messages (using console?)
-# TO-DO: consider adding data summary tab
-# TO-DO: replace design table in side bar with analysis settings
-# TO-DO: add update analysis buttons
-# TO-DO: add software version print out on information tab
-# TO-DO: store data and results in reactiveVal and reactiveValues
-# TO-DO: output example tables as csv
-# TO-DO: hide plots for invalid inputs
-# TO-DO: fix Windows OS images not showing
-## https://stackoverflow.com/questions/38011285/image-not-showing-in-shiny-app-r
-# TO-DO: add tutorial MD links to info tab
+# updated: 26 July 2024
 
 #### Setup ####
 
@@ -1932,3 +1920,15 @@ server <- function(input, output, session) {
 
 # create the Shiny app object 
 shinyApp(ui = ui, server = server)
+
+# TO-DO: improve detail of output error messages (using console?)
+# TO-DO: consider adding data summary tab
+# TO-DO: replace design table in side bar with analysis settings
+# TO-DO: add update analysis buttons
+# TO-DO: add software version print out on information tab
+# TO-DO: store data and results in reactiveVal and reactiveValues
+# TO-DO: output example tables as csv
+# TO-DO: hide plots for invalid inputs
+# TO-DO: fix Windows OS images not showing
+## https://stackoverflow.com/questions/38011285/image-not-showing-in-shiny-app-r
+# TO-DO: add tutorial MD links to info tab

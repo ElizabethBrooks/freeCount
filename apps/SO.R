@@ -1,14 +1,5 @@
 # creator: Elizabeth Brooks
-# updated: 21 June 2024
-
-# TO-DO: improve detail of output error messages (using console?)
-# TO-DO: update set names diagram using the input names
-# TO-DO: consider adding data summary tab
-# TO-DO: add software version print out on information tab
-# TO-DO: make upload button appear after at least two sets are input
-# TO-DO: check if headers are accounted for
-# TO-DO: store data and results in reactiveVal and reactiveValues
-# TO-DO: add tutorial MD links to info tab
+# updated: 26 July 2024
 
 #### Setup ####
 
@@ -1009,3 +1000,11 @@ server <- function(input, output, session) {
 # create the Shiny app object 
 shinyApp(ui = ui, server = server)
 
+# TO-DO: improve detail of output error messages (using console?)
+# TO-DO: update set names diagram using the input names
+# TO-DO: consider adding data summary tab
+# TO-DO: add software version print out on information tab
+# TO-DO: make upload button appear after at least two sets are input
+# TO-DO: check if headers are accounted for
+# TO-DO: store data and results in reactiveVal and reactiveValues
+# TO-DO: add tutorial MD links to info tab

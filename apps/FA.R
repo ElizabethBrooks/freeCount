@@ -1,18 +1,5 @@
 # creator: Elizabeth Brooks
-# updated: 21 June 2024
-
-# TO-DO: fix the dot plot to only show whole numbers in the scale legend
-# TO-DO: update the dot plot legend name
-# TO-DO: improve detail of output error messages (using console?)
-# TO-DO: fix download tables for other ontology levels
-# TO-DO: update helpful tips for input GO mapping files
-# TO-DO: consider adding data summary tab
-# TO-DO: add software version print out on information tab
-# TO-DO: change input expression to combo of text field and radio buttons
-# TO-DO: add bar plot of gene LFC (if DE genes)
-# TO-DO: output example tables as csv
-# TO-DO: check mappings table output (error for two rows with duplicate names)
-# TO-DO: add tutorial MD links to info tab
+# updated: 26 July 2024
 
 #### Setup ####
 
@@ -1928,3 +1915,15 @@ server <- function(input, output, session) {
 # create the Shiny app object 
 shinyApp(ui = ui, server = server)
 
+# TO-DO: fix the dot plot to only show whole numbers in the scale legend
+# TO-DO: update the dot plot legend name
+# TO-DO: improve detail of output error messages (using console?)
+# TO-DO: fix download tables for other ontology levels
+# TO-DO: update helpful tips for input GO mapping files
+# TO-DO: consider adding data summary tab
+# TO-DO: add software version print out on information tab
+# TO-DO: change input expression to combo of text field and radio buttons
+# TO-DO: add bar plot of gene LFC (if DE genes)
+# TO-DO: output example tables as csv
+# TO-DO: check mappings table output (error for two rows with duplicate names)
+# TO-DO: add tutorial MD links to info tab

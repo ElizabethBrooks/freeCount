@@ -1,9 +1,11 @@
 # freeCount
 
-These are R Shiny applications that provide a framework for analyzing biological data produced by genomic sequencing technologies, such as RNA-seq. Users are guided through biological data assessment, processing and analysis. The different analyses available include differential expression (DE), network, and functional analysis.
+freeCount is a modular set of tools and tutorials that provide a structured approach to biological count data analysis. Users are guided through data assessment, processing and analysis. The different analyses currently available include differential expression (DE), network, functional, and set operations.
+
+![freeCount logo](images/freeCount_DA_gettingStarted_cover.png)
 
 ## Cite
-Elizabeth Brooks, Sheri Sanders, Michael Pfrender. 2024. freeCount: A Coding Free Framework for Guided Count Data Visualization and Analysis. In Practice and Experience in Advanced Research Computing (PEARC '24). Association for Computing Machinery, New York, NY, USA. https://doi.org/10.1145/3626203.3670605
+Elizabeth Mae Brooks, Sheri A Sanders, and Michael E Pfrender. 2024. FreeCount: A Coding Free Framework for Guided Count Data Visualization and Analysis. In Practice and Experience in Advanced Research Computing 2024: Human Powered Computing (PEARC '24). Association for Computing Machinery, New York, NY, USA, Article 37, 1–4. https://doi.org/10.1145/3626203.3670605
 
 ## Tools & Features
 

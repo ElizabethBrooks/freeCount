@@ -1,28 +1,5 @@
-# creator: Elizabeth Brooks
-# updated: 1 July 2024
-
-# TO-DO: improve detail of output error messages (using console?)
-# TO-DO: consider adding data summary tab
-# TO-DO: add software version print out on information tab
-# TO-DO: add scree plot
-# TO-DO: double check pheatmap display
-# TO-DO: fix check of design file length (requires new line to match counts header length)
-# TO-DO: fix output table header, which is missing the "gene" column?
-# TO-DO: add bar plots of gene counts and LFC
-# TO-DO: output example tables as csv
-# TO-DO: add legend to volcano plots
-# TO-DO: allow input lists and tables of dispersion values
-# TO-DO: hide pheatmap when not enough DGE
-# TO-DO: add tutorial MD links to info tab
-# TO-DO: note that htseq stats are auto removed
-# TO-DO: note that the sample names need to be carefully formatted, for example:
-### don't include mathematical symbols like - that can confuse the GLM contrasts
-### don't have the same names between samples and groups
-# TO-DO: add not that plotMDS can't show if only 2 columns of data: need at least 3
-# TO-DO: plotBCV and plotQLDisp are only appropriate with replicates
-# TO-DO: note that LFC cut is only auto taken into consideration using GLMs with replicates
-# TO-DO: specifically set up-expressed genes as pink and down as blue, not-sig as green
-# TO-DO: check if sample and group names need to be different
+# developer: Elizabeth Brooks
+# updated: 26 July 2024
 
 #### Setup ####
 
@@ -2350,3 +2327,26 @@ server <- function(input, output, session) {
 
 # create the Shiny app object 
 shinyApp(ui = ui, server = server)
+
+# TO-DO: improve detail of output error messages (using console?)
+# TO-DO: consider adding data summary tab
+# TO-DO: add software version print out on information tab
+# TO-DO: add scree plot
+# TO-DO: double check pheatmap display
+# TO-DO: fix check of design file length (requires new line to match counts header length)
+# TO-DO: fix output table header, which is missing the "gene" column?
+# TO-DO: add bar plots of gene counts and LFC
+# TO-DO: output example tables as csv
+# TO-DO: add legend to volcano plots
+# TO-DO: allow input lists and tables of dispersion values
+# TO-DO: hide pheatmap when not enough DGE
+# TO-DO: add tutorial MD links to info tab
+# TO-DO: note that htseq stats are auto removed
+# TO-DO: note that the sample names need to be carefully formatted, for example:
+### don't include mathematical symbols like - that can confuse the GLM contrasts
+### don't have the same names between samples and groups
+# TO-DO: add not that plotMDS can't show if only 2 columns of data: need at least 3
+# TO-DO: plotBCV and plotQLDisp are only appropriate with replicates
+# TO-DO: note that LFC cut is only auto taken into consideration using GLMs with replicates
+# TO-DO: specifically set up-expressed genes as pink and down as blue, not-sig as green
+# TO-DO: check if sample and group names need to be different
