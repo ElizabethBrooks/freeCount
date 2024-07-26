@@ -1,6 +1,6 @@
 # freeCount
 
-freeCount is a modular set of tools and tutorials that provide a structured approach to biological count data analysis. Users are guided through data assessment, processing and analysis. The different analyses currently available include differential expression (DE), network, functional, and set operations.
+The freeCount analysis framework provides a modular set of tools and tutorials for a structured approach to biological count data analysis. Users are guided through data assessment, processing and analysis. The different analyses currently available include differential expression (DE), network, functional, and set operations.
 
 ![freeCount logo](images/freeCount_DA_gettingStarted_cover.png)
 
