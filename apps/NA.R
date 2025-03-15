@@ -1,7 +1,10 @@
-# creator: Elizabeth Brooks
-# updated: 26 July 2024
+# developer: Elizabeth Brooks
+# updated: 14 March 2025
 
 #### Setup ####
+
+# increase max uploadable file size to from the default 5MB to 30MB
+options(shiny.maxRequestSize=30*1024^2)
 
 # install any missing packages
 packageList <- c("BiocManager", "shiny", "bslib", "shinyWidgets", "dplyr", "matrixStats", "Hmisc", "splines", "foreach", "doParallel", "fastcluster", "dynamicTreeCut", "survival")
@@ -711,13 +714,13 @@ ui <- fluidPage(
               "
             ),
             tags$p(
-              "This application for expression network analysis was created by ",
-              tags$a("Elizabeth Brooks",href = "https://www.linkedin.com/in/elizabethmbrooks/"),
-              "."
+              "A tutorial for this application can be found ",
+              tags$a("here",href = "https://github.com/ElizabethBrooks/DGEAnalysis_ShinyApps/blob/main/tutorials/tutorial_app_networkAnalysis.md"),
+              " in the scripts directory of the freeCount GitHub."
             ),
             tags$p(
-              "The latest version of this application may be downloaded from ",
-              tags$a("GitHub",href = "https://github.com/ElizabethBrooks/freeCount/tree/main/apps"),
+              "The latest version of this application may be downloaded from the freeCount ",
+              tags$a("GitHub",href = "https://github.com/ElizabethBrooks/freeCount"),
               "."
             ),
             tags$p(
@@ -740,12 +743,23 @@ ui <- fluidPage(
             #tags$a("WGCNA package FAQ", href = "https://horvath.genetics.ucla.edu/html/CoexpressionNetwork/Rpackages/WGCNA/faq.html"), 
             #"."
             #),
-            tags$p(
-              "We would like to thank the students and researchers at ND who provided feedback for the application tools and tutorials.",
-              "A special thank you to the Schorey (William McManus) and Pfrender (Neil McAdams, Bret Coggins, Nitin Vincent) labs for feature feedback.",
-              "This project was funded by the National Science Foundation grant \"Collaborative Research: EDGE FGT: Genome-wide Knock-out mutant libraries for the microcrustacean Daphnia\" (2220695/2324639 to Sen Xu and 2220696 to Michael E. Pfrender).",
-              "This work used Jetstream2 at Indiana University through allocation BIO230029 from the Advanced Cyberinfrastructure Coordination Ecosystem: Services & Support (ACCESS) program, which is supported by NSF grants 2138259, 2138286, 2138307, 2137603, and 2138296."
-            )
+            tags$h1(
+              align="center",
+              "Cite",
+              style = "
+                color: white; 
+                background: #78c2ad;
+                font-size: x-large;
+                font-family: Georgia, Arial, sans-serif;
+                border-color: #78c2ad;
+                border-width: 4px;
+                border-style: solid;
+                border-radius: 25px;
+              "
+            ),
+            tags$p("Elizabeth Mae Brooks, Sheri A Sanders, and Michael E Pfrender. 2024. FreeCount: A Coding Free Framework for Guided Count Data Visualization and Analysis. 
+                   In Practice and Experience in Advanced Research Computing 2024: Human Powered Computing (PEARC '24). 
+                   Association for Computing Machinery, New York, NY, USA, Article 37, 1–4. https://doi.org/10.1145/3626203.3670605")
           )
         )
       )

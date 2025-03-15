@@ -7,7 +7,7 @@ A common task when working with transcriptomic data is the identification of dif
 ### Objectives
 
 <i>After completing this tutorial</i> you will know how to:
-* analyze quantified transcriptomic data
+* analyze quantified omics data
 * make comparisons using the experimental design
 * perform pairwise and ANOVA-like comparisons
 * use different types of plots to explore the data and results
@@ -16,7 +16,7 @@ A common task when working with transcriptomic data is the identification of dif
 
 #### Background
 
-
+[Introduction to differential expression analysis video](https://www.youtube.com/watch?v=60mdiLYnCeo&list=PLqi-7yMgvZy_IaAiPG89AX2cQH2JY4Ifo&index=11)
 
 ## edgeR
 

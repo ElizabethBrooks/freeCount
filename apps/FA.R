@@ -1,7 +1,10 @@
-# creator: Elizabeth Brooks
-# updated: 26 July 2024
+# developer: Elizabeth Brooks
+# updated: 14 March 2025
 
 #### Setup ####
+
+# increase max uploadable file size to from the default 5MB to 30MB
+options(shiny.maxRequestSize=30*1024^2)
 
 # install any missing packages
 packageList <- c("BiocManager", "shiny", "bslib", "shinyWidgets", "ggplot2", "rcartocolor", "tidyr", "eulerr")
@@ -14,9 +17,6 @@ if(length(newPackages)){
 if(length(newBioc)){
   BiocManager::install(newBioc)
 }
-
-# TO-DO: double check this increase on maximum upload size for servers
-options(shiny.maxRequestSize=30*1024^2)
 
 # load packages
 suppressPackageStartupMessages({
@@ -70,6 +70,11 @@ css_styles <- "
   border-top-right-radius: 25px;
   border-bottom-right-radius: 25px;
   border-bottom-left-radius: 25px;
+}
+#scoreStat, #universeCut {
+  border-color: #f3969a;
+  border-width: 2px;
+  border-style: solid;
 }
 "
 
@@ -254,7 +259,7 @@ ui <- fluidPage(
         ),
         tags$br(),
         tags$p(
-          "Note that the GO term analysis results and plots may take several moments to process depending on the size of the input data tables."
+          "Note that the functional analysis results and plots may take several moments to process depending on the size of the input data tables."
         ),
         tags$hr(),
         tags$p(
@@ -423,7 +428,7 @@ ui <- fluidPage(
         ),
         tags$br(),
         tags$p(
-          "The GO term analysis results and plots may take several moments to process depending on the size of the input tables."
+          "The functional analysis results and plots may take several moments to process depending on the size of the input tables."
         )
       ),
       
@@ -595,7 +600,7 @@ ui <- fluidPage(
             tags$p(
               "Begin exploring the GO term data and functional analysis results by selecting a GO term category (e.g., ontology level) below."
             ),
-            tags$br(),
+            tags$p("Note that it may take a moment for the analysis results to appear."),            tags$br(),
             fluidRow(
               column(
                 width = 6,
@@ -696,12 +701,27 @@ ui <- fluidPage(
             ),
             #),
             tags$br(),
-            tags$p(
-              HTML("<b>Table of Gene IDs</b>")
-            ),
-            downloadButton(outputId = "downloadSelected", label = "Download Table"),
-            tags$p(
-              "The table of gene IDs associated with the selected GO term may be downloaded above."
+            fluidRow(
+              column(
+                width = 6,
+                tags$p(
+                  HTML("<b>Table of Gene IDs</b>")
+                ),
+                downloadButton(outputId = "downloadSelected", label = "Download Table"),
+                tags$p(
+                  "The table of gene IDs associated with the selected GO term may be downloaded above."
+                )
+              ),
+              column(
+                width = 6,
+                tags$p(
+                  HTML("<b>Table of Gene Data</b>")
+                ),
+                downloadButton(outputId = "downloadSelectedData", label = "Download Table"),
+                tags$p(
+                  "The table of gene data associated with the selected GO term may be downloaded above."
+                )
+              )
             ),
             tags$hr(),
             tags$p(
@@ -768,6 +788,29 @@ ui <- fluidPage(
             tags$p(
               "The tables of gene IDs associated with each of the selected GO terms may be downloaded above."
             ),
+            tags$br(),
+            tags$p(
+              HTML("<b>Tables of Gene Data</b>")
+            ),
+            fluidRow(
+              column(
+                width = 6,
+                tags$p(
+                  "Gene Data for First GO Term:"
+                ),
+                downloadButton(outputId = "downloadSelectedDataOne", label = "Download Table")
+              ),
+              column(
+                width = 6,
+                tags$p(
+                  "Gene Data for Second GO Term:"
+                ),
+                downloadButton(outputId = "downloadSelectedDataTwo", label = "Download Table")
+              )
+            ),
+            tags$p(
+              "The tables of gene data associated with each of the selected GO terms may be downloaded above."
+            ),
             tags$hr(),
             # TO-DO: fix downloading of subgraphs
             tags$p(
@@ -829,9 +872,15 @@ ui <- fluidPage(
                 border-radius: 25px;
               "
             ),
+            #tags$h4(
+            #  textOutput(outputId = "ontologyLevelSelection"), 
+            #  align="center"
+            #),
+            tags$br(),
             tags$p(
               "Results from the GO term functional analysis may be viewed or downloaded below."
             ),
+            tags$p("Note that it may take a moment for the analysis results to appear."),
             tags$br(),
             tags$p(
               align = "center",
@@ -847,7 +896,7 @@ ui <- fluidPage(
             tags$hr(),
             tags$p(
               align = "center",
-              HTML("<b>Tables of All GO Term Results</b>")
+              HTML("<b>Table of GO Term Results</b>")
             ),
             fluidRow(
               column(
@@ -873,7 +922,7 @@ ui <- fluidPage(
               )
             ),
             tags$p(
-              "Above are the unfiltered tables of enriched GO terms for each of the ontology categories."
+              "Above are the unfiltered tables of enriched or overrepresented GO terms for each of the ontology categories."
             ),
             tags$br(),
             tags$p(
@@ -904,18 +953,9 @@ ui <- fluidPage(
               )
             ),
             tags$p(
-              "Above are the tables of significantly enriched GO terms for each ontology category filtered by the input p-value cut off."
+              "Above are the tables of significantly enriched or overrepresented GO terms for each ontology category, which have been filtered by the input p-value cut off."
             ),
             tags$hr(),
-            tags$p(
-              align = "center",
-              HTML("<b>Formatted Gene-to-GO Term Mapping Tables</b>")
-            ),
-            downloadButton(outputId = "mappingsDownload", label = "Download Table"),
-            tags$p(
-              "The above table of gene-to-GO term annotation mappings has been formatted for use with topGO."
-            ),
-            tags$br(),
             tags$p(
               align = "center",
               HTML("<b>Tables of Gene IDs for All GO Terms</b>")
@@ -944,7 +984,16 @@ ui <- fluidPage(
               )
             ),
             tags$p(
-              "Above are the tables of significantly enriched GO terms for each ontology category filtered by the input p-value cut off."
+              "Above are the tables of significantly enriched or overrepresented GO terms for each ontology category, which have been filtered by the input p-value cut off."
+            ),
+            tags$hr(),
+            tags$p(
+              align = "center",
+              HTML("<b>Table of Formatted Gene-to-GO Term Mappings</b>")
+            ),
+            downloadButton(outputId = "mappingsDownload", label = "Download Table"),
+            tags$p(
+              "The above table of gene-to-GO term annotation mappings has been formatted for use with topGO."
             )
           ),
           
@@ -966,13 +1015,13 @@ ui <- fluidPage(
               "
             ),
             tags$p(
-              "This application for functional enrichment analysis was created by ",
-              tags$a("Elizabeth Brooks",href = "https://www.linkedin.com/in/elizabethmbrooks/"),
-              "."
+              "A tutorial for this application can be found ",
+              tags$a("here",href = "https://github.com/ElizabethBrooks/DGEAnalysis_ShinyApps/blob/main/tutorials/tutorial_app_functionalAnalysis.md"),
+              " in the scripts directory of the freeCount GitHub."
             ),
             tags$p(
-              "The latest version of this application may be downloaded from ",
-              tags$a("GitHub",href = "https://github.com/ElizabethBrooks/freeCount/tree/main/apps"),
+              "The latest version of this application may be downloaded from the freeCount ",
+              tags$a("GitHub",href = "https://github.com/ElizabethBrooks/freeCount"),
               "."
             ),
             tags$p(
@@ -990,12 +1039,23 @@ ui <- fluidPage(
               tags$a("Gene set enrichment analysis with topGO", href = "https://bioconductor.org/packages/devel/bioc/vignettes/topGO/inst/doc/topGO.pdf"), 
               "."
             ),
-            tags$p(
-              "We would like to thank the students and researchers at ND who provided feedback for the application tools and tutorials.",
-              "A special thank you to the Schorey (William McManus) and Pfrender (Neil McAdams, Bret Coggins, Nitin Vincent) labs for feature feedback.",
-              "This project was funded by the National Science Foundation grant \"Collaborative Research: EDGE FGT: Genome-wide Knock-out mutant libraries for the microcrustacean Daphnia\" (2220695/2324639 to Sen Xu and 2220696 to Michael E. Pfrender).",
-              "This work used Jetstream2 at Indiana University through allocation BIO230029 from the Advanced Cyberinfrastructure Coordination Ecosystem: Services & Support (ACCESS) program, which is supported by NSF grants 2138259, 2138286, 2138307, 2137603, and 2138296."
-            )
+            tags$h1(
+              align="center",
+              "Cite",
+              style = "
+                color: white; 
+                background: #78c2ad;
+                font-size: x-large;
+                font-family: Georgia, Arial, sans-serif;
+                border-color: #78c2ad;
+                border-width: 4px;
+                border-style: solid;
+                border-radius: 25px;
+              "
+            ),
+            tags$p("Elizabeth Mae Brooks, Sheri A Sanders, and Michael E Pfrender. 2024. FreeCount: A Coding Free Framework for Guided Count Data Visualization and Analysis. 
+                   In Practice and Experience in Advanced Research Computing 2024: Human Powered Computing (PEARC '24). 
+                   Association for Computing Machinery, New York, NY, USA, Article 37, 1–4. https://doi.org/10.1145/3626203.3670605")
           )
         )
       )
@@ -1176,6 +1236,12 @@ server <- function(input, output, session) {
     return(TRUE)
   }
   outputOptions(output, 'dataUploaded', suspendWhenHidden=FALSE)
+  
+  # render text with input ontology level
+  #output$ontologyLevelSelection <- renderText({
+    # output input ontology level
+    #paste("Ontology Level:", input$ontologyLevel, sep=" ")
+  #})
   
   ## 
   # Functional Analysis Setup
@@ -1436,6 +1502,62 @@ server <- function(input, output, session) {
       selectGO <- retrieveSelected(selectedTermTwo())
       # write out all GO term gene IDs
       write.table(unlist(selectGO), file = outFile, sep = ",", quote = FALSE, row.names=FALSE, col.names = FALSE)
+    }
+  )
+  
+  # function to retrieve gene IDs for the selected GO term for the input ontology level
+  retrieveSelectedData <- function(term){
+    # create GO data
+    GO_data <- dataGO$topGO_data
+    # retrieve gene IDs for all GO terms
+    allGO <- genesInTerm(GO_data)
+    # retrieve selected GO term gene IDs
+    selectGO <- allGO[term]
+    # retrieve input gene data
+    inputData <- inputAnalysisTable()
+    # inner join to retrieve selected gene data
+    selectedData <- inputData[unlist(selectGO),]
+  }
+  
+  # download handler to export gene IDs for the selected GO term
+  output$downloadSelectedData <- downloadHandler(
+    filename = function() {
+      outTerm <- gsub(":", "_", selectedTerm())
+      outFile <- paste(outTerm, "gene_data.csv", sep = "_")
+    },
+    content = function(outFile) {
+      # retrieve gene IDs for the selected term
+      selectGO <- retrieveSelectedData(selectedTerm())
+      # write out all GO term gene IDs
+      write.table(selectGO, file = outFile, sep = ",", quote = FALSE, row.names=FALSE)
+    }
+  )
+  
+  # download handler to export gene IDs for the first selected GO term
+  output$downloadSelectedDataOne <- downloadHandler(
+    filename = function() {
+      outTerm <- gsub(":", "_", selectedTermOne())
+      outFile <- paste(outTerm, "gene_data.csv", sep = "_")
+    },
+    content = function(outFile) {
+      # retrieve gene IDs for the selected term
+      selectGO <- retrieveSelectedData(selectedTermOne())
+      # write out all GO term gene IDs
+      write.table(selectGO, file = outFile, sep = ",", quote = FALSE)
+    }
+  )
+  
+  # download handler to export gene IDs for the second selected GO term
+  output$downloadSelectedDataTwo <- downloadHandler(
+    filename = function() {
+      outTerm <- gsub(":", "_", selectedTermTwo())
+      outFile <- paste(outTerm, "gene_data.csv", sep = "_")
+    },
+    content = function(outFile) {
+      # retrieve gene IDs for the selected term
+      selectGO <- retrieveSelectedData(selectedTermTwo())
+      # write out all GO term gene IDs
+      write.table(selectGO, file = outFile, sep = ",", quote = FALSE)
     }
   )
   
@@ -1719,7 +1841,7 @@ server <- function(input, output, session) {
     # retrieve file name
     filename = function() {
       # setup output file name
-      paste(input$ontologyLevel, "GO_terms.csv", sep = "_")
+      "BP_GO_terms.csv"
     },
     # read in data
     content = function(file) {
@@ -1739,7 +1861,7 @@ server <- function(input, output, session) {
     # retrieve file name
     filename = function() {
       # setup output file name
-      paste(input$ontologyLevel, "GO_terms.csv", sep = "_")
+      "MF_GO_terms.csv"
     },
     # read in data
     content = function(file) {
@@ -1759,7 +1881,7 @@ server <- function(input, output, session) {
     # retrieve file name
     filename = function() {
       # setup output file name
-      paste(input$ontologyLevel, "GO_terms.csv", sep = "_")
+      "CC_GO_terms.csv"
     },
     # read in data
     content = function(file) {
@@ -1779,7 +1901,7 @@ server <- function(input, output, session) {
     # retrieve file name
     filename = function() {
       # setup output file name
-      paste(input$ontologyLevel, pVal(), "sigGO_terms.csv", sep = "_")
+      paste("BP_sigGO_terms_pVal", pVal(), ".csv", sep = "_")
     },
     # read in data
     content = function(file) {
@@ -1799,7 +1921,7 @@ server <- function(input, output, session) {
     # retrieve file name
     filename = function() {
       # setup output file name
-      paste(input$ontologyLevel, pVal(), "sigGO_terms.csv", sep = "_")
+      paste("MF_sigGO_terms_pVal", pVal(), ".csv", sep = "_")
     },
     # read in data
     content = function(file) {
@@ -1819,7 +1941,7 @@ server <- function(input, output, session) {
     # retrieve file name
     filename = function() {
       # setup output file name
-      paste(input$ontologyLevel, pVal(), "sigGO_terms.csv", sep = "_")
+      paste("CC_sigGO_terms_pVal", pVal(), ".csv", sep = "_")
     },
     # read in data
     content = function(file) {
@@ -1918,9 +2040,7 @@ shinyApp(ui = ui, server = server)
 # TO-DO: fix the dot plot to only show whole numbers in the scale legend
 # TO-DO: update the dot plot legend name
 # TO-DO: improve detail of output error messages (using console?)
-# TO-DO: fix download tables for other ontology levels
 # TO-DO: update helpful tips for input GO mapping files
-# TO-DO: consider adding data summary tab
 # TO-DO: add software version print out on information tab
 # TO-DO: change input expression to combo of text field and radio buttons
 # TO-DO: add bar plot of gene LFC (if DE genes)
