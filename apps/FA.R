@@ -984,7 +984,7 @@ ui <- fluidPage(
               )
             ),
             tags$p(
-              "Above are the tables of significantly enriched or overrepresented GO terms for each ontology category, which have been filtered by the input p-value cut off."
+              "Above are the tables of genes associated with the significantly enriched or overrepresented GO terms for each ontology category, which have been filtered by the input p-value cut off."
             ),
             tags$hr(),
             tags$p(
@@ -1901,7 +1901,8 @@ server <- function(input, output, session) {
     # retrieve file name
     filename = function() {
       # setup output file name
-      paste("BP_sigGO_terms_pVal", pVal(), ".csv", sep = "_")
+      fileOut <- paste("BP_sigGO_terms_pVal", pVal(), sep = "_")
+      paste(fileOut, "csv", sep = ".")
     },
     # read in data
     content = function(file) {
@@ -1921,7 +1922,8 @@ server <- function(input, output, session) {
     # retrieve file name
     filename = function() {
       # setup output file name
-      paste("MF_sigGO_terms_pVal", pVal(), ".csv", sep = "_")
+      fileOut <- paste("MF_sigGO_terms_pVal", pVal(), sep = "_")
+      paste(fileOut, "csv", sep = ".")
     },
     # read in data
     content = function(file) {
@@ -1941,7 +1943,8 @@ server <- function(input, output, session) {
     # retrieve file name
     filename = function() {
       # setup output file name
-      paste("CC_sigGO_terms_pVal", pVal(), ".csv", sep = "_")
+      fileOut <- paste("CC_sigGO_terms_pVal", pVal(), sep = "_")
+      paste(fileOut, "csv", sep = ".")
     },
     # read in data
     content = function(file) {
@@ -1975,7 +1978,7 @@ server <- function(input, output, session) {
       allGO <- retrieveAll("BP")
       # write out all GO term gene IDs
       sink(file)
-      allGO
+      print(allGO)
       sink()
     }
   )
@@ -1990,7 +1993,7 @@ server <- function(input, output, session) {
       allGO <- retrieveAll("MF")
       # write out all GO term gene IDs
       sink(file)
-      allGO
+      print(allGO)
       sink()
     }
   )
@@ -2005,7 +2008,7 @@ server <- function(input, output, session) {
       allGO <- retrieveAll("CC")
       # write out all GO term gene IDs
       sink(file)
-      allGO
+      print(allGO)
       sink()
     }
   )

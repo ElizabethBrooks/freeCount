@@ -18,6 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - FA ontology results output file naming
+- FA ontology level (BP, MF, CC) GO term and gene ID data on the results tab
 
 ### Changed
 
