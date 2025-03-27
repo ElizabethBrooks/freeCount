@@ -717,6 +717,7 @@ ui <- fluidPage(
                 tags$p(
                   HTML("<b>Table of Gene Data</b>")
                 ),
+                # To-do: add gene IDs to rows
                 downloadButton(outputId = "downloadSelectedData", label = "Download Table"),
                 tags$p(
                   "The table of gene data associated with the selected GO term may be downloaded above."
@@ -1529,7 +1530,7 @@ server <- function(input, output, session) {
       # retrieve gene IDs for the selected term
       selectGO <- retrieveSelectedData(selectedTerm())
       # write out all GO term gene IDs
-      write.table(selectGO, file = outFile, sep = ",", quote = FALSE, row.names=FALSE)
+      write.table(selectGO, file = outFile, sep = ",", quote = FALSE)
     }
   )
   
