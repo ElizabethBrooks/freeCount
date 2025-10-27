@@ -5,23 +5,6 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [1.2] - 2025-10-27
-
-### Added
-
-- None
-
-### Fixed
-
-- None
-
-### Changed
-
-- Updated package install lists
-
-### Removed
-
-- Removed diagrams showing the names of sets and set intersections in the SO app, since this caused issues resulting from updates to the ggVennDiagram package
 
 ## [1.1] - 2025-03-14
 
@@ -40,8 +23,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- None
+- Updated package install lists to only check for necessary packages
 
 ### Removed
 
-- None
+- Removed diagrams showing the names of sets and set intersections in the SO app, since this caused issues resulting from updates to the ggVennDiagram package
