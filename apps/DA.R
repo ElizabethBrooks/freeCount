@@ -1,5 +1,5 @@
 # developer: Elizabeth Brooks
-# updated: 14 March 2025
+# updated: 27 October 2025
 
 #### Setup ####
 
@@ -7,7 +7,8 @@
 options(shiny.maxRequestSize=30*1024^2)
 
 # install any missing packages
-packageList <- c("BiocManager", "shiny", "bslib", "shinyWidgets", "ggplot2", "rcartocolor", "dplyr", "statmod", "pheatmap", "ggplotify")
+packageList <- c("BiocManager", "shiny", "bslib", "shinyWidgets", "ggplot2", 
+                 "rcartocolor", "dplyr", "statmod", "pheatmap", "ggplotify")
 biocList <- c("edgeR")
 newPackages <- packageList[!(packageList %in% installed.packages()[,"Package"])]
 newBioc <- biocList[!(biocList %in% installed.packages()[,"Package"])]

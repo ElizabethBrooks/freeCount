@@ -1,5 +1,5 @@
 # developer: Elizabeth Brooks
-# updated: 14 March 2025
+# updated: 27 October 2025
 
 #### Setup ####
 
@@ -7,7 +7,8 @@
 options(shiny.maxRequestSize=30*1024^2)
 
 # install any missing packages
-packageList <- c("BiocManager", "shiny", "bslib", "shinyWidgets", "ggplot2", "rcartocolor", "ggVennDiagram", "gplots")
+packageList <- c("shiny", "bslib", "shinyWidgets", "ggplot2", 
+                 "rcartocolor", "ggVennDiagram", "gplots")
 newPackages <- packageList[!(packageList %in% installed.packages()[,"Package"])]
 if(length(newPackages)){
   install.packages(newPackages)
@@ -88,13 +89,13 @@ ui <- fluidPage(
   h1(id="app-heading", 
      tags$p(
        "freeCount SO",
-        style = "
+       style = "
           margin-top: 14px;
           margin-left: 25px; 
           font-family: Georgia, Arial, sans-serif;
           color: white
         "
-      )
+     )
   ),
   
   # setup sidebar layout
@@ -323,23 +324,10 @@ ui <- fluidPage(
               align="center",
               HTML("<b>Two-Way Venn Diagram</b>")
             ),
-            fluidRow(
-              column(
-                width = 6,
-                plotOutput(outputId = "twoWayVenn"),
-                downloadButton(outputId = "twoWayVennDownload", label = "Download Plot"),
-                tags$p(
-                  "The above two-way diagram shows the number and percentage of values that are contained in each of the input sets and their intersections."
-                )
-              ),
-              column(
-                width = 6,
-                plotOutput(outputId = "twoWayVennSets"),
-                downloadButton(outputId = "twoWayVennSetsDownload", label = "Download Plot"),
-                tags$p(
-                  "The above two-way diagram shows the names of the sets and intersections contained in each section of the diagram."
-                )
-              )
+            plotOutput(outputId = "twoWayVenn"),
+            downloadButton(outputId = "twoWayVennDownload", label = "Download Plot"),
+            tags$p(
+              "The above two-way diagram shows the number and percentage of values that are contained in each of the input sets and their intersections."
             ),
             tags$br(),
             fluidRow(
@@ -370,23 +358,10 @@ ui <- fluidPage(
                 align="center",
                 HTML("<b>Three-Way Venn Diagram</b>")
               ),
-              fluidRow(
-                column(
-                  width = 6,
-                  plotOutput(outputId = "threeWayVenn"),
-                  downloadButton(outputId = "threeWayVennDownload", label = "Download Plot"),
-                  tags$p(
-                    "The above three-way diagram shows the number and percentage of values that are contained in each of the input sets and their intersections."
-                  )
-                ),
-                column(
-                  width = 6,
-                  plotOutput(outputId = "threeWayVennSets"),
-                  downloadButton(outputId = "threeWayVennSetsDownload", label = "Download Plot"),
-                  tags$p(
-                    "The above two-way diagram shows the names of the sets and intersections contained in each section of the diagram."
-                  )
-                )
+              plotOutput(outputId = "threeWayVenn"),
+              downloadButton(outputId = "threeWayVennDownload", label = "Download Plot"),
+              tags$p(
+                "The above three-way diagram shows the number and percentage of values that are contained in each of the input sets and their intersections."
               ),
               fluidRow(
                 column(
@@ -417,23 +392,10 @@ ui <- fluidPage(
                 align="center",
                 HTML("<b>Four-Way Venn Diagram</b>")
               ),
-              fluidRow(
-                column(
-                  width = 6,
-                  plotOutput(outputId = "fourWayVenn"),
-                  downloadButton(outputId = "fourWayVennDownload", label = "Download Plot"),   
-                  tags$p(
-                    "The above four-way diagram shows the number and percentage of values that are contained in each of the input sets and their intersections."
-                  )
-                ),
-                column(
-                  width = 6,
-                  plotOutput(outputId = "fourWayVennSets"),
-                  downloadButton(outputId = "fourWayVennSetsDownload", label = "Download Plot"),
-                  tags$p(
-                    "The above two-way diagram shows the names of the sets and intersections contained in each section of the diagram."
-                  )
-                )
+              plotOutput(outputId = "fourWayVenn"),
+              downloadButton(outputId = "fourWayVennDownload", label = "Download Plot"),   
+              tags$p(
+                "The above four-way diagram shows the number and percentage of values that are contained in each of the input sets and their intersections."
               ),
               fluidRow(
                 column(
@@ -697,29 +659,6 @@ server <- function(input, output, session) {
       scale_fill_gradientn(colors = colorList)
   }
   
-  
-  # TO-DO: stat_sf(): requires the missing aestehtic geometry (windows issue?)
-  # https://stackoverflow.com/questions/76704893/r-stat-sf-requires-the-following-missing-aesthetics-geometry
-  # function to create plot venn diagrams sets
-  createVennSets <- function(dataList, labelList){
-    # create venn diagram
-    vennSets <- ggplot() +
-      # change mapping of color filling
-      geom_sf(data = venn_region(dataList), aes(fill = id), show.legend = FALSE) +  
-      # adjust edge size and color
-      geom_sf(color="grey", size = 3, data = venn_setedge(dataList), show.legend = FALSE) +  
-      # show set label in bold
-      geom_sf_text(aes(label = labelList), fontface = "bold", data = venn_setlabel(dataList)) +  
-      # add a alternative region name
-      geom_sf_label(aes(label = name), data = venn_region(dataList), alpha = 0.5) +  
-      # expand the plotting area
-      scale_x_continuous(expand = expansion(mult = .2)) +
-      # void theme
-      theme_void()
-    #return plot
-    vennSets
-  }
-  
   # function to retrieve intersections from the venn diagram
   retrieveVennSets <- function(namesList, compare){
     # create venn lists
@@ -758,37 +697,6 @@ server <- function(input, output, session) {
       # create plot
       outVenn <- createVenn(namesList, setList, colorList)
       # save plot
-      ggsave(file, plot = outVenn, device = "png")
-    }
-  )
-  
-  # function to render two-way venn
-  output$twoWayVennSets <- renderPlot({
-    # retrieve combined list of names
-    namesList <- createTwoWayList()
-    vennList <- Venn(namesList)
-    dataList <- process_data(vennList)
-    # setup label list
-    labelList <- c(input$setOne, input$setTwo)
-    # create plot
-    createVennSets(dataList, labelList)
-  })
-  
-  # download handler for two-way venn
-  output$twoWayVennSetsDownload <- downloadHandler(
-    filename = function() {
-      exportFile <- paste(input$setOne, input$setTwo, "twoWayVennSets.png", sep="_")
-    },
-    content = function(file) {
-      # retrieve combined list of names
-      namesList <- createTwoWayList()
-      vennList <- Venn(namesList)
-      dataList <- process_data(vennList)
-      # setup label list
-      labelList <- c(input$setOne, input$setTwo)
-      # create plot
-      outVenn <- createVennSets(dataList, labelList)
-      # save the plot
       ggsave(file, plot = outVenn, device = "png")
     }
   )
@@ -852,37 +760,6 @@ server <- function(input, output, session) {
       # create plot
       outVenn <- createVenn(namesList, setList, colorList)
       # save plot
-      ggsave(file, plot = outVenn, device = "png")
-    }
-  )
-  
-  # function to render three-way venn
-  output$threeWayVennSets <- renderPlot({
-    # retrieve combined list of names
-    namesList <- createThreeWayList()
-    vennList <- Venn(namesList)
-    dataList <- process_data(vennList)
-    # setup label list
-    labelList <- c(input$setOne, input$setTwo, input$setThree)
-    # create plot
-    createVennSets(dataList, labelList)
-  })
-  
-  # download handler for three-way venn
-  output$threeWayVennSetsDownload <- downloadHandler(
-    filename = function() {
-      exportFile <- paste(input$setOne, input$setTwo, input$setThree, "threeWayVennSets.png", sep="_")
-    },
-    content = function(file) {
-      # retrieve combined list of names
-      namesList <- createThreeWayList()
-      vennList <- Venn(namesList)
-      dataList <- process_data(vennList)
-      # setup label list
-      labelList <- c(input$setOne, input$setTwo, input$setThree)
-      # create plot
-      outVenn <- createVennSets(dataList, labelList)
-      # save the plot
       ggsave(file, plot = outVenn, device = "png")
     }
   )
@@ -952,38 +829,6 @@ server <- function(input, output, session) {
     }
   )
   
-  # function to render four-way venn
-  output$fourWayVennSets <- renderPlot({
-    # retrieve combined list of names
-    namesList <- createFourWayList()
-    vennList <- Venn(namesList)
-    dataList <- process_data(vennList)
-    # setup label list
-    labelList <- c(input$setOne, input$setTwo, input$setThree, input$setFour)
-    # create plot
-    createVennSets(dataList, labelList)
-  })
-  
-  # download handler for four-way venn
-  output$fourWayVennSetsDownload <- downloadHandler(
-    filename = function() {
-      exportFile <- paste(input$setOne, input$setTwo, input$setThree, input$setFour, sep="_")
-      exportFile <- paste(exportFile, "fourWayVennSets.png", sep="_")
-    },
-    content = function(file) {
-      # retrieve combined list of names
-      namesList <- createFourWayList()
-      vennList <- Venn(namesList)
-      dataList <- process_data(vennList)
-      # setup label list
-      labelList <- c(input$setOne, input$setTwo, input$setThree, input$setFour)
-      # create plot
-      outVenn <- createVennSets(dataList, labelList)
-      # save the plot
-      ggsave(file, plot = outVenn, device = "png")
-    }
-  )
-  
   # download table with number of filtered genes
   output$fourWayIntersections <- downloadHandler(
     filename = function() {
@@ -1017,4 +862,3 @@ shinyApp(ui = ui, server = server)
 # TO-DO: check if headers are accounted for
 # TO-DO: store data and results in reactiveVal and reactiveValues
 # TO-DO: add tutorial MD links to info tab
-# To-DO: add analyze button and analysis tab
