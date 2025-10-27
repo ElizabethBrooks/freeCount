@@ -7,7 +7,8 @@
 options(shiny.maxRequestSize=30*1024^2)
 
 # install any missing packages
-packageList <- c("BiocManager", "shiny", "bslib", "shinyWidgets", "ggplot2", "rcartocolor", "tidyr", "eulerr")
+packageList <- c("BiocManager", "shiny", "bslib", "shinyWidgets", "ggplot2", 
+                 "rcartocolor", "tidyr", "eulerr")
 biocList <- c("topGO", "Rgraphviz")
 newPackages <- packageList[!(packageList %in% installed.packages()[,"Package"])]
 newBioc <- biocList[!(biocList %in% installed.packages()[,"Package"])]
@@ -158,7 +159,7 @@ ui <- fluidPage(
           accept = ".csv"
         ),
         tags$p(
-          "Upload Mappings Table (*.txt):"
+          "Upload Mappings Table (*.txt or *.csv):"
         ),
         fileInput(
           "mappings", 
@@ -717,7 +718,6 @@ ui <- fluidPage(
                 tags$p(
                   HTML("<b>Table of Gene Data</b>")
                 ),
-                # To-do: add gene IDs to rows
                 downloadButton(outputId = "downloadSelectedData", label = "Download Table"),
                 tags$p(
                   "The table of gene data associated with the selected GO term may be downloaded above."
@@ -1180,6 +1180,7 @@ server <- function(input, output, session) {
     }
     # TO-DO: double check reading in tab delimited pannzer2 outputs
     # Error in read.table: "more columns than column names" with sep = "", but not with sep = "\t"
+    # No enrichment can pe performed - there are no feasible GO terms!
     # read in the file
     #GOmaps_input <- suppressWarnings(read.delim(file = input$mappings$datapath, sep = "\t", row.names=NULL, colClasses = c(goid = "character")))
     GOmaps_input <- suppressWarnings(read.delim(file = input$mappings$datapath, sep = "", row.names=NULL, colClasses = c(goid = "character")))
@@ -2051,3 +2052,4 @@ shinyApp(ui = ui, server = server)
 # TO-DO: output example tables as csv
 # TO-DO: check mappings table output (error for two rows with duplicate names)
 # TO-DO: add tutorial MD links to info tab
+# TO-DO: write.delim FA results tables with descriptions

@@ -552,6 +552,7 @@ ui <- fluidPage(
                   tags$p(
                     HTML("<b>Enter Expression for Comparison:</b>")
                   ),
+                  # To-Do: make text input area larger
                   textInput(
                     "compareExpression", 
                     label = NULL

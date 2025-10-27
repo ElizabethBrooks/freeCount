@@ -1017,3 +1017,4 @@ shinyApp(ui = ui, server = server)
 # TO-DO: check if headers are accounted for
 # TO-DO: store data and results in reactiveVal and reactiveValues
 # TO-DO: add tutorial MD links to info tab
+# To-DO: add analyze button and analysis tab
