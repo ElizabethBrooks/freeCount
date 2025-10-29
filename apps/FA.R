@@ -1182,8 +1182,8 @@ server <- function(input, output, session) {
     # Error in read.table: "more columns than column names" with sep = "", but not with sep = "\t"
     # No enrichment can pe performed - there are no feasible GO terms!
     # read in the file
-    #GOmaps_input <- suppressWarnings(read.delim(file = input$mappings$datapath, sep = "\t", row.names=NULL, colClasses = c(goid = "character")))
-    GOmaps_input <- suppressWarnings(read.delim(file = input$mappings$datapath, sep = "", row.names=NULL, colClasses = c(goid = "character")))
+    GOmaps_input <- suppressWarnings(read.delim(file = input$mappings$datapath, sep = "\t", row.names=NULL, colClasses = c(goid = "character")))
+    #GOmaps_input <- suppressWarnings(read.delim(file = input$mappings$datapath, sep = "", row.names=NULL, colClasses = c(goid = "character")))
     # check what format mappings file was input
     if(ncol(GOmaps_input) == 2){ # two columns
       # check if mappings are in topGO format
