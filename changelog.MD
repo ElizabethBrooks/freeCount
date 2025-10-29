@@ -24,6 +24,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Updated package install lists to only check for necessary packages
+- Switched delimiter for reading GO term mappings files in the FA app
 
 ### Removed
 

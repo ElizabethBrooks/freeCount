@@ -1202,6 +1202,7 @@ server <- function(input, output, session) {
         # clean up
         file.remove("mappings_GO.fmt.txt") 
       }
+    # TO-DO: double check outputting of GO:GO: instead of GO:
     }else if(ncol(GOmaps_input) == 8){ # 8 columns
       # double check if input mappings are from PANNZER2
       if("qpid" %in% colnames(GOmaps_input) && "goid" %in% colnames(GOmaps_input)){
