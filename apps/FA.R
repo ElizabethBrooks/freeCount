@@ -2046,6 +2046,7 @@ shinyApp(ui = ui, server = server)
 # TO-DO: fix the dot plot to only show whole numbers in the scale legend
 # TO-DO: update the dot plot legend name
 # TO-DO: improve detail of output error messages (using console?)
+## https://stackoverflow.com/questions/34422342/show-warning-to-user-in-shiny-in-r
 # TO-DO: update helpful tips for input GO mapping files
 # TO-DO: add software version print out on information tab
 # TO-DO: change input expression to combo of text field and radio buttons
@@ -2054,3 +2055,5 @@ shinyApp(ui = ui, server = server)
 # TO-DO: check mappings table output (error for two rows with duplicate names)
 # TO-DO: add tutorial MD links to info tab
 # TO-DO: write.delim FA results tables with descriptions
+# TO-DO: add input options to the analysis settings window while the app is running the analysis
+# TO-DO: add/fix white background for getting started text

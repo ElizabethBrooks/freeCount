@@ -1,5 +1,5 @@
 # developer: Elizabeth Brooks
-# updated: 27 October 2025
+# updated: 30 October 2025
 
 #### Setup ####
 
@@ -1624,6 +1624,10 @@ server <- function(input, output, session) {
   
   # function to calculate table of DE genes
   pairwiseTest <- eventReactive(list(input$analysisUpdate), {
+    # require pairwise analysis selection
+    if(input$analysisType == "GLM"){
+      return(NULL)
+    }
     # require valid inputs
     if(is.null(compareSamples())){
       return(NULL)
@@ -1974,6 +1978,7 @@ server <- function(input, output, session) {
       # replace the dispersion value in the DGE object
       list$common.dispersion <- as.numeric(valueDisp())
       # estimate the QL dispersions using the input dispersion value(s)
+      #na.omit(glmFit(list, design))
       glmFit(list, design)
     }
   }
@@ -2024,6 +2029,10 @@ server <- function(input, output, session) {
   
   # function to perform glm contrasts
   glmContrast <- eventReactive(list(input$analysisUpdate), {
+    # require GLM analysis selection
+    if(input$analysisType == "pairwise"){
+      return(NULL)
+    }
     # require the expression
     #req(input$compareExpression)
     # set the input expression as global
@@ -2348,6 +2357,7 @@ server <- function(input, output, session) {
 shinyApp(ui = ui, server = server)
 
 # TO-DO: improve detail of output error messages (using console?)
+## https://stackoverflow.com/questions/34422342/show-warning-to-user-in-shiny-in-r
 # TO-DO: consider adding data summary tab
 # TO-DO: add software version print out on information tab
 # TO-DO: add scree plot
@@ -2367,3 +2377,4 @@ shinyApp(ui = ui, server = server)
 # TO-DO: note that LFC cut is only auto taken into consideration using GLMs with replicates
 # TO-DO: specifically set up-expressed genes as pink and down as blue, not-sig as green
 # TO-DO: check if sample and group names need to be different
+# TO-DO: add/fix white background for getting started text

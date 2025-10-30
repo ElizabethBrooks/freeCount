@@ -1938,6 +1938,7 @@ server <- function(input, output, session) {
 shinyApp(ui = ui, server = server)
 
 # TO-DO: improve detail of output error messages (using console?)
+## https://stackoverflow.com/questions/34422342/show-warning-to-user-in-shiny-in-r
 # TO-DO: consider adding data summary tab
 # TO-DO: replace design table in side bar with analysis settings
 # TO-DO: add update analysis buttons
@@ -1948,3 +1949,4 @@ shinyApp(ui = ui, server = server)
 # TO-DO: fix Windows OS images not showing
 ## https://stackoverflow.com/questions/38011285/image-not-showing-in-shiny-app-r
 # TO-DO: add tutorial MD links to info tab
+# TO-DO: add/fix white background for getting started text

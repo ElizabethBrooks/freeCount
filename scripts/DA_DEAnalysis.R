@@ -43,7 +43,8 @@ analysisType <- "pairwise"
 # import gene count data
 #inputData <- read.csv(file="/Users/bamflappy/Repos/freeCount/data/DA/example3_daphnia_counts.csv", row.names=1)
 #inputData <- read.csv(file="/Users/bamflappy/GBCF/freeCount/data/MusabEdgeR.fmt.csv", row.names=1)
-inputData <- read.csv(file="/Users/bamflappy/GBCF/freeCount/data/MusabEdgeR.csv", row.names=1)
+#inputData <- read.csv(file="/Users/bamflappy/GBCF/freeCount/data/MusabEdgeR.csv", row.names=1)
+inputData <- read.csv(file="/Users/bamflappy/Repos/freeCount/data/DA/projects/DAP_counts.csv", row.names=1)
 
 # trim the data table of htseq stats
 removeList <- c("__no_feature", "__ambiguous", "__too_low_aQual", "__not_aligned", "__alignment_not_unique")
@@ -52,7 +53,8 @@ countsTable <- inputData[!row.names(inputData) %in% removeList,]
 # import grouping factor
 #targets <- read.csv(file="/Users/bamflappy/Repos/freeCount/data/DA/example3_daphnia_design_edgeR.csv", row.names=1)
 #targets <- read.csv(file="/Users/bamflappy/GBCF/freeCount/data/MusabEdgeRDesign.fmt.csv", row.names=1)
-targets <- read.csv(file="/Users/bamflappy/GBCF/freeCount/data/MusabEdgeRDesign.csv", row.names=1)
+#targets <- read.csv(file="/Users/bamflappy/GBCF/freeCount/data/MusabEdgeRDesign.csv", row.names=1)
+targets <- read.csv(file="/Users/bamflappy/Repos/freeCount/data/DA/projects/DAP_design.csv", row.names=1)
 
 # set LFC cut off
 cutLFC <- log2(1.2)
@@ -66,17 +68,19 @@ if(analysisType == tolower("pairwise")){
   dispersionsVal <- "auto"
   # set comparison
   #comparisonExp <- c("treat.high", "treat.low")
-  comparisonExp <- c("LNCaP", "BoM")
+  #comparisonExp <- c("LNCaP", "BoM")
+  comparisonExp <- c("WildType2A", "Scarlet2A")
 }else if(analysisType == "GLM"){
   # set dispersions value
   dispersionsVal <- "NULL"
   # set comparison
   #comparisonExp <- "(treat.high + treat.low) - (cntrl.high + cntrl.low)"
-  comparisonExp <- "BoM-LNCaP"
+  #comparisonExp <- "BoM-LNCaP"
+  comparisonExp <- "Scarlet2A-WildType2A"
 }
 
 # no replicates, human data
-dispersionsVal <- 0.16
+#dispersionsVal <- 0.16
 
 ##
 # Analysis Setup

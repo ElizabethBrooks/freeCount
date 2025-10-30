@@ -6,7 +6,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
-## [1.1] - 2025-03-14
+## [1.1] - 30 October 2025
 
 ### Added
 
@@ -20,6 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - FA ontology results output file naming
 - FA ontology level (BP, MF, CC) GO term and gene ID data on the results tab
+- Issue with DA app running both pairwise and GLM analysis on button press
 
 ### Changed
 

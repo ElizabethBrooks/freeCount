@@ -855,6 +855,7 @@ server <- function(input, output, session) {
 shinyApp(ui = ui, server = server)
 
 # TO-DO: improve detail of output error messages (using console?)
+## https://stackoverflow.com/questions/34422342/show-warning-to-user-in-shiny-in-r
 # TO-DO: update set names diagram using the input names
 # TO-DO: consider adding data summary tab
 # TO-DO: add software version print out on information tab
@@ -862,3 +863,4 @@ shinyApp(ui = ui, server = server)
 # TO-DO: check if headers are accounted for
 # TO-DO: store data and results in reactiveVal and reactiveValues
 # TO-DO: add tutorial MD links to info tab
+# TO-DO: add/fix white background for getting started text
