@@ -15,7 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - tutorial MD GitHub links to DA, FA, and NA
 - citation section and details to the information tab of each application 
 - tip 6 on DA noting that HTSeq stats (no_feature, ambiguous, too_low_aQual, not_aligned, alignment_not_unique) are automatically removed from the input counts table
-- Separate set of apps for Posit Cloud
+- Separate set of apps for Posit Cloud and notes about the difference on the getting started pages
 
 ### Fixed
 
@@ -31,3 +31,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Removed
 
 - Removed diagrams showing the names of sets and set intersections in the SO app, since this caused issues resulting from updates to the ggVennDiagram package
+- Removed un-filtered pheatmaps and report generation from the cloud DA app

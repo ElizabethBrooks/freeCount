@@ -262,6 +262,10 @@ ui <- fluidPage(
         tags$p(
           "Note that the functional analysis results and plots may take several moments to process depending on the size of the input data tables."
         ),
+        #tags$br(),
+        #tags$p(
+        #  "This version of the FA app is designed for use on Posit Cloud and it is missing some features found in the local version of the FA app."
+        #),
         tags$hr(),
         tags$p(
           align="center",

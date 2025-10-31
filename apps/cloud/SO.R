@@ -241,6 +241,10 @@ ui <- fluidPage(
         tags$p(
           "After uploading at least two files, it will be possible to view and download the venn diagrams along with the unique values belonging to each set and their intersections."
         ),
+        #tags$br(),
+        #tags$p(
+        #  "This version of the SO app is designed for use on Posit Cloud and it is missing some features found in the local version of the SO app."
+        #),
         tags$hr(),
         tags$p(
           align="center",

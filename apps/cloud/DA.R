@@ -8,8 +8,7 @@ options(shiny.maxRequestSize=30*1024^2)
 
 # install any missing packages
 packageList <- c("BiocManager", "shiny", "bslib", "shinyWidgets", "ggplot2", 
-                 "rcartocolor", "dplyr", "statmod", "pheatmap", "ggplotify",
-                 "rmarkdown")
+                 "rcartocolor", "dplyr", "statmod", "pheatmap", "ggplotify")
 biocList <- c("edgeR")
 newPackages <- packageList[!(packageList %in% installed.packages()[,"Package"])]
 newBioc <- biocList[!(biocList %in% installed.packages()[,"Package"])]
@@ -161,12 +160,12 @@ ui <- fluidPage(
         tags$p(
           "Current Analysis Settings:"
         ), 
-        tableOutput(outputId = "inputSettings"),
-        tags$hr(),
-        tags$p(
-          "Click to Download Analysis Report:"
-        ),
-        downloadButton("report", "Download Report")
+        tableOutput(outputId = "inputSettings")#,
+        #tags$hr(),
+        #tags$p(
+        #  "Click to Download Analysis Report:"
+        #),
+        #downloadButton("report", "Download Report")
       )
     ),
     
@@ -216,6 +215,10 @@ ui <- fluidPage(
         tags$br(),
         tags$p(
           "Note that the DE analysis results and plots may take several moments to process depending on the size of the input gene counts table."
+        ),
+        tags$br(),
+        tags$p(
+          "This version of the DA app is designed for use on Posit Cloud and it is missing some features found in the local version of the DA app."
         ),
         tags$hr(),
         tags$p(
@@ -2323,34 +2326,35 @@ server <- function(input, output, session) {
     }
   )
   
+  # TO-DO: this crashes on Posit Cloud
   # download Rmd HTML report with the current inputs
   # https://shiny.posit.co/r/articles/build/generating-reports/
-  output$report <- downloadHandler(
+  #output$report <- downloadHandler(
     # For PDF output, change this to "report.pdf"
-    filename = "DA_report.html",
-    content = function(file) {
+  #  filename = "DA_report.html",
+  #  content = function(file) {
       # Copy the report file to a temporary directory before processing it, in
       # case we don't have write permissions to the current working dir
-      tempReport <- file.path(tempdir(), "DA_report.Rmd")
-      file.copy("../markdown/DA_report.Rmd", tempReport, overwrite = TRUE)
+  #    tempReport <- file.path(tempdir(), "DA_report.Rmd")
+  #    file.copy("../../markdown/DA_report.Rmd", tempReport, overwrite = TRUE)
       # Set up parameters to pass to Rmd document
-      params <- list(
-        analysisIn = valueAnalysis(),
-        inputDataIn = input$geneCountsTable$datapath,
-        targetsIn = input$expDesignTable$datapath,
-        cutLFCIn = valueLFC(),
-        cutFDRIn = valueFDR(),
-        dispersionsIn = valueDisp(),
-        comparisonIn = valueExp()
-      )
+  #    params <- list(
+  #      analysisIn = valueAnalysis(),
+  #      inputDataIn = input$geneCountsTable$datapath,
+  #      targetsIn = input$expDesignTable$datapath,
+  #      cutLFCIn = valueLFC(),
+  #      cutFDRIn = valueFDR(),
+  #      dispersionsIn = valueDisp(),
+  #      comparisonIn = valueExp()
+  #    )
       # Knit the document, passing in the `params` list, and eval it in a
       # child of the global environment
-      rmarkdown::render(tempReport, output_file = file,
-                        params = params#,
+  #    rmarkdown::render(tempReport, output_file = file,
+  #                      params = params#,
                         #envir = new.env(parent = globalenv())
-      )
-    }
-  )
+  #    )
+  #  }
+  #)
 }
 
 #### App Object ####
