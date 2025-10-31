@@ -2057,3 +2057,4 @@ shinyApp(ui = ui, server = server)
 # TO-DO: write.delim FA results tables with descriptions
 # TO-DO: add input options to the analysis settings window while the app is running the analysis
 # TO-DO: add/fix white background for getting started text
+# TO-DO: only update Range of GO Term P-Values plot title on button press

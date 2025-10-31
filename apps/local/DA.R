@@ -8,7 +8,8 @@ options(shiny.maxRequestSize=30*1024^2)
 
 # install any missing packages
 packageList <- c("BiocManager", "shiny", "bslib", "shinyWidgets", "ggplot2", 
-                 "rcartocolor", "dplyr", "statmod", "pheatmap", "ggplotify")
+                 "rcartocolor", "dplyr", "statmod", "pheatmap", "ggplotify",
+                 "rmarkdown")
 biocList <- c("edgeR")
 newPackages <- packageList[!(packageList %in% installed.packages()[,"Package"])]
 newBioc <- biocList[!(biocList %in% installed.packages()[,"Package"])]
