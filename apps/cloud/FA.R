@@ -1,5 +1,5 @@
 # developer: Elizabeth Brooks
-# updated: 29 October 2025
+# updated: 17 November 2025
 
 #### Setup ####
 
@@ -1326,7 +1326,9 @@ server <- function(input, output, session) {
     get_interesting_DE_genes <- function(geneUniverse){
       interesting_DE_genes <- rep(0, length(geneUniverse))
       for(i in 1:length(geneUniverse)){
-        if(eval(parse(text = paste(geneUniverse[i], input$universeCut, sep=" ")))){
+        if (is.na(geneUniverse[i])) {
+          interesting_DE_genes[i] = 0
+        }else if(eval(parse(text = paste(geneUniverse[i], input$universeCut, sep=" ")))){
           interesting_DE_genes[i] = 1
         }
       }
