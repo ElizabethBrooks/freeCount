@@ -1,5 +1,5 @@
 # developer: Elizabeth Brooks
-# updated: 30 October 2025
+# updated: 17 November 2025
 
 #### Setup ####
 
@@ -10,7 +10,7 @@ options(shiny.maxRequestSize=30*1024^2)
 packageList <- c("BiocManager", "shiny", "bslib", "shinyWidgets", "ggplot2", 
                  "rcartocolor", "dplyr", "statmod", "pheatmap", "ggplotify",
                  "rmarkdown")
-biocList <- c("edgeR")
+biocList <- c("apeglm", "DESeq2")
 newPackages <- packageList[!(packageList %in% installed.packages()[,"Package"])]
 newBioc <- biocList[!(biocList %in% installed.packages()[,"Package"])]
 if(length(newPackages)){
@@ -33,13 +33,11 @@ suppressPackageStartupMessages({
   library(ggplotify)
 })
 
-# TO-DO: double check
 # color blind safe plotting palettes
-defaultColors <- palette.colors(palette = "Okabe-Ito")
-blindColors <- c("#000000", "#999999", "#E69F00", "#56B4E9", "#009E73", 
-                       "#F0E442", "#0072B2", "#D55E00", "#CC79A7")
-safeColors <- carto_pal(12, "Safe")
-plotColors <- c(safeColors, blindColors, defaultColors)
+plotColors <- carto_pal(12, "Safe")
+
+# create a list of continuous colors
+colors <- colorRampPalette( rev(brewer.pal(9, "Blues")) )(255)
 
 # prepare styles for css
 #font-family: Arial, sans-serif !important;
@@ -79,11 +77,9 @@ css_styles <- "
 "
 
 # set default values
-defaultAnalysis <- "pairwise"
 defaultLFC <- 1.2
 defaultFDR <- 0.05
-defaultPairwiseDisp <- "auto"
-defaultGLMDisp <- "NULL"
+defaultDes <- "NA"
 defaultExp <- "NA"
 
 #### UI ####
@@ -540,7 +536,7 @@ ui <- fluidPage(
               "
               ),
               tags$h4(
-                textOutput(outputId = "glmComparison"), 
+                textOutput(outputId = "deComparison"), 
                 align="center"
               ),
               tags$br(),
@@ -563,17 +559,6 @@ ui <- fluidPage(
                   textInput(
                     "compareExpression", 
                     label = NULL
-                  )
-                ),
-                column(
-                  width = 6,
-                  tags$p(
-                    HTML("<b>Enter Dispersion Value:</b>")
-                  ),
-                  textInput(
-                    inputId = "inputGLMDisp", 
-                    label = NULL,
-                    value = defaultGLMDisp
                   )
                 )
               ),
@@ -1161,7 +1146,7 @@ server <- function(input, output, session) {
       return(NULL)
     }
     # import grouping factor
-    targets <- read.csv(input$expDesignTable$datapath, row.names=1)
+    design <- read.csv(input$expDesignTable$datapath, row.names=1)
   })
   
   # check if input files have been uploaded
@@ -1186,8 +1171,9 @@ server <- function(input, output, session) {
     if(!is.character(rownames(targets))){
       return(NULL)
     }
-    # setup a design matrix
-    factor(targets[,1])
+    # convert the grouping data into factors
+    colData <- as.data.frame(lapply(targets, as.factor))
+    rownames(colData) <- rownames(targets)
   })
   
   # compare input design and counts samples
@@ -1232,14 +1218,6 @@ server <- function(input, output, session) {
   }
   outputOptions(output, 'inputCheck', suspendWhenHidden=FALSE)
   
-  # setup reactive analysis type value
-  valueAnalysis <- reactiveVal(defaultAnalysis)
-  
-  # update analysis type value
-  observeEvent(input$analysisUpdate, {
-    valueAnalysis(input$analysisType)
-  })
-  
   # setup reactive LFC value
   valueLFC <- reactiveVal(defaultLFC)
   
@@ -1256,51 +1234,26 @@ server <- function(input, output, session) {
     valueFDR(input$cutFDR)
   })
   
-  # setup reactive dispersion value
-  valueDisp <- reactiveVal(defaultPairwiseDisp)
-  
-  # update GLM dispersion value
-  observeEvent(input$analysisUpdate, {
-    if(valueAnalysis() == "GLM"){
-      valueDisp(input$inputGLMDisp)
-    }else{
-      valueDisp(input$inputPairwiseDisp)
-    }
-  })
+  # setup reactive design value
+  valueDes <- reactiveVal(defaultDes)
   
   # setup reactive expression value
   valueExp <- reactiveVal(defaultExp)
   
-  # update expression value
+  # update expression and design values
   observeEvent(input$analysisUpdate, {
-    if(valueAnalysis() == "GLM"){
-      valueExp(input$compareExpression)
-    }else{
-      valueExp(c(input$levelOne, input$levelTwo))
-    }
+    valueDes(input$designExpression)
+    valueExp(input$compareExpression)
   })
   
   # update inputs for comparisons
   observeEvent(input$runAnalysis, {
     # retrieve input design table
     group <- levels(designFactors())
-    # update and set the first select items
-    updateSelectInput(
-      session, 
-      "levelOne",
-      choices = group,
-    )
-    # update and set the second select items
-    updateSelectInput(
-      session, 
-      "levelTwo",
-      choices = group,
-      selected = tail(group, 1)
-    )
     # update reactive expression value with a temporary pairwise expression
-    valueExp(c(head(group, 1), tail(group, 1)))
+    valueExp(colnames(group)[1])
     # create temporary GLM expression
-    tmpExpression <- paste(tail(group, 1), head(group, 1), sep = "-")
+    tmpExpression <- paste(colnames(group)[1])
     # update and set the glm comparison expression
     updateTextInput(
       session,
@@ -1311,23 +1264,11 @@ server <- function(input, output, session) {
   
   # render table with input settings
   output$inputSettings <- renderTable({
-    if(valueAnalysis() == "GLM"){
-      # create table with factor levels
-      settings <- data.frame(
-        Setting = c("Analysis", "LFC", "FDR", "Dispersion", "Comparison"),
-        Value = c(valueAnalysis(), valueLFC(), valueFDR(), valueDisp(), valueExp())
-      )
-    }else{
-      # input expression
-      listExp <- valueExp()
-      # pairwise expression
-      inputExp <- paste(listExp[2], listExp[1], sep = " vs ")
-      # create table with factor levels
-      settings <- data.frame(
-        Setting = c("Analysis", "LFC", "FDR", "Dispersion", "Comparison"),
-        Value = c(valueAnalysis(), valueLFC(), valueFDR(), valueDisp(), inputExp)
-      )
-    }
+    # create table with factor levels
+    settings <- data.frame(
+      Setting = c("Analysis", "LFC", "FDR", "Comparison"),
+      Value = c(valueAnalysis(), valueLFC(), valueFDR(), valueExp())
+    )
   })
   
   # render experimental design table
@@ -1345,135 +1286,99 @@ server <- function(input, output, session) {
     )
   })
   
-  ##
-  # Data Normalization & Exploration
-  ##
-  
-  # function for data normalization
-  normalizeData <- function(){
-    # retrieve input design table
-    group <- designFactors()
-    # begin to construct the DGE list object
+  # function to create the DE list object
+  dataSetFromMatrix <- function(){
+    # retrieve input counts, design, and expression
     geneCounts <- countsType()
-    list <- DGEList(counts=geneCounts,group=group)
+    targetFactors <- designFactors()
+    listExp <- valueExp()
+    # create DESeqDataSet list object
+    dds <- DESeqDataSetFromMatrix(countData = geneCounts,
+                                  colData = targetFactors,
+                                  design = listExp)
   }
   
-  # check if results have completed
-  output$normalizeResultsCompleted <- function(){
-    if(is.null(normalizeData())){
-      return(FALSE)
-    }
-    return(TRUE)
+  # TP-DO: allow user input of reference levels for each factor
+  # specify the reference level
+  #dds$treatment <- relevel(dds$treatment, ref = "VIS")
+  #dds$genotype <- relevel(dds$genotype, ref = "PA")
+  
+  ##
+  # Data Exploration
+  ##
+  
+  # function for finding the genes with sufficient expression
+  findMin <- function(){
+    # retrieve input design
+    targets <- inputDesign()
+    # get the minimum group size
+    sampleCounts <- table(targets)
+    sampleCounts[sampleCounts == 0] <- NA
+    smallestGroupSize <- min(sampleCounts, na.rm = TRUE)
+    # TO-DO: allow user inputs of minimum counts threshold
+    # keep only rows that have a count of at least 10 for a minimal number of samples
+    keep <- rowSums(counts(dds) >= 10) >= smallestGroupSize
   }
-  outputOptions(output, 'normalizeResultsCompleted', suspendWhenHidden=FALSE, priority=0)
-  
-  # function for normalized data filtering
-  filterNorm <- function(){
-    # begin to construct the DGE list object
-    list <- normalizeData()
-    # filter the list of gene counts based on expression levels
-    keep <- filterByExpr(list)
-    # remove genes that are not expressed in either experimental condition
-    list <- list[keep, , keep.lib.sizes=FALSE]
-    # calculate scaling factors
-    list <- calcNormFactors(list)
-  }
-  
-  # download table with number of filtered genes
-  output$cpmNorm <- downloadHandler(
-    # retrieve file name
-    filename = function() {
-      # setup output file name
-      paste("normalizedCounts", "csv", sep = ".")
-    },
-    # read in data
-    content = function(file) {
-      # begin to construct the DGE list object
-      list <- normalizeData()
-      # compute counts per million (CPM) using normalized library sizes
-      normList <- cpm(list, normalized.lib.sizes=TRUE)
-      # add gene row name tag
-      normList <- as_tibble(normList, rownames = "gene")
-      # output table
-      write.table(normList, file, sep=",", row.names=FALSE, quote=FALSE)
-    }
-  )
-  
-  # plot of library sizes before normalization
-  createLibrarySizes <- function(){
-    # begin to construct the DGE list object
-    list <- normalizeData()
-    # retrieve the number of samples
-    numSamples <- ncol(list)
-    # create barplot of library sizes before normalization
-    barplot(list$samples$lib.size*1e-6, names=1:numSamples, ylab="Library Size (millions)", main = "Library Sizes Before Normalization")
-  }
-  
-  # render plot of library sizes before normalization
-  output$librarySizes <- renderImage({
-    # save the plot
-    exportFile <- "librarySizesPlot.png"
-    png(exportFile)
-    createLibrarySizes()
-    dev.off()
-    # Return a list
-    list(src = exportFile, alt = "Invalid Results")
-  }, deleteFile = TRUE)
-  
-  # download handler for the bar plot
-  output$downloadLibrarySizes <- downloadHandler(
-    filename = function() {
-      "librarySizesPlot.png"
-    },
-    content = function(file) {
-      # save the plot
-      png(file)
-      createLibrarySizes()
-      dev.off()
-    }
-  )
   
   # render table with number of filtered genes
-  output$numNorm <- renderTable({
-    # begin to construct the DGE list object
-    list <- normalizeData()
-    # filter the list of gene counts based on expression levels
-    keep <- filterByExpr(list)
+  output$numFilt <- renderTable({
+    # filter the genes based on expression levels
+    keep <- findMin()
     # view the number of filtered genes
     table(keep)[2]
   }, colnames = FALSE)
   
+  # function for pre-filtering the data
+  preFilter <- function(){
+    # filter the genes based on expression levels
+    keep <- findMin()
+    # filter the list object
+    dds <- dds[keep,]
+  }
+  
+  # check if results have completed
+  output$preFilterCompleted <- function(){
+    if(is.null(preFilter())){
+      return(FALSE)
+    }
+    return(TRUE)
+  }
+  outputOptions(output, 'preFilterCompleted', suspendWhenHidden=FALSE, priority=0)
+  
+  # function for vst of the data
+  vstData <- function(){
+    # retrieve filtered counts
+    dds <- preFilter()
+    # vst the data
+    vsd <- vst(dds, blind=FALSE)
+  }
+  
   # PCA plot
   createPCA <- function(){
-    # retrieve input design table
-    group <- designFactors()
-    # calculate scaling factors
-    list <- filterNorm()
-    # TO-DO: consider allowing users to input shapes and colors or other features
-    # retrieve the number of grouping levels
-    stringLevels <- gsub("\\..*","", (levels(group)))
-    # setup colors and points
-    colors <- plotColors[1:length(stringLevels)]
-    #points <- c(0:length(unique(stringLevels)))
-    # add extra space to right of plot area and change clipping to figure
-    par(mar=c(6.5, 5.5, 5.5, 9.5), xpd=TRUE)
-    # PCA plot with distances approximating log2 fold changes
-    #plotMDS(list, col=colors[group], pch=points[group], gene.selection="common", main = "Principal Component Analysis")
-    plotMDS(list, col=colors[group], gene.selection="common", main = "Principal Component Analysis")
-    # place the legend outside the right side of the plot
-    #legend("topright", inset=c(-0.5,0), legend=levels(group), pch=points, col=colors)
-    legend("topright", inset=c(-0.5,0), legend=levels(group), fill=colors)
+    # retrieve the vst data
+    vsd <- vstData()
+    # save the PCA
+    pcaData <- plotPCA(vsd, intgroup=colnames(colData)[-1], returnData=FALSE)
+    # store the PCA plot
+    sample_pca <- ggplot(pcaData@data, aes(PC1, PC2, color=pcaData@data[,5], shape=pcaData@data[,6])) +
+      geom_point(size=3) + 
+      scale_colour_manual(values = c(plotColors[seq(1, length(levels(pcaData@data[,5])))])) +
+      scale_shape_manual(values = seq(0, length(levels(pcaData@data[,6]))-1)) +
+      xlab(pcaData@labels$x) +
+      ylab(pcaData@labels$y) + 
+      coord_fixed()
   }
   
   # render PCA plot
   output$PCA <- renderImage({
-    # save the plot
+    # save image
     exportFile <- "PCAPlot.png"
-    png(exportFile)
-    createPCA()
-    dev.off()
+    # create the plot
+    pcaPlot <- createPCA()
+    # save the PCA plot
+    ggsave(exportFile, plot = pcaPlot, device = "png", units = "in")
     # Return a list
-    list(src = exportFile, alt = "Invalid Results")
+    list(src = exportFile, alt = "Invalid Results", height = "500px")
   }, deleteFile = TRUE)
   
   # download handler for the PCA plot
@@ -1482,77 +1387,43 @@ server <- function(input, output, session) {
       "PCAPlot.png"
     },
     content = function(file) {
-      # save the plot
-      png(file)
-      createPCA()
-      dev.off()
+      # create the plot
+      pcaPlot <- createPCA()
+      # save the PCA plot
+      ggsave(file, plot = pcaPlot, device = "png", units = "in")
     }
   )
   
-  # MDS plot
-  createMDS <- function(){
-    # retrieve input design table
-    group <- designFactors()
-    # calculate scaling factors
-    list <- filterNorm()
-    # TO-DO: consider allowing users to input shapes and colors or other features
-    # retrieve the number of grouping levels
-    stringLevels <- gsub("\\..*","", (levels(group)))
-    # setup colors and points
-    colors <- plotColors[1:length(stringLevels)]
-    #points <- c(0:length(unique(stringLevels)))
-    # add extra space to right of plot area and change clipping to figure
-    par(mar=c(6.5, 5.5, 5.5, 9.5), xpd=TRUE)
-    # PCA plot with distances approximating log2 fold changes
-    #plotMDS(list, col=colors[group], pch=points[group], main = "Multi-Dimensional Scaling (MDS) Plot")
-    plotMDS(list, col=colors[group], main = "Multi-Dimensional Scaling")
-    # place the legend outside the right side of the plot
-    #legend("topright", inset=c(-0.5,0), legend=levels(group), pch=points, col=colors)
-    legend("topright", inset=c(-0.5,0), legend=levels(group), fill=colors)
+  # function to determine the sample distances
+  determineDistances <- function(){
+    # retrieve the vst data
+    vsd <- vstData()
+    # transpose of the transformed count matrix to get sample-to-sample distances
+    sampleDists <- dist(t(assay(vsd)))
+  }
+   
+  # function to prepare the distance matrix
+  prepareDistMatrix <- function(){ 
+    # retrieve sample distances
+    sampleDists <- determineDistances()
+    # convert the distances to a matrix
+    sampleDistMatrix <- as.matrix(sampleDists)
+    # update the column names
+    colnames(sampleDistMatrix) <- NULL
   }
   
-  # render MDS plot
-  output$MDS <- renderImage({
-    # save the plot
-    exportFile <- "MDSPlot.png"
-    png(exportFile)
-    createMDS()
-    dev.off()
-    # Return a list
-    list(src = exportFile, alt = "Invalid Results")
-  }, deleteFile = TRUE)
-  
-  # download handler for the MDS plot
-  output$downloadMDS <- downloadHandler(
-    filename = function() {
-      "MDSPlot.png"
-    },
-    content = function(file) {
-      # save the plot
-      png(file)
-      createMDS()
-      dev.off()
-    }
-  )
-  
-  # pheatmap of individual samples using moderated log2 CPM
+  # pheatmap of the individual samples
   createPheatmap <- function(){
-    # retrieve input design
-    targets <- inputDesign()
-    # calculate scaling factors
-    list <- filterNorm()
-    # calculate the log2 CPM of the gene count data
-    logcpm <- cpm(list, log=TRUE)
-    #Create data frame with the experimental design layout
-    exp_factor <- data.frame(Sample = unlist(targets, use.names = FALSE))
-    rownames(exp_factor) <- colnames(logcpm)
-    # TO-DO: use color blind safe pallette for sample dendrogram
-    # create heatmap of individual samples using moderated log2 CPM
-    as.ggplot(
-      pheatmap(logcpm, scale="row", annotation_col = exp_factor, 
-               main="Heatmap of Samples", show_rownames = FALSE,
-               color = colorRampPalette(c(plotColors[5], "white", plotColors[6]))(100))
-    )
+    # retrieve sample distances
+    sampleDists <- determineDistances()
+    # retrieve the distance matrix
+    sampleDistMatrix <- prepareDistMatrix()
+    # TO-DO: use color blind safe pallette
+    # store the clustering plot as a ggplot object
+    as.ggplot(pheatmap(sampleDistMatrix,
+                       clustering_distance_rows=sampleDists,
+                       clustering_distance_cols=sampleDists,
+                       col=colors))
   }
   
   # render pheatmap of individual samples using moderated log2 CPM
@@ -1580,484 +1451,37 @@ server <- function(input, output, session) {
     }
   )
   
-  # plot of dispersion estimates and biological coefficient of variation
-  createBCV <- function(){
-    # calculate scaling factors
-    list <- filterNorm()
-    # estimate common dispersion and tagwise dispersions to produce a matrix of pseudo-counts
-    list <- estimateDisp(list)
-    # create BCV plot
-    plotBCV(list, main = "Biological Coefficient of Variation")
-  }
-  
-  # render plot of dispersion estimates and biological coefficient of variation
-  output$BCV <- renderImage({
-    # save the plot
-    exportFile <- "BCVPlot.png"
-    png(exportFile)
-    createBCV()
-    dev.off()
-    # Return a list
-    list(src = exportFile, alt = "Invalid Results")
-  }, deleteFile = TRUE)
-  
-  # download handler for the BCV plot
-  output$downloadBCV <- downloadHandler(
-    filename = function() {
-      "BCVPlot.png"
-    },
-    content = function(file) {
-      # save the plot
-      png(file)
-      createBCV()
-      dev.off()
-    }
-  )
-  
   ##
-  # Pairwise Comparisons (Contrasts)
-  ##
-  
-  # render text with pairwise comparison
-  output$pairwiseComparison <- renderText({
-    # require input data
-    #req(input$levelOne, input$levelTwo)
-    # input expression
-    listExp <- valueExp()
-    # create string with factor levels
-    paste(listExp[2], listExp[1], sep = " vs ")
-  })
-  
-  # function to calculate table of DE genes
-  pairwiseTest <- eventReactive(list(input$analysisUpdate), {
-    # require pairwise analysis selection
-    if(input$analysisType == "GLM"){
-      return(NULL)
-    }
-    # require valid inputs
-    if(is.null(compareSamples())){
-      return(NULL)
-    }
-    # require input data
-    #req(input$levelOne, input$levelTwo)
-    # calculate scaling factors
-    list <- filterNorm()
-    # check the input dispersion value for indication of replication
-    if(tolower(valueDisp()) == "common" ||
-       tolower(valueDisp()) == "trended" ||
-       tolower(valueDisp()) == "tagwise" ||
-       tolower(valueDisp()) == "auto"){ # case insensitive check string inputs
-      # estimate common dispersion and tagwise dispersions to produce a matrix of pseudo-counts
-      listDisp <- estimateDisp(list)
-      # perform exact test
-      exactTest(listDisp, pair=valueExp(), dispersion=tolower(valueDisp()))
-    }else{ # assumes numeric
-      # perform exact test
-      tested <- exactTest(list, pair=valueExp(), dispersion=as.numeric(valueDisp()))
-    }
-  })
-  
-  # check if results have completed
-  output$pairwiseResultsCompleted <- function(){
-    if(is.null(pairwiseTest())){
-      return(FALSE)
-    }
-    return(TRUE)
-  }
-  outputOptions(output, 'pairwiseResultsCompleted', suspendWhenHidden=FALSE, priority=0)
-  
-  # render results summary
-  output$pairwiseSummary <- renderTable({
-    # perform exact test
-    tested <- pairwiseTest()
-    # view the total number of differentially expressed genes at a FDR and LFC cut off
-    DGEgenes = decideTests(tested, p.value=valueFDR(), lfc=valueLFC())
-    resultsSummary <- summary(DGEgenes)
-    # create the results summary
-    resultsTable <- data.frame(
-      Direction = c("Down", "NotSig", "Up"),
-      Number = resultsSummary[,1]
-    )
-    # return the formatted results summary
-    resultsTable
-  })
-  
-  # pheatmap of pairwise DGE 
-  createPairwisePheatmapDGE <- function(){
-    # perform exact test
-    tested <- pairwiseTest()
-    # retrieve input design
-    targets <- inputDesign()
-    # calculate scaling factors
-    list <- filterNorm()
-    # create a results table of DE genes by FDR and LFC
-    resultsTbl <- topTags(tested, n=nrow(tested$table), adjust.method="fdr", p.value=valueFDR())$table
-    # identify significantly DE genes
-    DGESubset <- resultsTbl[resultsTbl$logFC > valueLFC() | resultsTbl$logFC < (-1*valueLFC()),]
-    # calculate the log2 CPM of the gene count data
-    logcpm <- cpm(list, log=TRUE)
-    # subset the log2 CPM by the DGE set
-    DGESubset.keep <- rownames(logcpm) %in% rownames(DGESubset)
-    logcpmSubset <- logcpm[DGESubset.keep, ]
-    # combine all columns into one period separated
-    exp_factor <- data.frame(Sample = unlist(targets, use.names = FALSE))
-    rownames(exp_factor) <- colnames(logcpmSubset)
-    # TO-DO: use color blind safe pallette for sample dendrogram
-    #Create heatmap for DGE
-    as.ggplot(
-      pheatmap(logcpmSubset, scale="row", annotation_col = exp_factor, 
-               main="Heatmap of Pairwise DE Genes", show_rownames = FALSE,
-               color = colorRampPalette(c(plotColors[5], "white", plotColors[6]))(100))
-    )
-  }
-  
-  # render pheatmap of pairwise DGE
-  output$pheatmapPairwise <- renderImage({
-    # save image
-    exportFile <- "pheatmapPlotPairwise.png"
-    # create the plot
-    pheatmapPlot <- createPairwisePheatmapDGE()
-    # save the plot
-    ggsave(exportFile, plot = pheatmapPlot, bg = "white", device = "png")
-    # Return a list
-    list(src = exportFile, alt = "Invalid Results", height = "500px")
-  }, deleteFile = TRUE)
-  
-  # download handler for the pairwise heatmap plot
-  output$downloadPheatmapPairwise <- downloadHandler(
-    filename = function() {
-      "pheatmapPlotPairwise.png"
-    },
-    content = function(file) {
-      # create the plot
-      pheatmapPlot <- createPairwisePheatmapDGE()
-      # save the plot
-      ggsave(file, plot = pheatmapPlot, bg = "white", device = "png")
-    }
-  )
-  
-  # plot of log2-fold change against log2-counts per million with DE genes highlighted
-  createPairwiseMD <- function(){
-    # perform exact test
-    tested <- pairwiseTest()
-    # return MD plot
-    plotMD(tested, main = "Mean-Differences of Pairwise DE Genes", adjust.method="fdr", p.value=valueFDR())
-    # add blue lines to indicate 2-fold changes
-    abline(h=c((-1*valueLFC()), valueLFC()), col="blue") 
-  }
-  
-  # render plot of log2-fold change against log2-counts per million with DE genes highlighted
-  output$pairwiseMD <- renderImage({
-    # save the plot
-    exportFile <- "pairwiseMDPlot.png"
-    png(exportFile)
-    createPairwiseMD()
-    dev.off()
-    # Return a list
-    list(src = exportFile, alt = "Invalid Results")
-  }, deleteFile = TRUE)
-  
-  
-  # download handler for the MD plot
-  output$downloadPairwiseMD <- downloadHandler(
-    filename = function() {
-      "pairwiseMDPlot.png"
-    },
-    content = function(file) {
-      # save the plot
-      png(file)
-      createPairwiseMD()
-      dev.off()
-    }
-  )
-  
-  # create volcano plot
-  plotPairwiseVolcano <- function(){
-    # perform exact test
-    tested <- pairwiseTest()
-    # create a results table of DE genes
-    resultsTbl <- topTags(tested, n=nrow(tested$table), adjust.method="fdr")$table
-    # add column for identifying direction of DE gene expression
-    resultsTbl$colorDE <- plotColors[5]
-    resultsTbl$alphaDE <- 0.75
-    # identify significantly up DE genes
-    resultsTbl$colorDE[resultsTbl$logFC > valueLFC() & resultsTbl$FDR < valueFDR()] <- plotColors[4]
-    resultsTbl$alphaDE[resultsTbl$logFC > valueLFC() & resultsTbl$FDR < valueFDR()] <- 1
-    #resultsTbl$colorDE[sign(resultsTbl$logFC) == 1 & resultsTbl$FDR < valueFDR()] <- "Up"
-    # identify significantly down DE genes
-    resultsTbl$colorDE[resultsTbl$logFC < (-1*valueLFC()) & resultsTbl$FDR < valueFDR()] <- plotColors[6]
-    resultsTbl$alphaDE[resultsTbl$logFC < (-1*valueLFC()) & resultsTbl$FDR < valueFDR()] <- 1
-    #resultsTbl$colorDE[sign(resultsTbl$logFC) == -1 & resultsTbl$FDR < valueFDR()] <- "Down"
-    # add column with -log10(FDR) values
-    resultsTbl$negLog10FDR <- -log10(resultsTbl$FDR)
-    # create volcano plot
-    ggplot(data=resultsTbl, aes(x=logFC, y=negLog10FDR, color = colorDE, alpha = alphaDE)) + 
-      geom_point() +
-      theme_minimal() +
-      scale_color_identity() +
-      scale_alpha(guide = 'none') +
-      ggtitle("Volcano Plot of Pairwise DE Genes") +
-      theme(plot.title = element_text(hjust = 0.5)) +
-      theme(plot.title = element_text(face="bold")) +
-      xlab("LFC")
-  }
-  
-  # render volcano plot
-  output$pairwiseVolcano <- renderPlot({
-    # create plot
-    plotPairwiseVolcano()
-  })
-  
-  # download handler for the volcano plot
-  output$downloadPairwiseVolcano <- downloadHandler(
-    filename = function() {
-      "pairwiseVolcanoPlot.png"
-    },
-    content = function(file) {
-      # create plot
-      volcanoPlotPairwise <- plotPairwiseVolcano()
-      # save plot
-      ggsave(file, plot = volcanoPlotPairwise, device = "png")
-    }
-  )
-  
-  # TO-DO: allow users to select plot points and render text from brushed plot points
-  # render text from brushed plot points
-  #output$volcanoInfo <- renderText({
-  # perform exact test
-  #tested <- pairwiseTest()
-  # create a results table of DE genes
-  #resultsTbl <- topTags(tested, n=nrow(tested$table), adjust.method="fdr", p.value=valueFDR())$table
-  # add column with -log10(FDR) values
-  #resultsTbl$negLog10FDR <- -log10(resultsTbl$FDR)
-  # With base graphics, need to tell it what the x and y variables are.
-  #brushedPoints(resultsTbl, input$volcano_brush, xvar = "logFC", yvar = "negLog10FDR")
-  #})
-  
-  # download table with number of DE genes
-  output$pairwiseResults <- downloadHandler(
-    filename = function() {
-      # input expression
-      listExp <- valueExp()
-      # setup output file name
-      paste(listExp[2], listExp[1], "pairwiseDE_genes.csv", sep = "_")
-    },
-    content = function(file) {
-      # perform exact test
-      tested <- pairwiseTest()
-      # view results table of top 10 DE genes
-      resultsTbl <- topTags(tested, n=nrow(tested$table), adjust.method="fdr")$table
-      # add gene row name tag
-      resultsTbl <- as_tibble(resultsTbl, rownames = "gene")
-      # output table
-      write.table(resultsTbl, file, sep=",", row.names=FALSE, quote=FALSE)
-    }
-  )
-  
-  # TO-DO: note LFC cut off filter with glmTREAT
-  # https://www.ncbi.nlm.nih.gov/pmc/articles/PMC2654802/#:~:text=Results%3A%20We%20present%20a%20method,given%20(biologically%20meaningful)%20threshold.
-  # download table with number of filtered DE genes
-  output$pairwiseSigResults <- downloadHandler(
-    filename = function() {
-      # input expression
-      listExp <- valueExp()
-      # setup output file name
-      paste(listExp[2], listExp[1], "pairwiseSigDE_genes.csv", sep = "_")
-    },
-    content = function(file) {
-      # perform exact test
-      tested <- pairwiseTest()
-      # create a results table of DE genes by FDR
-      resultsTbl <- topTags(tested, n=nrow(tested$table), adjust.method="fdr", p.value=valueFDR())$table
-      # identify significantly DE genes by LFC cut offs
-      DGESubset <- resultsTbl[resultsTbl$logFC > valueLFC() | resultsTbl$logFC < (-1*valueLFC()),]
-      # add gene row name tag
-      resultsTbl.out <- as_tibble(DGESubset, rownames = "gene")
-      # output table
-      write.table(resultsTbl.out, file, sep=",", row.names=FALSE, quote=FALSE)
-    }
-  )
-  
-  # function to retrieve gene IDs from results tables
-  retrievePairwiseGeneIDs <- function(){
-    # perform exact test
-    tested <- pairwiseTest()
-    # view results table of top 10 DE genes
-    resultsTbl <- topTags(tested, n=nrow(tested$table), adjust.method="fdr")$table
-    # retrieve gene IDS
-    resultsTblNames <- rownames(resultsTbl)
-    # add commas
-    resultsTblNames <- paste(resultsTblNames, ",", sep="")
-    # retrieve last entry
-    lastEntry <- resultsTblNames[length(resultsTblNames)]
-    # remove extra trailing comma
-    resultsTblNames[length(resultsTblNames)] <- gsub(",", "\n", lastEntry)
-    # return list of gene IDs
-    resultsTblNames
-  }
-  
-  # function to retrieve gene IDs from results tables
-  retrievePairwiseSigGeneIDs <- function(){
-    # perform exact test
-    tested <- pairwiseTest()
-    # create a results table of DE genes by FDR
-    resultsTbl <- topTags(tested, n=nrow(tested$table), adjust.method="fdr", p.value=valueFDR())$table
-    # identify significantly DE genes by LFC cut offs
-    DGESubset <- resultsTbl[resultsTbl$logFC > valueLFC() | resultsTbl$logFC < (-1*valueLFC()),]
-    # retrieve gene IDS
-    resultsTblNames <- rownames(DGESubset)
-    # add commas
-    resultsTblNames <- paste(resultsTblNames, ",", sep="")
-    # retrieve last entry
-    lastEntry <- resultsTblNames[length(resultsTblNames)]
-    # remove extra trailing comma
-    resultsTblNames[length(resultsTblNames)] <- gsub(",", "\n", lastEntry)
-    # return list of gene IDs
-    resultsTblNames
-  }
-  
-  # download table with number of DE genes IDs
-  output$pairwiseResultsIDs <- downloadHandler(
-    filename = function() {
-      # input expression
-      listExp <- valueExp()
-      # setup output file name
-      paste(listExp[2], listExp[1], "pairwiseDE_geneIDs.csv", sep = "_")
-    },
-    content = function(file) {
-      # add commas
-      resultsTblNames <- retrievePairwiseGeneIDs()
-      # output table
-      writeLines(resultsTblNames, con = file, sep = "")
-    }
-  )
-  
-  # download table with number of filtered DE genes IDs
-  output$pairwiseSigResultsIDs <- downloadHandler(
-    filename = function() {
-      # input expression
-      listExp <- valueExp()
-      # setup output file name
-      paste(listExp[2], listExp[1], "pairwiseSigDE_geneIDs.csv", sep = "_")
-    },
-    content = function(file) {
-      # add commas
-      resultsTblNames <- retrievePairwiseSigGeneIDs()
-      # output table
-      writeLines(resultsTblNames, con = file, sep = "")
-    }
-  )
-  
-  ##
-  # GLM Fitting
-  ##
-  
-  # function to create the glm design
-  glmDesign <- function(){
-    # require valid inputs
-    if(is.null(compareSamples())){
-      return(NULL)
-    }
-    # retrieve input design table
-    group <- designFactors()
-    # parametrize the experimental design with a one-way layout 
-    design <- model.matrix(~ 0 + group)
-    # add group names
-    colnames(design) <- levels(group)
-    # return design layout
-    design
-  }
-  
-  # function for fitting the glm
-  glmFitting <- function(){
-    # calculate scaling factors
-    list <- filterNorm()
-    # retrieve the experimental design 
-    design <- glmDesign()
-    # check the input dispersion value
-    if(tolower(valueDisp()) == "null"){ # case insensitive check for NULL string input
-      # estimate common dispersion and tagwise dispersions to produce a matrix of pseudo-counts
-      listDisp <- estimateDisp(list, design, robust=TRUE)
-      # estimate the QL dispersions using the data object to estimate dispersion values
-      glmQLFit(listDisp, design, robust=TRUE)
-    }else{
-      # replace the dispersion value in the DGE object
-      list$common.dispersion <- as.numeric(valueDisp())
-      # estimate the QL dispersions using the input dispersion value(s)
-      #na.omit(glmFit(list, design))
-      glmFit(list, design)
-    }
-  }
-  
-  # plot of QL dispersions
-  createGLMDispersions <- function(){
-    # retrieve the fitted glm
-    fit <- glmFitting()
-    # return the plot
-    plotQLDisp(fit)
-  }
-  
-  # render plot of QL dispersions
-  output$glmDispersions <- renderImage({
-    # save the plot
-    exportFile <- "glmDispersionsPlot.png"
-    png(exportFile)
-    createGLMDispersions()
-    dev.off()
-    # Return a list
-    list(src = exportFile, alt = "Invalid Results")
-  }, deleteFile = TRUE)
-  
-  # download handler for the GLM dispersions plot
-  output$downloadGLMDispersions <- downloadHandler(
-    filename = function() {
-      "glmDispersionsPlot.png"
-    },
-    content = function(file) {
-      # save the plot
-      png(file)
-      createGLMDispersions()
-      dev.off()
-    }
-  )
-  
-  ##
-  # GLM Contrasts
+  # DE Analysis Contrasts
   ##
   
   # render text with glm comparison
-  output$glmComparison <- renderText({
+  output$deComparison <- renderText({
     # require the expression
     #req(input$compareExpression)
     # return the expression
     valueExp()
   })
   
+  # function to perform DE analysis
+  deAnalysis <- function(){
+    # retrieve filtered counts
+    dds <- preFilter()
+    # standard differential expression analysis steps are wrapped into a single function
+    dds <- DESeq(dds)
+  }
+  
   # function to perform glm contrasts
   glmContrast <- eventReactive(list(input$analysisUpdate), {
-    # require GLM analysis selection
-    if(input$analysisType == "pairwise"){
-      return(NULL)
-    }
-    # require the expression
-    #req(input$compareExpression)
-    # set the input expression as global
-    inputExpression <<- valueExp()
-    # retrieve the fitted glm
-    fit <- glmFitting()
-    # retrieve the experimental design 
-    design <- glmDesign()
-    # examine the overall effect of treatment
-    glmContrast <- makeContrasts(glmSet = inputExpression,
-                                 levels=design)
-    # check the input dispersion value
-    if(tolower(valueDisp()) == "null"){ # case insensitive check for NULL string input
-      # look at genes with significant expression across all groups
-      glmTreat(fit, contrast=glmContrast, lfc=valueLFC())
-    }else{
-      # look at genes with significant expression across all groups
-      glmLRT(fit, contrast=glmContrast)
-    }
+    # retrieve input design
+    colData <- designFactors()
+    # perform DE analysis
+    dds <- deAnalysis()
+    # TO-DO: allow user to input contrast
+    # directly specify the comparison
+    res <- results(dds, contrast=c(colnames(colData)[2],rev(levels(colData[,2]))))
+    # order our results table by the smallest p value
+    resOrdered <- res[order(res$pvalue),]
   })
   
   # check if results have completed
@@ -2069,17 +1493,31 @@ server <- function(input, output, session) {
   }
   outputOptions(output, 'glmResultsCompleted', suspendWhenHidden=FALSE, priority=0)
   
+  # function to filter results
+  filterResults <- function(){
+    # perform DE analysis
+    dds <- deAnalysis()
+    # TO-DO: allow users to input cut offs
+    # set the adjusted p-value cut off to 0.05 and LFC to 1.2
+    res05 <- results(dds, contrast=c(colnames(targets)[2],levels(targets[,2])), alpha=0.05, lfcThreshold=1.2)
+    # order our results table by the smallest p value
+    resOrdered <- res05[order(res05$pvalue),]
+  }
+  
   # render table with the summary of results
   output$glmSummary <- renderTable({
-    # perform glm test
-    tested <- glmContrast()
-    # view the total number of differentially expressed genes at a FDR and LFC cut off
-    DGEgenes = decideTests(tested,p.value=valueFDR(), lfc=valueLFC())
-    resultsSummary <- summary(DGEgenes)
+    # retrieve filtered DE results
+    tested <- filterResults()
+    # summarize results
+    testSummary <- summary(resOrdered)
+    # number of up expressed
+    numUp <- gsub(",", "", strsplit(capture.output(testSummary)[4], " ")[[1]][9])
+    # number of down expressed
+    numDown <- gsub(",", "", strsplit(capture.output(testSummary)[5], " ")[[1]][6])
     # create the results summary
     resultsTable <- data.frame(
-      Direction = c("Down", "NotSig", "Up"),
-      Number = resultsSummary[,1]
+      Direction = c("Down", "Up"),
+      Number = c(numDown, numUp)
     )
     # return the formatted results summary
     resultsTable
@@ -2087,14 +1525,18 @@ server <- function(input, output, session) {
   
   # pheatmap of glm DGE 
   createGLMPheatmapDGE <- function(){
-    # perform exact test
-    tested <- glmContrast()
+    # retrieve filtered DE results
+    tested <- filterResults()
     # retrieve input design
     targets <- inputDesign()
+    
+    ## TO-DO: continue to update
+    
     # calculate scaling factors
     list <- filterNorm()
     # create a results table of DE genes by FDR and LFC
     resultsTbl <- topTags(tested, n=nrow(tested$table), adjust.method="fdr", p.value=valueFDR())$table
+    # TO-DO: change to >= or <=
     # identify significantly DE genes
     DGESubset <- resultsTbl[resultsTbl$logFC > valueLFC() | resultsTbl$logFC < (-1*valueLFC()),]
     # calculate the log2 CPM of the gene count data
@@ -2329,32 +1771,31 @@ server <- function(input, output, session) {
   
   # download Rmd HTML report with the current inputs
   # https://shiny.posit.co/r/articles/build/generating-reports/
-  output$report <- downloadHandler(
+  #output$report <- downloadHandler(
     # For PDF output, change this to "report.pdf"
-    filename = "DA_report.html",
-    content = function(file) {
+    #filename = "DA_report.html",
+    #content = function(file) {
       # Copy the report file to a temporary directory before processing it, in
       # case we don't have write permissions to the current working dir
-      tempReport <- file.path(tempdir(), "DA_report.Rmd")
-      file.copy("../markdown/DA_report.Rmd", tempReport, overwrite = TRUE)
+      #tempReport <- file.path(tempdir(), "DA_report.Rmd")
+      #file.copy("../markdown/DA_report.Rmd", tempReport, overwrite = TRUE)
       # Set up parameters to pass to Rmd document
-      params <- list(
-        analysisIn = valueAnalysis(),
-        inputDataIn = input$geneCountsTable$datapath,
-        targetsIn = input$expDesignTable$datapath,
-        cutLFCIn = valueLFC(),
-        cutFDRIn = valueFDR(),
-        dispersionsIn = valueDisp(),
-        comparisonIn = valueExp()
-      )
+      #params <- list(
+        #inputDataIn = input$geneCountsTable$datapath,
+        #targetsIn = input$expDesignTable$datapath,
+        #cutLFCIn = valueLFC(),
+        #cutFDRIn = valueFDR(),
+        #designIn = valueDes(),
+        #comparisonIn = valueExp()
+      #)
       # Knit the document, passing in the `params` list, and eval it in a
       # child of the global environment
-      rmarkdown::render(tempReport, output_file = file,
-                        params = params#,
-                        #envir = new.env(parent = globalenv())
-      )
-    }
-  )
+      #rmarkdown::render(tempReport, output_file = file,
+                        #params = params#,
+                        ##envir = new.env(parent = globalenv())
+      #)
+    #}
+  #)
 }
 
 #### App Object ####

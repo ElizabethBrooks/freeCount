@@ -1,5 +1,5 @@
 # developer: Elizabeth Brooks
-# updated: 29 October 2025
+# updated: 17 November 2025
 
 #### Setup ####
 
@@ -223,22 +223,22 @@ ui <- fluidPage(
           HTML("Start in the left-hand sidebar by:")
         ),
         tags$p(
-          HTML("<b>1.</b> entering the statistic for gene scoring, for example:")
+          HTML("<b>1.</b> entering the statistic for gene scoring:")
         ),
         tags$p(
-          HTML("<ul><li><i>FDR</i> from DE analysis results</li></ul>")
+          HTML("<ul><li><i>FDR</i> (edgeR) or <i>padj</i> (DESeq2) for DE analysis results</li></ul>")
         ),
         tags$p(
-          HTML("<ul><li>module <i>number</i> from WGCNA results</li></ul>")
+          HTML("<ul><li><i>number</i> of the module for WGCNA results</li></ul>")
         ),
         tags$p(
-          HTML("<b>2.</b> entering the expression for gene scoring, for example:")
+          HTML("<b>2.</b> entering the expression for gene scoring:")
         ),
         tags$p(
-          HTML("<ul><li><i>< 0.05</i> for specifying significant DE genes using a <i>FDR</i> cut off</li></ul>")
+          HTML("<ul><li><i><0.05</i> for specifying significantly DE genes using a <i>FDR</i> or <i>padj</i> cut off</li></ul>")
         ),
         tags$p(
-          HTML("<ul><li><i>== 1</i> for specifying a specific module <i>number</i> from WGCNA</li></ul>")
+          HTML("<ul><li><i>== 1</i> for specifying one module <i>number</i> from the WGCNA</li></ul>")
         ),
         tags$p(
           HTML("<b>3.</b> uploading a gene score table <i>.csv</i> file with the <i>unfiltered</i> results table from DE analysis or WGCNA")
@@ -1322,7 +1322,9 @@ server <- function(input, output, session) {
     get_interesting_DE_genes <- function(geneUniverse){
       interesting_DE_genes <- rep(0, length(geneUniverse))
       for(i in 1:length(geneUniverse)){
-        if(eval(parse(text = paste(geneUniverse[i], input$universeCut, sep=" ")))){
+        if (is.na(geneUniverse[i])) {
+          interesting_DE_genes[i] = 0
+        }else if(eval(parse(text = paste(geneUniverse[i], input$universeCut, sep=" ")))){
           interesting_DE_genes[i] = 1
         }
       }
