@@ -1,5 +1,5 @@
 # developer: Elizabeth Brooks
-# updated: 17 November 2025
+# updated: 2 December 2025
 
 #### Setup ####
 
@@ -223,22 +223,22 @@ ui <- fluidPage(
           HTML("Start in the left-hand sidebar by:")
         ),
         tags$p(
-          HTML("<b>1.</b> entering the statistic for gene scoring, for example:")
+          HTML("<b>1.</b> entering the statistic for gene scoring:")
         ),
         tags$p(
-          HTML("<ul><li><i>FDR</i> from DE analysis results</li></ul>")
+          HTML("<ul><li><i>FDR</i> (edgeR) or <i>padj</i> (DESeq2) for DE analysis results</li></ul>")
         ),
         tags$p(
-          HTML("<ul><li>module <i>number</i> from WGCNA results</li></ul>")
+          HTML("<ul><li><i>number</i> of the module for WGCNA results</li></ul>")
         ),
         tags$p(
-          HTML("<b>2.</b> entering the expression for gene scoring, for example:")
+          HTML("<b>2.</b> entering the expression for gene scoring:")
         ),
         tags$p(
-          HTML("<ul><li><i>< 0.05</i> for specifying significant DE genes using a <i>FDR</i> cut off</li></ul>")
+          HTML("<ul><li><i><0.05</i> for specifying significantly DE genes using a <i>FDR</i> or <i>padj</i> cut off</li></ul>")
         ),
         tags$p(
-          HTML("<ul><li><i>== 1</i> for specifying a specific module <i>number</i> from WGCNA</li></ul>")
+          HTML("<ul><li><i>== 1</i> for specifying one module <i>number</i> from the WGCNA</li></ul>")
         ),
         tags$p(
           HTML("<b>3.</b> uploading a gene score table <i>.csv</i> file with the <i>unfiltered</i> results table from DE analysis or WGCNA")
@@ -262,10 +262,6 @@ ui <- fluidPage(
         tags$p(
           "Note that the functional analysis results and plots may take several moments to process depending on the size of the input data tables."
         ),
-        #tags$br(),
-        #tags$p(
-        #  "This version of the FA app is designed for use on Posit Cloud and it is missing some features found in the local version of the FA app."
-        #),
         tags$hr(),
         tags$p(
           align="center",
