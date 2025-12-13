@@ -2060,3 +2060,5 @@ shinyApp(ui = ui, server = server)
 # TO-DO: add input options to the analysis settings window while the app is running the analysis
 # TO-DO: add/fix white background for getting started text
 # TO-DO: only update Range of GO Term P-Values plot title on button press
+# TO-DO: allow input of only significant DE genes along with the full set
+# TO-DO: allow input LFC in addition to FDR for input DE gene sets

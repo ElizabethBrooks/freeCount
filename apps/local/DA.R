@@ -2385,3 +2385,4 @@ shinyApp(ui = ui, server = server)
 # TO-DO: check if sample and group names need to be different
 # TO-DO: add/fix white background for getting started text
 # TO-DO: add results table with sig and not-sig DEGs flagged for FA (based on both FDR and LFC)
+# TO-DO: update "Data Exploration" tab to "Exploration"
