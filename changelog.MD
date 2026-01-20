@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.2] - 19 January 2026
+
+### Added
+
+- All apps formatted for use with Posit Connect Cloud
+
 ## [1.1] - 14 March 2025
 
 ### Added

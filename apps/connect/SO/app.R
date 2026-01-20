@@ -1,0 +1,875 @@
+# developer: Elizabeth Brooks
+# updated: 19 January 2026
+
+#### Setup ####
+
+## Posit Connect Cloud Setup ##
+## generate a manifest.json for posit connect cloud
+# https://docs.posit.co/connect-cloud/how-to/r/dependencies.html
+## run in the console
+##setwd("/Users/bamflappy/Repos/freeCount/apps/connect/SO")
+##install.packages("rsconnect")
+##library(rsconnect)
+##writeManifest()
+
+# increase max uploadable file size to from the default 5MB to 30MB
+options(shiny.maxRequestSize=30*1024^2)
+
+# install any missing packages
+packageList <- c("shiny", "bslib", "shinyWidgets", "ggplot2", 
+                 "rcartocolor", "ggVennDiagram", "gplots")
+newPackages <- packageList[!(packageList %in% installed.packages()[,"Package"])]
+if(length(newPackages)){
+  install.packages(newPackages)
+}
+
+# load packages
+suppressPackageStartupMessages({
+  library(shiny)
+  library(bslib)
+  library(ggVennDiagram)
+  library(ggplot2)
+  library(rcartocolor)
+  library(gplots)
+  library(shinyWidgets)
+})
+
+# color blind safe plotting palettes
+plotColors <- carto_pal(12, "Safe")
+
+# prepare styles for css
+#font-family: Arial, sans-serif !important;
+css_styles <- "
+* {
+  font-family: Arial, sans-serif;
+  color: #5A5A5A;
+}
+#app-heading {
+  background: linear-gradient(to right, #78c2ad, #f3969a);
+  border-radius: 25px;
+  border-color: #F5E7C9;
+  border-width: 8px;
+  border-style: solid;
+}
+.tabbable > .nav > li > a {
+  background-color: #f3969a;  
+  color: white; 
+  border-color: white;
+  border-width: 2px;
+}
+.nav-tabs .nav-link.active,.nav-tabs>li>a.active,.nav-tabs .nav-pills>li>a.active,.nav-tabs :where(ul.nav.navbar-nav > li)>a.active,.nav-tabs .nav-item.show .nav-link,.nav-tabs .nav-item.in .nav-link,.nav-tabs .nav-item.show .nav-tabs>li>a,.nav-tabs .nav-item.in .nav-tabs>li>a,.nav-tabs .nav-item.show .nav-pills>li>a,.nav-tabs .nav-item.in .nav-pills>li>a,.nav-tabs>li.show .nav-link,.nav-tabs>li.in .nav-link,.nav-tabs>li.show .nav-tabs>li>a,.nav-tabs>li.in .nav-tabs>li>a,.nav-tabs>li.show .nav-pills>li>a,.nav-tabs>li.in .nav-pills>li>a,.nav-tabs .nav-pills>li.show .nav-link,.nav-tabs .nav-pills>li.in .nav-link,.nav-tabs .nav-pills>li.show .nav-tabs>li>a,.nav-tabs .nav-pills>li.in .nav-tabs>li>a,.nav-tabs .nav-pills>li.show .nav-pills>li>a,.nav-tabs .nav-pills>li.in .nav-pills>li>a,.nav-tabs .nav-item.show :where(ul.nav.navbar-nav > li)>a,.nav-tabs .nav-item.in :where(ul.nav.navbar-nav > li)>a,.nav-tabs>li.show :where(ul.nav.navbar-nav > li)>a,.nav-tabs>li.in :where(ul.nav.navbar-nav > li)>a,.nav-tabs .nav-pills>li.show :where(ul.nav.navbar-nav > li)>a,.nav-tabs .nav-pills>li.in :where(ul.nav.navbar-nav > li)>a,.nav-tabs .show:where(ul.nav.navbar-nav > li):not(.dropdown) .nav-link,.nav-tabs .in:where(ul.nav.navbar-nav > li):not(.dropdown) .nav-link,.nav-tabs .show:where(ul.nav.navbar-nav > li):not(.dropdown) .nav-tabs>li>a,.nav-tabs .in:where(ul.nav.navbar-nav > li):not(.dropdown) .nav-tabs>li>a,.nav-tabs .show:where(ul.nav.navbar-nav > li):not(.dropdown) .nav-pills>li>a,.nav-tabs .in:where(ul.nav.navbar-nav > li):not(.dropdown) .nav-pills>li>a,.nav-tabs .show:where(ul.nav.navbar-nav > li):not(.dropdown) :where(ul.nav.navbar-nav > li)>a,.nav-tabs .in:where(ul.nav.navbar-nav > li):not(.dropdown) :where(ul.nav.navbar-nav > li)>a {
+  color: white;
+  background-color: #5A5A5A;
+  border-color: #78c2ad;
+  border-width: 2px;
+}
+.tab-pane.active {
+  background-color: white;
+  border-color: white;
+  border-width: 10px;
+  border-style: solid;
+  border-top-right-radius: 25px;
+  border-bottom-right-radius: 25px;
+  border-bottom-left-radius: 25px;
+}
+#setOne, #setTwo, #setThree, #setFour {
+  border-color: #f3969a;
+  border-width: 2px;
+  border-style: solid;
+}
+"
+
+#### UI ####
+
+# Define UI 
+ui <- fluidPage(
+  # set background color
+  setBackgroundColor("#FFF4DD"),
+  
+  # use a theme
+  theme = bs_theme(bootswatch = "minty"),
+  
+  # apply css styles
+  tags$style(
+    HTML(css_styles)
+  ),
+  
+  # add application title
+  h1(id="app-heading", 
+     tags$p(
+       "freeCount SO",
+       style = "
+          margin-top: 14px;
+          margin-left: 25px; 
+          font-family: Georgia, Arial, sans-serif;
+          color: white
+        "
+     )
+  ),
+  
+  # setup sidebar layout
+  sidebarLayout(
+    
+    # setup sidebar panel
+    sidebarPanel(
+      # setup the style
+      style = "
+          background-color: white;
+          border-color: #F5E7C9; 
+          border-width: 8px; 
+          border-style: solid;
+          border-radius: 25px
+      ",
+      # file uploads
+      tags$p(
+        "Enter set one name:"
+      ),
+      textInput(
+        "setOne", 
+        label = NULL,
+        value = "Set One"
+      ),
+      # TO-DO: consider allowing other file types to be uploaded
+      tags$p(
+        "Upload set one table (*.csv):"
+      ),
+      fileInput(
+        "oneTable", 
+        label = NULL,
+        multiple = FALSE,
+        accept = ".csv"
+      ),
+      tags$hr(),
+      tags$p(
+        "Enter set two name:"
+      ),
+      textInput(
+        "setTwo", 
+        label = NULL,
+        value = "Set Two"
+      ),
+      tags$p(
+        "Upload set two table (*.csv):"
+      ),
+      fileInput(
+        "twoTable", 
+        label = NULL,
+        multiple = FALSE,
+        accept = ".csv"
+      ),
+      conditionalPanel(
+        condition = "output.twoDataUploaded",
+        tags$hr(),
+        tags$p(
+          "Enter set three name:"
+        ),
+        textInput(
+          "setThree", 
+          label = NULL,
+          value = "Set Three"
+        ),
+        tags$p(
+          "Upload set three table (*.csv):"
+        ),
+        fileInput(
+          "threeTable", 
+          label = NULL,
+          multiple = FALSE,
+          accept = ".csv"
+        ),
+        conditionalPanel(
+          condition = "output.threeDataUploaded",
+          tags$hr(),
+          tags$p(
+            "Enter set four name:"
+          ),
+          textInput(
+            "setFour", 
+            label = NULL,
+            value = "Set Four"
+          ),
+          tags$p(
+            "Upload set four table (*.csv):"
+          ),
+          fileInput(
+            "fourTable", 
+            label = NULL,
+            multiple = FALSE,
+            accept = ".csv"
+          )
+        )
+      ),
+      # add button to enable dark mode style
+      #tags$p(
+      #  "Select Color Mode:"
+      #),
+      #input_dark_mode()
+    ),
+    
+    # setup the main panel
+    mainPanel(
+      # getting started text
+      conditionalPanel(
+        condition = "!output.twoDataUploaded",
+        # set the background style
+        style = "
+          background-color: white; 
+          border-color: white; 
+          border-width: 10px; 
+          border-style: solid;
+          border-radius: 25px
+        ",
+        # header
+        tags$h1(
+          "Getting Started", 
+          align = "center",
+          style = "
+            color: white; 
+            background: #78c2ad;
+            font-size: xx-large;
+            font-family: Georgia, Arial, sans-serif;
+            border-color: #78c2ad;
+            border-width: 4px;
+            border-style: solid;
+            border-radius: 25px
+          "
+        ),
+        tags$br(),
+        # TO-DO: add input step numbers
+        tags$p(
+          HTML("<b>Hello!</b>"),
+          HTML("Start in the left-hand sidebar by:")
+        ),
+        tags$p(
+          HTML("<b>1.</b> entering the names of the sets for comparison")
+        ),
+        tags$p(
+          HTML("<b>2.</b> uploading two <i>.csv</i> files with discrete values")
+        ),
+        tags$br(),
+        tags$p(
+          "After uploading at least two files, it will be possible to view and download the venn diagrams along with the unique values belonging to each set and their intersections."
+        ),
+        tags$hr(),
+        tags$p(
+          align="center",
+          HTML("<b>Helpful Tips</b>")
+        ),
+        tags$p(
+          HTML("<b>Tip 1:</b> The first column of the <i>.csv</i> files are expected to contain the set values for comparison (e.g., gene IDs).")
+        ),
+        tags$p(
+          HTML("<b>Tip 2:</b> It is possible to upload files that contain only a single column of values, since every column after the first is ignored.")
+        ),
+        tags$p(
+          HTML("<b>Tip 3:</b> Two files must be uploaded for a minimum comparison between two sets of values.")
+        ),
+        tags$p(
+          HTML("<b>Tip 4:</b> After uploading the first two files, it will be possible to compare up to four sets of values.")
+        ),
+      ),
+      
+      # results text and plots
+      conditionalPanel(
+        condition = "output.twoDataUploaded",
+        # set of tab panels
+        tabsetPanel(
+          type = "tabs",
+          tabPanel(
+            "Tips",
+            tags$h1(
+              align="center",
+              "Helpful Tips",
+              style = "
+                color: white; 
+                background: #78c2ad;
+                font-size: x-large;
+                font-family: Georgia, Arial, sans-serif;
+                border-color: #78c2ad;
+                border-width: 4px;
+                border-style: solid;
+                border-radius: 25px;
+              "
+            ),
+            tags$p(
+              HTML("<b>Tip 1:</b> The results may take several moments to appear depending on the size of the input data tables.")
+            ),
+            tags$p(
+              HTML("<b>Tip 2:</b> Navigate to the <i>Venn Diagrams</i> by clicking the tab at the top of the page.")
+            ),
+            tags$p(
+              HTML("<b>Tip 3:</b> It is possible to change the sets of values for comparison by changing the uploaded files in the left-hand side bar.")
+            ),
+            tags$p(
+              HTML("<b>Tip 4:</b> It is possible to compare up to four sets of values by uploading additional <i>.csv</i> files in the left-hand side bar.")
+            ),
+            tags$p(
+              HTML("<b>Tip 5:</b> Enter or change the names of each set in the left-hand side bar.")
+            )
+          ),
+          
+          # Venn Diagrams tab
+          tabPanel(
+            "Venn Diagrams",
+            tags$h1(
+              align="center",
+              "Venn Diagrams",
+              style = "
+                color: white; 
+                background: #78c2ad;
+                font-size: x-large;
+                font-family: Georgia, Arial, sans-serif;
+                border-color: #78c2ad;
+                border-width: 4px;
+                border-style: solid;
+                border-radius: 25px
+              "
+            ),
+            tags$p(
+              "Displayed below are venn diagrams for exploring the relationship between sets of discrete values. It is possible to download the diagrams along with the unique values belonging to each set and their intersections."
+            ),
+            tags$hr(),
+            tags$p(
+              align="center",
+              HTML("<b>Two-Way Venn Diagram</b>")
+            ),
+            plotOutput(outputId = "twoWayVenn"),
+            downloadButton(outputId = "twoWayVennDownload", label = "Download Plot"),
+            tags$p(
+              "The above two-way diagram shows the number and percentage of values that are contained in each of the input sets and their intersections."
+            ),
+            tags$br(),
+            fluidRow(
+              column(
+                width = 6,
+                tags$p(
+                  "Select a set or intersection:"
+                ),
+                selectInput(
+                  inputId = "twoWayCompare",
+                  label = NULL,
+                  choices = c("")
+                )
+              ),
+              column(
+                width = 6,
+                tags$p(
+                  "Download set or intersection:"
+                ),
+                downloadButton(outputId = "twoWayIntersections", label = "Download Table")
+              )
+            ),
+            # three-way venn
+            conditionalPanel(
+              condition = "output.threeDataUploaded",
+              tags$hr(),
+              tags$p(
+                align="center",
+                HTML("<b>Three-Way Venn Diagram</b>")
+              ),
+              plotOutput(outputId = "threeWayVenn"),
+              downloadButton(outputId = "threeWayVennDownload", label = "Download Plot"),
+              tags$p(
+                "The above three-way diagram shows the number and percentage of values that are contained in each of the input sets and their intersections."
+              ),
+              fluidRow(
+                column(
+                  width = 6,
+                  tags$p(
+                    "Select a set or intersection:"
+                  ),
+                  selectInput(
+                    inputId = "threeWayCompare",
+                    label = NULL,
+                    choices = c("")
+                  )
+                ),
+                column(
+                  width = 6,
+                  tags$p(
+                    "Download set or intersection:"
+                  ),
+                  downloadButton(outputId = "threeWayIntersections", label = "Download Table")
+                )
+              )
+            ),
+            # four-way venn
+            conditionalPanel(
+              condition = "output.fourDataUploaded",
+              tags$hr(),
+              tags$p(
+                align="center",
+                HTML("<b>Four-Way Venn Diagram</b>")
+              ),
+              plotOutput(outputId = "fourWayVenn"),
+              downloadButton(outputId = "fourWayVennDownload", label = "Download Plot"),   
+              tags$p(
+                "The above four-way diagram shows the number and percentage of values that are contained in each of the input sets and their intersections."
+              ),
+              fluidRow(
+                column(
+                  width = 6,
+                  tags$p(
+                    "Select a set or intersection:"
+                  ),
+                  selectInput(
+                    inputId = "fourWayCompare",
+                    label = NULL,
+                    choices = c("")
+                  )
+                ),
+                column(
+                  width = 6,
+                  tags$p(
+                    "Download set or intersection:"
+                  ),
+                  downloadButton(outputId = "fourWayIntersections", label = "Download Table")
+                )
+              )
+            )
+          ),
+          
+          # information tab
+          tabPanel(
+            "Information",
+            tags$h1(
+              align="center",
+              "Helpful Information",
+              style = "
+                color: white; 
+                background: #78c2ad;
+                font-size: x-large;
+                font-family: Georgia, Arial, sans-serif;
+                border-color: #78c2ad;
+                border-width: 4px;
+                border-style: solid;
+                border-radius: 25px
+              "
+            ),
+            tags$p(
+              "The latest version of this application may be downloaded from the freeCount ",
+              tags$a("GitHub",href = "https://github.com/ElizabethBrooks/freeCount"),
+              "."
+            ),
+            tags$p(
+              "Example sets of gene IDs are also provided on",
+              tags$a("GitHub", href = "https://github.com/ElizabethBrooks/freeCount/tree/main/data/ggVennDiagram"),
+              "."
+            ),
+            tags$h1(
+              align="center",
+              "Cite",
+              style = "
+                color: white; 
+                background: #78c2ad;
+                font-size: x-large;
+                font-family: Georgia, Arial, sans-serif;
+                border-color: #78c2ad;
+                border-width: 4px;
+                border-style: solid;
+                border-radius: 25px;
+              "
+            ),
+            tags$p("Elizabeth Mae Brooks, Sheri A Sanders, and Michael E Pfrender. 2024. FreeCount: A Coding Free Framework for Guided Count Data Visualization and Analysis. 
+                   In Practice and Experience in Advanced Research Computing 2024: Human Powered Computing (PEARC '24). 
+                   Association for Computing Machinery, New York, NY, USA, Article 37, 1–4. https://doi.org/10.1145/3626203.3670605")
+          )
+        )
+      )
+    )
+  )
+)
+
+#### Server ####
+
+# Define server 
+server <- function(input, output, session) {
+  # view and adjust themes
+  #bs_themer()
+  
+  ##
+  # Data Setup
+  ##
+  
+  # retrieve input data one
+  inputOneTable <- reactive({
+    # require input data
+    req(input$oneTable)
+    # check the input table is not null
+    if(is.null(input$oneTable)){
+      return(NULL)
+    }
+    # read the file
+    dataTableInput <- read.csv(file = input$oneTable$datapath, row.names=1)
+    # return data
+    namesSet <- rownames(dataTableInput)
+  })
+  
+  # retrieve input data two
+  inputTwoTable <- reactive({
+    # require input data
+    req(input$twoTable)
+    # check the input table is not null
+    if(is.null(input$twoTable)){
+      return(NULL)
+    }
+    # read the file
+    dataTableInput <- read.csv(file = input$twoTable$datapath, row.names=1)
+    # return data
+    namesSet <- rownames(dataTableInput)
+  })
+  
+  # retrieve input data three
+  inputThreeTable <- reactive({
+    # require input data
+    req(input$threeTable)
+    # check the input table is not null
+    if(is.null(input$threeTable)){
+      return(NULL)
+    }
+    # read the file
+    dataTableInput <- read.csv(file = input$threeTable$datapath, row.names=1)
+    # return data
+    namesSet <- rownames(dataTableInput)
+  })
+  
+  # retrieve input data four
+  inputFourTable <- reactive({
+    # require input data
+    req(input$fourTable)
+    # check the input table is not null
+    if(is.null(input$fourTable)){
+      return(NULL)
+    }
+    # read the file
+    dataTableInput <- read.csv(file = input$fourTable$datapath, row.names=1)
+    # return data
+    namesSet <- rownames(dataTableInput)
+  })
+  
+  # check if two files have been uploaded
+  output$twoDataUploaded <- function(){
+    # check the input tables are not null
+    if(is.null(inputOneTable())){
+      return(FALSE)
+    }else if(is.null(inputTwoTable())){
+      return(FALSE)
+    }
+    return(TRUE)
+  }
+  outputOptions(output, 'twoDataUploaded', suspendWhenHidden=FALSE)
+  
+  # check if three files have been uploaded
+  output$threeDataUploaded <- function(){
+    # check the input tables are not null
+    if(is.null(inputOneTable())){
+      return(FALSE)
+    }else if(is.null(inputTwoTable())){
+      return(FALSE)
+    }else if(is.null(inputThreeTable())){
+      return(FALSE)
+    }
+    return(TRUE)
+  }
+  outputOptions(output, 'threeDataUploaded', suspendWhenHidden=FALSE)
+  
+  # check if four files have been uploaded
+  output$fourDataUploaded <- function(){
+    # check the input tables are not null
+    if(is.null(inputOneTable())){
+      return(FALSE)
+    }else if(is.null(inputTwoTable())){
+      return(FALSE)
+    }else if(is.null(inputThreeTable())){
+      return(FALSE)
+    }else if(is.null(inputFourTable())){
+      return(FALSE)
+    }
+    return(TRUE)
+  }
+  outputOptions(output, 'fourDataUploaded', suspendWhenHidden=FALSE)
+  
+  # function to retrieve set intersections
+  retrieveCompareList <- function(namesList){
+    # create venn lists
+    vennList <- venn(namesList, show.plot = FALSE)
+    # retrieve intersections
+    listaAtt <- attributes(vennList)$intersections
+    # get list of set intersections
+    compareList <- names(listaAtt)
+  }
+  
+  # update inputs for two-way comparisons
+  observe({
+    # retrieve combined list of names
+    namesList <- createTwoWayList()
+    # get list of set intersections
+    compareList <- retrieveCompareList(namesList)
+    # update and set the two-way select items
+    updateSelectInput(
+      session, 
+      inputId = "twoWayCompare",
+      choices = compareList,
+      selected = compareList[1]
+    )
+  })
+  
+  # update inputs for three-way comparisons
+  observe({
+    # retrieve combined list of names
+    namesList <- createThreeWayList()
+    # get list of set intersections
+    compareList <- retrieveCompareList(namesList)
+    # update and set the two-way select items
+    updateSelectInput(
+      session, 
+      inputId = "threeWayCompare",
+      choices = compareList,
+      selected = compareList[1]
+    )
+  })
+  
+  # update inputs for four-way comparisons
+  observe({
+    # retrieve combined list of names
+    namesList <- createFourWayList()
+    # get list of set intersections
+    compareList <- retrieveCompareList(namesList)
+    # update and set the two-way select items
+    updateSelectInput(
+      session, 
+      inputId = "fourWayCompare",
+      choices = compareList,
+      selected = compareList[1]
+    )
+  })
+  
+  
+  ## 
+  # Venn Diagrams
+  ##
+  
+  # function to create two-way names list
+  createTwoWayList <- function(){
+    # retrieve set of row names
+    namesSetOne <- inputOneTable()
+    namesSetTwo <- inputTwoTable()
+    # create combined list of names
+    namesList <- list(setOne = namesSetOne, 
+                      setTwo = namesSetTwo
+    )
+  }
+  
+  # function to create venn diagrams
+  createVenn <- function(namesList, setList, colorList){
+    # create venn diagram
+    ggVennDiagram(namesList, label_alpha=0.25, category.names = setList) +
+      scale_x_continuous(expand = expansion(mult = .2)) +
+      scale_fill_gradientn(colors = colorList)
+  }
+  
+  # function to retrieve intersections from the venn diagram
+  retrieveVennSets <- function(namesList, compare){
+    # create venn lists
+    vennList <- venn(namesList, show.plot = FALSE)
+    # retrieve intersections
+    listaAtt <- attributes(vennList)$intersections
+    # get sets of values
+    listaAtt[names(listaAtt) == compare] 
+  }
+  
+  # function to render two-way venn
+  output$twoWayVenn <- renderPlot({
+    # retrieve combined list of names
+    namesList <- createTwoWayList()
+    # setup set list
+    setList <- c(input$setOne, input$setTwo)
+    # setup colorList
+    colorList <- c(plotColors[1], plotColors[2])
+    # create plot
+    createVenn(namesList, setList, colorList)
+  })
+  
+  # download handler for two-way venn
+  output$twoWayVennDownload <- downloadHandler(
+    filename = function() {
+      exportFile <- paste(input$setOne, input$setTwo, sep="_")
+      exportFile <- paste(exportFile, "twoWayVenn.png", sep="_")
+    },
+    content = function(file) {
+      # retrieve combined list of names
+      namesList <- createTwoWayList()
+      # setup set list
+      setList <- c(input$setOne, input$setTwo)
+      # setup colorList
+      colorList <- c(plotColors[1], plotColors[2])
+      # create plot
+      outVenn <- createVenn(namesList, setList, colorList)
+      # save plot
+      ggsave(file, plot = outVenn, device = "png")
+    }
+  )
+  
+  # download table with number of filtered genes
+  output$twoWayIntersections <- downloadHandler(
+    filename = function() {
+      # setup output file name
+      paste(input$twoWayCompare, "twoWayVenn.csv", sep = "_")
+    },
+    content = function(file) {
+      # retrieve combined list of names
+      namesList <- createTwoWayList()
+      # retrieve selected sets
+      compare <- input$twoWayCompare
+      # retrieve intersections values
+      resultsTbl <- retrieveVennSets(namesList, compare)
+      # output table
+      write.table(resultsTbl, file, sep=",", row.names=TRUE, quote=FALSE)
+    }
+  )
+  
+  
+  # function to create three-way names list
+  createThreeWayList <- function(){
+    # retrieve set of row names
+    namesSetOne <- inputOneTable()
+    namesSetTwo <- inputTwoTable()
+    namesSetThree <- inputThreeTable()
+    # create combined list of names
+    namesList <- list(setOne = namesSetOne, 
+                      setTwo = namesSetTwo,
+                      setThree = namesSetThree
+    )
+  }
+  
+  # function to render three-way venn
+  output$threeWayVenn <- renderPlot({
+    # retrieve combined list of names
+    namesList <- createThreeWayList()
+    # setup set list
+    setList <- c(input$setOne, input$setTwo, input$setThree)
+    # setup colorList
+    colorList <- c(plotColors[1], plotColors[2])
+    # create plot
+    createVenn(namesList, setList, colorList)
+  })
+  
+  # download handler for three-way venn
+  output$threeWayVennDownload <- downloadHandler(
+    filename = function() {
+      exportFile <- paste(input$setOne, input$setTwo, input$setThree, "threeWayVenn.png", sep="_")
+    },
+    content = function(file) {
+      # retrieve combined list of names
+      namesList <- createThreeWayList()
+      # setup set list
+      setList <- c(input$setOne, input$setTwo, input$setThree)
+      # setup colorList
+      colorList <- c(plotColors[1], plotColors[2])
+      # create plot
+      outVenn <- createVenn(namesList, setList, colorList)
+      # save plot
+      ggsave(file, plot = outVenn, device = "png")
+    }
+  )
+  
+  # download table with number of filtered genes
+  output$threeWayIntersections <- downloadHandler(
+    filename = function() {
+      # setup output file name
+      paste(input$threeWayCompare, "threeWayVenn.csv", sep = "_")
+    },
+    content = function(file) {
+      # retrieve combined list of names
+      namesList <- createThreeWayList()
+      # retrieve selected sets
+      compare <- input$threeWayCompare
+      # retrieve intersections values
+      resultsTbl <- retrieveVennSets(namesList, compare)
+      # output table
+      write.table(resultsTbl, file, sep=",", row.names=TRUE, quote=FALSE)
+    }
+  )
+  
+  
+  # function to create four-way names list
+  createFourWayList <- function(){
+    # retrieve set of row names
+    namesSetOne <- inputOneTable()
+    namesSetTwo <- inputTwoTable()
+    namesSetThree <- inputThreeTable()
+    namesSetFour <- inputFourTable()
+    # create combined list of names
+    namesList <- list(setOne = namesSetOne, 
+                      setTwo = namesSetTwo,
+                      setThree = namesSetThree,
+                      setFour = namesSetFour
+    )
+  }
+  
+  # function to render four-way venn
+  output$fourWayVenn <- renderPlot({
+    # retrieve combined list of names
+    namesList <- createFourWayList()
+    # setup set list
+    setList <- c(input$setOne, input$setTwo, input$setThree, input$setFour)
+    # setup colorList
+    colorList <- c(plotColors[1], plotColors[2])
+    # create plot
+    createVenn(namesList, setList, colorList)
+  })
+  
+  # download handler for four-way venn
+  output$fourWayVennDownload <- downloadHandler(
+    filename = function() {
+      exportFile <- paste(input$setOne, input$setTwo, input$setThree, input$setFour, "fourWayVenn.png", sep="_")
+    },
+    content = function(file) {
+      # retrieve combined list of names
+      namesList <- createFourWayList()
+      # setup set list
+      setList <- c(input$setOne, input$setTwo, input$setThree, input$setFour)
+      # setup colorList
+      colorList <- c(plotColors[1], plotColors[2])
+      # create plot
+      outVenn <- createVenn(namesList, setList, colorList)
+      # save plot
+      ggsave(file, plot = outVenn, device = "png")
+    }
+  )
+  
+  # download table with number of filtered genes
+  output$fourWayIntersections <- downloadHandler(
+    filename = function() {
+      # setup output file name
+      paste(input$fourWayCompare, "fourWayVenn.csv", sep = "_")
+    },
+    content = function(file) {
+      # retrieve combined list of names
+      namesList <- createFourWayList()
+      # retrieve selected sets
+      compare <- input$fourWayCompare
+      # retrieve intersections values
+      resultsTbl <- retrieveVennSets(namesList, compare)
+      # output table
+      write.table(resultsTbl, file, sep=",", row.names=TRUE, quote=FALSE)
+    }
+  )
+  
+}
+
+#### App Object ####
+
+# create the Shiny app object 
+shinyApp(ui = ui, server = server)
+
+# TO-DO: improve detail of output error messages (using console?)
+## https://stackoverflow.com/questions/34422342/show-warning-to-user-in-shiny-in-r
+# TO-DO: update set names diagram using the input names
+# TO-DO: consider adding data summary tab
+# TO-DO: add software version print out on information tab
+# TO-DO: make upload button appear after at least two sets are input
+# TO-DO: check if headers are accounted for
+# TO-DO: store data and results in reactiveVal and reactiveValues
+# TO-DO: add tutorial MD links to info tab
+# TO-DO: add/fix white background for getting started text
