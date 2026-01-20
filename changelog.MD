@@ -7,6 +7,7 @@ All notable changes to this project will be documented in this file.
 ### Added
 
 - All apps formatted for use with Posit Connect Cloud
+- Added icons to each app to help users differentiate the tools
 
 ## [1.1] - 14 March 2025
 

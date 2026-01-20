@@ -100,7 +100,15 @@ ui <- fluidPage(
   # add application title
   h1(id="app-heading", 
      tags$p(
-       "freeCount DA",
+       "freeCount DA2",
+       tags$i(
+         class = "fa fa-dna",
+         style = "color: white"
+       ),
+       tags$i(
+         class = "fa fa-dna",
+         style = "color: white"
+       ),
        style = "
           margin-top: 14px;
           margin-left: 25px; 

@@ -98,6 +98,14 @@ ui <- fluidPage(
   h1(id="app-heading", 
      tags$p(
        "freeCount SO",
+       tags$i(
+         class = "fa fa-circle",
+         style = "color: white"
+       ),
+       tags$i(
+         class = "fa-regular fa-circle",
+         style = "color: white"
+       ),
        style = "
           margin-top: 14px;
           margin-left: 25px; 

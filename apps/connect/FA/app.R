@@ -114,6 +114,10 @@ ui <- fluidPage(
   h1(id="app-heading", 
      tags$p(
        "freeCount FA",
+       tags$i(
+         class = "fa fa-cog",
+         style = "color: white"
+       ),
        style = "
           margin-top: 14px;
           margin-left: 25px; 
