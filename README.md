@@ -72,10 +72,22 @@ The typical user is a student or researcher who begins their journey as a novice
 > [!IMPORTANT]
 > The tutorials for using the applications or creating scripts for the different analyses can be found in the [tutorials](https://github.com/ElizabethBrooks/DGEAnalysis_ShinyApps/tree/main/tutorials) folder of this repository.
 
-Additional tutorials are available on the following pages of my website, go into further detail about the different analyses and other helpful information.
-* Helpful information for downloading the applications in this repository can be found in the tutorial [GitHub Version Control Quick Start Guide](https://morphoscape.wordpress.com/2024/02/28/github-version-control-quick-start-guide/).
-* A tutorial of the biostatistical analysis performed in this application is provided in [Downstream Bioinformatics Analysis of Omics Data with edgeR](https://morphoscape.wordpress.com/2022/08/09/downstream-bioinformatics-analysis-of-omics-data-with-edger/).
-* Gene tables were may be created from RNA-seq data as described in [Bioinformatics Analysis of Omics Data with the Shell & R](https://morphoscape.wordpress.com/2022/07/28/bioinformatics-analysis-of-omics-data-with-the-shell-r/).
+Additional tutorials are available on the following pages of my website, which go into further detail about the different analyses and other helpful information.
+
+### Getting Started
+
+* How to perform DE analysis to identify genes driving patterns of variation associated with groups of samples is described in [Differential Expression Analysis with freeCount](https://tinyurl.com/566nxzzu).
+* How to determine the functions of DE genes using functional analysis is shown in [Functional Analysis with freeCount](https://tinyurl.com/4d9xzt5b).
+* How to used WGCNA to investigate the function of genes at the system-level is described in [Network Analysis with freeCount](https://tinyurl.com/mstvx4a7).
+* How to determine the functions of genes associated with network modules is sown in [Functional Analysis of Networks with freeCount](https://tinyurl.com/9x78fknj).
+* How to use Venn diagrams to compare lists of things, such as DE genes or modules is described in [Set Operations with freeCount](https://tinyurl.com/2hdjyfts).
+* How to use Posit Connect Cloud to run the freeCount apps is shown in [Bioinformatics Analysis on Posit Connect Cloud with freeCount](https://tinyurl.com/y833vbn2).
+
+### Additional Tutorials
+
+* A walkthrough of a typical biostatistical analysis is provided in [Downstream Bioinformatics Analysis of Omics Data with edgeR](https://morphoscape.wordpress.com/2022/08/09/downstream-bioinformatics-analysis-of-omics-data-with-edger/).
+* Gene count tables may be created from RNA-seq data as described in [Bioinformatics Analysis of Omics Data with the Shell & R](https://morphoscape.wordpress.com/2022/07/28/bioinformatics-analysis-of-omics-data-with-the-shell-r/).
+* Helpful information for downloading this code repository can be found in the tutorial [GitHub Version Control Quick Start Guide](https://morphoscape.wordpress.com/2024/02/28/github-version-control-quick-start-guide/).
 
 ### Example Data Sets
 
