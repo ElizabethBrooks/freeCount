@@ -9,7 +9,7 @@ Elizabeth Mae Brooks, Sheri A Sanders, and Michael E Pfrender. 2024. FreeCount: 
 
 ## Tools & Features
 
-* **DA**: **D**E **A**nalysis
+* [freeCount **DA**](https://tinyurl.com/bdz27mzf): **D**E **A**nalysis
 	* Clustering analysis using distance based PCA and MDS
 	* Exact tests with edgeR
 	* ANOVA like analysis using GLMs with edgeR
@@ -17,19 +17,19 @@ Elizabeth Mae Brooks, Sheri A Sanders, and Michael E Pfrender. 2024. FreeCount: 
  		* to remove lowly-expressed genes
  		* by FDR adjusted p-value cut off
  		* by LFC cut off (exact tests only, since GLMs account for LFC cut offs)
-* **NA**: **N**etwork **A**nalysis
+* [freeCount **NA**](https://tinyurl.com/573zc6vv): **N**etwork **A**nalysis
 	* Clustering analysis using hierarchical clustering
 	* Unsigned networks with WGCNA
 	* Filtering to
  		* remove bad genes and samples
  		* select genes associated with particular modules
-* **FA**: **F**unctional **A**nalysis
+* [freeCount **FA**](https://tinyurl.com/knc335bd): **F**unctional **A**nalysis
 	* Over-representation analysis using Fisher's exact tests with topGO
 	* Enrichment like analysis using rank based Kolmogrov-Smirnov (KS) tests with topGO
 	* Filtering
  		* by unadjusted p-value cut off
  		* by candidate GO term list
-* **SO**: **S**et **O**perations
+* [freeCount **SO**](https://tinyurl.com/mr22u85h): **S**et **O**perations
 	* Venn diagrams with ggVennDiagram
 	* Extraction of subsets with gplots
 
