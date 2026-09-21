@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.4] - 21 September 2026
+
+### Added
+
+- Added the ability to upload a table of significant genes that can be used instead of a filter for the foreground set of genes
+- Added the batch functional analysis (BFA) and batch set operations (BSO) apps to the local, cloud, and connect directories
+
+## [1.3] - 24 April 2026
+
+### Added
+
+- Created batch functional analysis (BFA) and batch set operations (BSO) apps
+
 ## [1.2] - 19 January 2026
 
 ### Added

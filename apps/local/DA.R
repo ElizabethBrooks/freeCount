@@ -1,5 +1,5 @@
 # developer: Elizabeth Brooks
-# updated: 30 October 2025
+# updated: 21 April 2026
 
 #### Setup ####
 
@@ -85,6 +85,7 @@ defaultFDR <- 0.05
 defaultPairwiseDisp <- "auto"
 defaultGLMDisp <- "NULL"
 defaultExp <- "NA"
+inputExpression <- "NA"
 
 #### UI ####
 
@@ -103,17 +104,34 @@ ui <- fluidPage(
   
   # add application title
   h1(id="app-heading", 
-     tags$p(
-       "freeCount DA",
-       tags$i(
-         class = "fa fa-dna",
-         style = "color: white"
+     fluidRow(
+       column(
+         width = 6,
+         tags$p(
+           HTML("&emsp;"),
+           "freeCount DA",
+           tags$i(
+             class = "fa fa-dna",
+             style = "color: white"
+           ),
+           style = "
+            font-family: Georgia, Arial, sans-serif;
+            color: white
+            "
+         )
+       ),
+       column(
+         width = 6, 
+         align = "right",
+         "DE Analysis", 
+         HTML("&emsp;"),
+         style = "
+          font-family: Georgia, Arial, sans-serif;
+          color: white
+        "
        ),
        style = "
           margin-top: 14px;
-          margin-left: 25px; 
-          font-family: Georgia, Arial, sans-serif;
-          color: white
         "
      )
   ),
@@ -1023,7 +1041,7 @@ ui <- fluidPage(
             ),
             tags$p(
               "Example gene counts and experimental design tables are also provided on ",
-              tags$a("GitHub", href = "https://github.com/ElizabethBrooks/freeCount/tree/main/data/edgeR"),
+              tags$a("GitHub", href = "https://github.com/ElizabethBrooks/freeCount/tree/main/data/DA"),
               "."
             ),
             tags$p(
@@ -2390,3 +2408,6 @@ shinyApp(ui = ui, server = server)
 # TO-DO: add/fix white background for getting started text
 # TO-DO: add results table with sig and not-sig DEGs flagged for FA (based on both FDR and LFC)
 # TO-DO: update "Data Exploration" tab to "Exploration"
+# TO-DO: add ability to see raw counts for selected genes
+# TO-DO: use collapsible sections to reduce text -> make a CURE version of the apps with less features
+# TO-DO: check Download Report button for posit connect cloud

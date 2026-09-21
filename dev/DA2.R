@@ -81,6 +81,7 @@ defaultLFC <- 1.2
 defaultFDR <- 0.05
 defaultDes <- "NA"
 defaultExp <- "NA"
+inputExpression <- "NA"
 
 #### UI ####
 
@@ -1012,7 +1013,7 @@ ui <- fluidPage(
             ),
             tags$p(
               "Example gene counts and experimental design tables are also provided on ",
-              tags$a("GitHub", href = "https://github.com/ElizabethBrooks/freeCount/tree/main/data/edgeR"),
+              tags$a("GitHub", href = "https://github.com/ElizabethBrooks/freeCount/tree/main/data/DA2"),
               "."
             ),
             tags$p(

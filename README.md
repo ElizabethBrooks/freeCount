@@ -196,6 +196,17 @@ Significantly over-represented or enriched GO terms can be determined using the 
 
 The intersection of DE genes and modules can be identified by comparing the sets of genes placed in each network module to the set of DE genes. The genes contained in the intersections of sets are extracted using the venn function of the gplots R package (Warnes et al., 2022). The set relationships are visualized using the ggVennDiagram package (Gao et al., 2024).
 
+## Setup for Posit Connect Cloud
+
+Follow to generate a manifest.json for posit connect cloud (https://docs.posit.co/connect-cloud/how-to/r/dependencies.html).
+
+For example, run the following R code in the console:
+
+setwd("/Users/bamflappy/Repos/freeCount/apps/connect/FA")
+install.packages("rsconnect")
+library(rsconnect)
+writeManifest()
+
 ## Contributions & Acknowledgements
 
 These applications were developed by [Elizabeth Brooks](https://www.linkedin.com/in/elizabethmbrooks/) with the guidance and support of Sheri Sanders and Michael Pfrender.

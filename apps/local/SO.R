@@ -1,5 +1,5 @@
 # developer: Elizabeth Brooks
-# updated: 27 October 2025
+# updated: 21 April 2026
 
 #### Setup ####
 
@@ -87,21 +87,38 @@ ui <- fluidPage(
   
   # add application title
   h1(id="app-heading", 
-     tags$p(
-       "freeCount SO",
-       tags$i(
-         class = "fa fa-circle",
-         style = "color: white"
+     fluidRow(
+       column(
+         width = 6,
+         tags$p(
+           HTML("&emsp;"),
+           "freeCount SO",
+           tags$i(
+             class = "fa fa-circle",
+             style = "color: white"
+           ),
+           tags$i(
+             class = "fa-regular fa-circle",
+             style = "color: white"
+           ),
+           style = "
+            font-family: Georgia, Arial, sans-serif;
+            color: white
+            "
+         )
        ),
-       tags$i(
-         class = "fa-regular fa-circle",
-         style = "color: white"
+       column(
+         width = 6, 
+         align = "right",
+         "Set Operations", 
+         HTML("&emsp;"),
+         style = "
+          font-family: Georgia, Arial, sans-serif;
+          color: white
+        "
        ),
        style = "
           margin-top: 14px;
-          margin-left: 25px; 
-          font-family: Georgia, Arial, sans-serif;
-          color: white
         "
      )
   ),
@@ -128,15 +145,14 @@ ui <- fluidPage(
         label = NULL,
         value = "Set One"
       ),
-      # TO-DO: consider allowing other file types to be uploaded
       tags$p(
-        "Upload set one table (*.csv):"
+        "Upload set one table (*.txt or *.csv):"
       ),
       fileInput(
         "oneTable", 
         label = NULL,
         multiple = FALSE,
-        accept = ".csv"
+        accept = "text"
       ),
       tags$hr(),
       tags$p(
@@ -148,13 +164,13 @@ ui <- fluidPage(
         value = "Set Two"
       ),
       tags$p(
-        "Upload set two table (*.csv):"
+        "Upload set two table (*.txt or *.csv):"
       ),
       fileInput(
         "twoTable", 
         label = NULL,
         multiple = FALSE,
-        accept = ".csv"
+        accept = "text"
       ),
       conditionalPanel(
         condition = "output.twoDataUploaded",
@@ -168,13 +184,13 @@ ui <- fluidPage(
           value = "Set Three"
         ),
         tags$p(
-          "Upload set three table (*.csv):"
+          "Upload set three table (*.txt or *.csv):"
         ),
         fileInput(
           "threeTable", 
           label = NULL,
           multiple = FALSE,
-          accept = ".csv"
+          accept = "text"
         ),
         conditionalPanel(
           condition = "output.threeDataUploaded",
@@ -188,13 +204,13 @@ ui <- fluidPage(
             value = "Set Four"
           ),
           tags$p(
-            "Upload set four table (*.csv):"
+            "Upload set four table (*.txt or *.csv):"
           ),
           fileInput(
             "fourTable", 
             label = NULL,
             multiple = FALSE,
-            accept = ".csv"
+            accept = "text"
           )
         )
       ),
@@ -257,8 +273,9 @@ ui <- fluidPage(
         tags$p(
           HTML("<b>Tip 1:</b> The first column of the <i>.csv</i> files are expected to contain the set values for comparison (e.g., gene IDs).")
         ),
+        # TO-DO: double check
         tags$p(
-          HTML("<b>Tip 2:</b> It is possible to upload files that contain only a single column of values, since every column after the first is ignored.")
+          HTML("<b>Tip 2:</b> It is possible to upload files that contain multiple columns of values, since every column after the first is ignored.")
         ),
         tags$p(
           HTML("<b>Tip 3:</b> Two files must be uploaded for a minimum comparison between two sets of values.")
@@ -452,7 +469,7 @@ ui <- fluidPage(
             ),
             tags$p(
               "Example sets of gene IDs are also provided on",
-              tags$a("GitHub", href = "https://github.com/ElizabethBrooks/freeCount/tree/main/data/ggVennDiagram"),
+              tags$a("GitHub", href = "https://github.com/ElizabethBrooks/freeCount/tree/main/data/SO"),
               "."
             ),
             tags$h1(
@@ -872,3 +889,4 @@ shinyApp(ui = ui, server = server)
 # TO-DO: store data and results in reactiveVal and reactiveValues
 # TO-DO: add tutorial MD links to info tab
 # TO-DO: add/fix white background for getting started text
+# TO-DO: consider allowing other file types to be uploaded <- DONE

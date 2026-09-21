@@ -1,5 +1,5 @@
 # developer: Elizabeth Brooks
-# updated: 27 October 2025
+# updated: 21 April 2026
 
 #### Setup ####
 
@@ -92,17 +92,34 @@ ui <- fluidPage(
   
   # add application title
   h1(id="app-heading", 
-     tags$p(
-       "freeCount NA",
-       tags$i(
-         class = "fa fa-circle-nodes",
-         style = "color: white"
+     fluidRow(
+       column(
+         width = 6,
+         tags$p(
+           HTML("&emsp;"),
+           "freeCount NA",
+           tags$i(
+             class = "fa fa-circle-nodes",
+             style = "color: white"
+           ),
+           style = "
+            font-family: Georgia, Arial, sans-serif;
+            color: white
+            "
+         )
+       ),
+       column(
+         width = 6, 
+         align = "right",
+         "Network Analysis", 
+         HTML("&emsp;"),
+         style = "
+          font-family: Georgia, Arial, sans-serif;
+          color: white
+        "
        ),
        style = "
           margin-top: 14px;
-          margin-left: 25px; 
-          font-family: Georgia, Arial, sans-serif;
-          color: white
         "
      )
   ),
@@ -162,19 +179,17 @@ ui <- fluidPage(
         tags$p(
           "Click to Run Analysis:"
         ),  
-        actionButton("runAnalysis", "Run Analysis"),
-        tags$hr()
+        actionButton("runAnalysis", "Run Analysis")
       ),
       # show panel depending on input files check
       conditionalPanel(
-        condition = "input.runUpload && output.inputCheck",
-        tags$p(
-          "Design Table:"
-        ),     
+        condition = "input.runUpload && input.runAnalysis",
+        h4("Current Settings", align = "center"),
+        tags$hr(),
         fluidRow(
           align = "center",
-          # display input design table
-          tableOutput(outputId = "designTable")
+          # display input settings
+          tableOutput(outputId = "inputSettings")
         )
       )
     ),
@@ -583,14 +598,16 @@ ui <- fluidPage(
                 tags$p(
                   HTML("<b>Module Number Labels and Sizes:</b>")
                 ),
-                tableOutput(outputId = "moduleTable")
+                #tableOutput(outputId = "moduleTable")
+                downloadButton(outputId = "moduleTable", label = "Download Table")
               ),
               column(
                 width = 6,
                 tags$p(
                   HTML("<b>Module Color Labels and Sizes:</b>")
                 ),
-                tableOutput(outputId = "colorsTable")
+                #tableOutput(outputId = "colorsTable")
+                downloadButton(outputId = "colorsTable", label = "Download Table")
               )
             ),
             tags$br(),
@@ -731,7 +748,7 @@ ui <- fluidPage(
             ),
             tags$p(
               "Example normalized gene counts and experimental design tables are also provided on ",
-              tags$a("GitHub", href = "https://github.com/ElizabethBrooks/freeCount/tree/main/data/WGCNA"),
+              tags$a("GitHub", href = "https://github.com/ElizabethBrooks/freeCount/tree/main/data/NA"),
               "."
             ),
             tags$p(
@@ -963,7 +980,6 @@ server <- function(input, output, session) {
     )
   })
   
-  
   ##
   # Data Input and Cleaning
   ##
@@ -1176,6 +1192,25 @@ server <- function(input, output, session) {
       min=1, 
       max=testSizeMax,
       step=1
+    )
+  })
+  
+  # render table with input settings
+  output$inputSettings <- renderTable({
+    # create table with factor levels
+    settings <- data.frame(
+      Setting = c("Branch Cut Height", 
+                  "Minimum Branch Cluster Size", 
+                  "Soft Threholding Power Range", 
+                  "Soft Thresholding Power", 
+                  "Minimum Module Size", 
+                  "Module Eigengene Cut Height"),
+      Value = c(input$setCutHeight, 
+                input$setMinSize, 
+                input$setPowersRange, 
+                input$setPowers, 
+                input$setSize, 
+                input$setMEDissThres)
     )
   })
   
@@ -1539,8 +1574,8 @@ server <- function(input, output, session) {
                                 minClusterSize = minModuleSize)
   })
   
-  # function to render table of modules
-  output$moduleTable <- renderTable({
+  # function to create table of modules
+  createModuleTable <- function(){
     # retrieve modules
     dynamicMods <- findModules()
     # get table of results
@@ -1556,7 +1591,21 @@ server <- function(input, output, session) {
     colnames(infoTable) <- c("Module", "Size")
     # return table
     infoTable
-  })
+  }
+  
+  # download table with modules
+  output$moduleTable <- downloadHandler(
+    filename = function() {
+      # setup output file name
+      "moduleTable.csv"
+    },
+    content = function(file) {
+      # retrieve intersections values
+      resultsTbl <- createModuleTable()
+      # output table
+      write.table(resultsTbl, file, sep=",", row.names=FALSE, quote=FALSE)
+    }
+  )
   
   # function to convert module labels
   convertLabels <- function(){
@@ -1570,8 +1619,8 @@ server <- function(input, output, session) {
     dynamicColors = labels2colors(dynamicMods)
   }
   
-  # function to render table of colors
-  output$colorsTable <- renderTable({
+  # function to create table of colors
+  createColorsTable <- function(){
     # retrieve modules
     dynamicColors <- convertLabels()
     # get table of results
@@ -1587,7 +1636,21 @@ server <- function(input, output, session) {
     colnames(infoTable) <- c("Module", "Size")
     # return table
     infoTable
-  })
+  }
+  
+  # download table with colors
+  output$colorsTable <- downloadHandler(
+    filename = function() {
+      # setup output file name
+      "colorsTable.csv"
+    },
+    content = function(file) {
+      # retrieve intersections values
+      resultsTbl <- createColorsTable()
+      # output table
+      write.table(resultsTbl, file, sep=",", row.names=FALSE, quote=FALSE)
+    }
+  )
   
   # function to create plot of dendorgram with colors
   createPlotColorDendro <- function(){
@@ -1944,13 +2007,15 @@ shinyApp(ui = ui, server = server)
 # TO-DO: improve detail of output error messages (using console?)
 ## https://stackoverflow.com/questions/34422342/show-warning-to-user-in-shiny-in-r
 # TO-DO: consider adding data summary tab
-# TO-DO: replace design table in side bar with analysis settings
+# TO-DO: replace design table in side bar with analysis settings <- DONE
 # TO-DO: add update analysis buttons
 # TO-DO: add software version print out on information tab
-# TO-DO: store data and results in reactiveVal and reactiveValues
+# TO-DO: store data and results in reactive values
 # TO-DO: output example tables as csv
 # TO-DO: hide plots for invalid inputs
 # TO-DO: fix Windows OS images not showing
 ## https://stackoverflow.com/questions/38011285/image-not-showing-in-shiny-app-r
 # TO-DO: add tutorial MD links to info tab
 # TO-DO: add/fix white background for getting started text
+# TO-DO: add download buttons for the module and colors tables <- DONE
+# TO-DO: output module eigengene data with module numbers
